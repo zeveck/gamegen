@@ -1,0 +1,15 @@
+{
+  "name": "gamegen",
+  "owner": {
+    "name": "zeveck"
+  },
+  "description": "gamegen: make a complete, playable game from a description.",
+  "allowCrossMarketplaceDependenciesOn": ["imagegen2", "anim8gen", "audiogen", "nanogen"],
+  "plugins": [
+    {
+      "name": "gamegen",
+      "source": "./skills",
+      "description": "Describe a game and get a finished, play-tested one: designed, reviewed, illustrated, animated, scored and built. Requires and installs imagegen2, anim8gen, audiogen and nanogen."
+    }
+  ]
+}
