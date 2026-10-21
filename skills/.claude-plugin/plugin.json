@@ -1,19 +1,26 @@
 {
-  "name": "gamegen",
-  "version": "2026.10.20",
-  "description": "Make a complete, playable game from a description: designed, reviewed, illustrated, animated, scored, built and play-tested.",
+  "name": "gg",
+  "version": "2026.10.21",
+  "description": "/gamegen: make a complete, playable game from a description: designed, reviewed, illustrated, animated, scored, built and play-tested.",
   "author": {
     "name": "zeveck"
   },
   "homepage": "https://github.com/zeveck/gamegen",
   "repository": "https://github.com/zeveck/gamegen",
   "license": "MIT",
-  "keywords": ["game", "gamedev", "game-design", "sprites", "music", "web-game"],
+  "keywords": [
+    "game",
+    "gamedev",
+    "game-design",
+    "sprites",
+    "music",
+    "web-game"
+  ],
   "skills": "./gamegen",
   "dependencies": [
-    { "name": "imagegen2", "marketplace": "imagegen2" },
-    { "name": "anim8gen", "marketplace": "anim8gen" },
-    { "name": "audiogen", "marketplace": "audiogen" },
-    { "name": "nanogen", "marketplace": "nanogen" }
+    "imagegen2",
+    "anim8gen",
+    "audiogen",
+    "nanogen"
   ]
 }

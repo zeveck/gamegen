@@ -12,9 +12,15 @@ audiogen plugins for art and sound.
 - `skills/gamegen/SKILL.md` is the pipeline. Detail for each phase lives in
   `skills/gamegen/references/`, read by the skill when it reaches that phase.
   Keep SKILL.md readable end to end; move long detail into a reference file.
-- `.claude-plugin/marketplace.json` is the marketplace. It allowlists the four
-  companion marketplaces (`allowCrossMarketplaceDependenciesOn`); without that,
-  the dependencies don't install.
+- The plugin is named `gg`, so its skill shows as `/gg:gamegen` (and plain
+  `/gamegen`). The repository and marketplace are `gamegen`.
+- `.claude-plugin/marketplace.json` is the marketplace. It lists gamegen and
+  the four companion plugins (from their own repositories, via `git-subdir`),
+  so `/plugin install gg --marketplace zeveck/gamegen` installs everything.
+  anim8gen's imagegen2 dependency is declared on its entry here (anim8gen's
+  own `plugin.json` declares none, so each marketplace can supply its own).
+- `skills/gamegen/scripts/check-setup.sh` tests the API keys with free requests
+  before a run spends anything.
 
 ## Rules
 

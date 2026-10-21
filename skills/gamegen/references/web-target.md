@@ -38,8 +38,8 @@ it's vendored into `game/` (no CDNs), and only when it saves a lot of work; a
   `touch-action: none; user-select: none; overflow: hidden` on the body, and
   `preventDefault` on touch and key events the game uses (arrow keys and space
   scroll the page otherwise).
-- A title, description, theme color, favicon, apple-touch-icon, manifest link
-  and Open Graph tags with the social card.
+- A theme color, favicon, apple-touch-icon and manifest link, plus the title,
+  description and link-preview tags (see "Sharing and search" below).
 
 ## Drawing and scaling
 
@@ -164,6 +164,35 @@ self.addEventListener('fetch', event => {
     }))));
 });
 ```
+
+## Sharing and search
+
+Every web game gets these, so links to it look good and search engines
+understand it:
+
+- **A title and description**: `<title>` (the game's name and what it is, such
+  as "Hoard Hopper: a pixel dragon platformer") and a one or two sentence
+  `<meta name="description">` that makes someone want to play.
+- **Link previews**: Open Graph and Twitter tags (`og:title`,
+  `og:description`, `og:image` with its width, height and alt text,
+  `twitter:card` set to `summary_large_image`).
+- **A social card**: `social-card.jpg`, 1200x630, the image link previews show.
+  Make it from the game's own art, not as a new generated image:
+  1. Write `design/social-card.html`: a 1200x630 page with the game's title
+     art or a striking screenshot as the background, the main character, and
+     the game's name in its own font and colors (load them from `game/` with
+     relative paths). Keep the name large and away from the edges; previews
+     crop a little.
+  2. Screenshot it with `playwright-cli` at exactly 1200x630: serve the
+     project root on 127.0.0.1 only (it may hold `.env`), open the page,
+     `resize 1200 630`, `screenshot --filename=design/social-card.png`, then
+     stop that server.
+  3. Look at it, then save it as `game/social-card.jpg` (Pillow, quality
+     about 85).
+- **Once the game's web address is known** (the person tells you, or with
+  `--change` later): a `<link rel="canonical">`, absolute URLs in the preview
+  tags (some sites need them for the image), `robots.txt` and a one-page
+  `sitemap.xml`. Until then, leave those out rather than guess an address.
 
 ## The debug hook (for play-testing)
 

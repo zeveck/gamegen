@@ -6,7 +6,8 @@ description: >-
   sound effects with imagegen2, nanogen, anim8gen and audiogen, builds it (a
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
-argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--out <folder>]"
+argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--out <folder>]"
+allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(python3 -m http.server *), Bash(playwright-cli *)"
 ---
 
 # /gamegen — make a game from a description
@@ -53,6 +54,13 @@ looking at the work at once. Check that your tool list includes `Agent` (or
 
 ### 2. Read the request
 
+**Help.** If the arguments are exactly `help` (or `--help`), show the
+overview from `references/help.md` and stop. If they're exactly `help` and one
+option name and nothing else (with or without the dashes, such as
+`help style`), show that option's section and stop. Do nothing else in either
+case. Anything longer is a game idea: "help a lost robot find its way home" or
+"help scope out a haunted house".
+
 Arguments can come in any order. Everything that isn't a flag (or a flag's
 value) is the game description. Flags and defaults:
 
@@ -66,6 +74,7 @@ value) is the game description. Flags and defaults:
 | `--rounds` | design review rounds, 1 to 4 | `2` |
 | `--plan-only` | stop after the reviewed design, before spending anything on assets | off |
 | `--continue` | pick up an earlier run (after `--plan-only`, or one that was interrupted) | off |
+| `--change` | change a finished game: the words after it (other than other flags and their values) describe what to change | off |
 | `--out` | folder for the game | see below |
 
 The description can also carry these wishes in plain words ("for phones", "in
@@ -75,49 +84,90 @@ wins; note it in the design.
 
 **Where the game goes.** With `--out`, use that folder. Otherwise, make the
 game right here only if this folder is essentially empty: nothing but `.git`,
-`.devcontainer`, `.gitignore`, `.env`, `LICENSE`, and at most a placeholder
-`README.md` of a few lines (like the one GitHub makes for a new repository).
+`.devcontainer`, `.claude`, `.vscode`, `.playwright`, `.gitignore`, `.env`,
+`.DS_Store`, `LICENSE`, `CLAUDE.md`, and at most a placeholder `README.md` of a
+few lines (like the one GitHub makes for a new repository).
 Anything else, make a new folder named after the game (short and kebab-case,
 such as `hoard-hopper`). Never overwrite someone's files: an existing
 `README.md` with real content, their code, or an existing game (a folder with
 `design/GAME_DESIGN.md`, when `--continue` wasn't given) means a new folder.
 Say which folder you chose in your first update.
 
-**Continuing.** With `--continue`, find `design/STATUS.md` (in `--out`, the
-current folder, or the one game folder below it), read it and the design, and
-resume at the first unfinished phase. A description given with `--continue` is
-a note on what to change; apply it to the design before resuming.
+**Finding an existing game** (for `--continue` and `--change`): use `--out`
+if given. Otherwise the current folder, if it holds a game (a
+`design/STATUS.md`). Otherwise the game folders directly below it: if there's
+one, use it; if there are several, use the one changed most recently and say
+which in your first update (they can pick another with `--out`).
 
-### 3. Check the tools
+**Continuing.** With `--continue`, read the game's `design/STATUS.md` and
+design, and resume at the first unfinished phase. A description given with
+`--continue` is a note on what to change; apply it to the design before
+resuming. On a finished game, treat it as `--change`.
 
-Find out what's available, without printing any secret values:
+**Changing a finished game.** `--change <what to change>` (or `--continue`
+with notes, on a finished game) means: keep everything they didn't mention,
+and change what they asked for, whether it's small (the font, the title, one
+character's look) or big (a new level, a double jump, a boss, publishing at a
+web address). If there's no game, say so and suggest starting one; if the
+game isn't finished yet, suggest `--continue`. Then:
 
-- **The four plugins.** Confirm the `imagegen2`, `nanogen`, `anim8gen` and
-  `audiogen` skills are available to you. They come with gamegen; if one is
-  missing, plan around it and mention it in the report.
-- **API keys.** Each generator needs a key, read from the environment or from
-  a `.env` file: in the folder where `/gamegen` was run, or up from there to
-  the top of the project (check for the key's name only, e.g. with
-  `grep -c '^OPENAI_API_KEY=' .env`, never printing its value). If the game
-  goes in a new folder and the keys are in a `.env` above it, run the
-  generators from the folder that has the `.env`, or point them at it as their
-  skills describe:
-  - `OPENAI_API_KEY`: imagegen2, and anim8gen (which draws with imagegen2)
-  - `GEMINI_API_KEY` or `GOOGLE_API_KEY`: nanogen
-  - `ELEVENLABS_API_KEY`: audiogen
-- **anim8gen's helpers** need `python3` with Pillow
-  (`python3 -c "import PIL"`).
-- **Play-testing** uses `playwright-cli` when it's installed (the zeveck dev
-  container has it). Without it, see `references/playtest-guide.md` for the
-  fallback.
+1. Update the design with the change, and follow it through: a new title also
+   means the title screen, logo, app name and icon labels, social card and
+   README; new art matches the style anchor and style line.
+2. For anything that changes how the game plays, run one short design review
+   round on the change.
+3. Make only the assets the change needs. Each change gets its own budget:
+   `--budget` if given now, otherwise the default $20.
+4. Build it, play-test what changed, and replay every level's solution to make
+   sure nothing else broke.
+5. Wrap up as usual: update the README and screenshots, start the game, and
+   report with a fresh link and what changed.
 
-Adapt instead of failing. No image keys at all (or `--budget 0`): draw the
-art in code (clean vector shapes, procedural patterns) and say so up front in
-the report. No `ELEVENLABS_API_KEY`: make sound effects and simple music with
-the Web Audio API (for web games), or ship without sound for other targets.
-Only one image key: use that tool for everything; without `OPENAI_API_KEY`
-there's no anim8gen, so characters get a few drawn poses or code animation.
-Write these decisions into the design.
+### 3. Check everything works, before spending anything
+
+Run the setup check from the folder `/gamegen` was run in:
+
+```bash
+bash "${CLAUDE_SKILL_DIR}/scripts/check-setup.sh"
+```
+
+It tests each API key with a free request (never printing it), using the
+environment or the nearest `.env` file in that folder or above it, and checks
+Python with Pillow and `playwright-cli`:
+
+- `OPENAI_API_KEY`: imagegen2, and anim8gen (which draws with imagegen2)
+- `GEMINI_API_KEY` or `GOOGLE_API_KEY`: nanogen
+- `ELEVENLABS_API_KEY`: audiogen (the check also reports the account's tier;
+  free-tier audio must credit ElevenLabs)
+
+**Every key the game needs must pass before anything else happens.** If one is
+missing or refused, stop right there, before any design work or spending, and
+tell the person in plain words: which service, what the check said, and how
+to fix it (get a key from platform.openai.com, aistudio.google.com or
+elevenlabs.io, and add it to `.env` in this folder). Don't quietly fall back
+to something worse.
+
+A key isn't needed only when the person has said so:
+
+- `--budget 0`, or a request like "draw the art in code": no image keys.
+- "No music", "no sound", "silent": no ElevenLabs key. ("Make the sounds in
+  code" means effects synthesized with Web Audio.)
+- "Only use OpenAI" (or Gemini) for the art: that one image key.
+
+Without `OPENAI_API_KEY` there's no anim8gen, so characters get a few drawn
+poses or code animation. If Pillow is missing, install it
+(`python3 -m pip install --user pillow`) and say so. If `playwright-cli` is
+missing, play-testing uses the fallback in `references/playtest-guide.md`.
+
+Confirm the four plugins' skills (`imagegen2`, `nanogen`, `anim8gen`,
+`audiogen`) are available to you; they install with gamegen. When the game
+goes in a new folder below the one with `.env`, run the generators from the
+folder that has the `.env`, with output paths pointing into the game folder.
+
+Later, if a generator fails partway through for a reason a retry won't fix
+(the key stops working, credits run out), stop generating and tell the person
+what happened and how to fix it, then pick up with `--continue` once they
+have. Don't swap in code-drawn art unless they agree.
 
 ### 4. Start the progress file
 
@@ -274,30 +324,52 @@ second round only if the first found must-fix problems.
 
 ## Phase 8 — Wrap up
 
-1. **Write the game's README** from `references/readme-template.md`: what the
+1. **Make the social card and check the page's details** (web games): the
+   1200x630 image link previews show, made from the game's own art and
+   screenshotted with `playwright-cli`, plus the title, description and
+   preview tags. See "Sharing and search" in `references/web-target.md`.
+2. **Write the game's README** from `references/readme-template.md`: what the
    game is, how to play on desktop and phone, screenshots, how to run it, and
    how it was made (the original request and the plugins that made the art and
    sound).
-2. **For web games in a git repository,** add the GitHub Pages workflow from
-   `references/web-target.md` at the repository's root (unless it already
-   publishes a Pages site), so turning on Pages publishes the game.
-3. **Tick off `design/STATUS.md`.**
-4. **Report to the person,** briefly and in plain language (no talk of
+3. **Add the GitHub Pages workflow** (web games) from
+   `references/web-target.md`, so publishing is just a push and a switch. If
+   the game folder is inside a git repository, put it at that repository's
+   root (unless the repository already publishes a Pages site, in which case
+   skip it and say so). If it isn't, put it at the game folder's root, which
+   becomes the repository's root when they push it.
+4. **Start the game for them** (web games). Serve the game folder and leave it
+   running, so the report ends with a link they can click:
+   - Pick a free port: try 8000, then 8001 and up, checking each with
+     `python3 -c "import socket; socket.socket().bind(('127.0.0.1', PORT))"`.
+     If an earlier run in this session already serves this game, reuse it.
+   - Start `python3 -m http.server <port> --bind 127.0.0.1 --directory <game folder>/game`
+     with the Bash tool's `run_in_background` option (not `&` or `nohup`),
+     so it keeps running after you finish.
+   - Fetch the address once (`curl -s -o /dev/null -w '%{http_code}'`) to make
+     sure it loads.
+5. **Tick off `design/STATUS.md`.**
+6. **Report to the person,** briefly and in plain language (no talk of
    phases, agents, service workers or other machinery):
    - The game's name, one line about it, and the folder it's in.
-   - How to play it right now: the two commands to start a small local web
-     server and the address to open, with a word on why (browsers won't run a
-     game opened by double-clicking the file). If you're inside a dev
-     container, add that on their computer they can run `dc forward <port>`
-     in the project folder, then open `http://localhost:<port>` (and
-     `dc forward <port> --network` to try it on a phone on the same Wi-Fi).
+   - **For web games, the link to play it now,** first and on its own line:
+     `http://localhost:<port>`. If you're in a dev container: VS Code forwards
+     it to their computer (if the link doesn't open, the Ports tab shows where
+     it went); with `dc`, they first run `dc forward <port>` in the project
+     folder on their computer (and `dc forward <port> --network` to try it on
+     a phone on the same Wi-Fi). It keeps running while Claude Code is open.
+   - How to start it again another time: the two commands to serve the game
+     folder (`cd <game folder>/game`, then `python3 -m http.server 8000`),
+     with a word on why (browsers won't run a game opened by double-clicking
+     the file).
+   - **For other targets,** instead: how to open and run the project in its
+     engine, and clearly what couldn't be play-tested here.
    - What's in it (levels, characters, music) and the controls.
    - What it cost, against the estimate.
-   - Anything that didn't make it in, or doesn't work, said plainly. For
-     targets other than web, say clearly what couldn't be play-tested here.
-   - How to share it: push the folder to GitHub and turn on Pages (Settings,
-     Pages, Source: GitHub Actions).
+   - Anything that didn't make it in, or doesn't work, said plainly.
+   - How to share it (web games): push the folder to GitHub and turn on Pages
+     (Settings, Pages, Source: GitHub Actions).
    - Two or three ideas for what to add next, as ready-to-paste commands
-     (`/gamegen --continue add a boss at the end of the last cave`).
+     (`/gamegen --change add a boss at the end of the last cave`).
 
 Keep the report short and enthusiastic but honest. The game is the star.

@@ -3,13 +3,33 @@
   "owner": {
     "name": "zeveck"
   },
-  "description": "gamegen: make a complete, playable game from a description.",
-  "allowCrossMarketplaceDependenciesOn": ["imagegen2", "anim8gen", "audiogen", "nanogen"],
+  "description": "gamegen: make a complete, playable game from a description, with the art and sound tools it uses.",
   "plugins": [
     {
-      "name": "gamegen",
+      "name": "gg",
       "source": "./skills",
-      "description": "Describe a game and get a finished, play-tested one: designed, reviewed, illustrated, animated, scored and built. Requires and installs imagegen2, anim8gen, audiogen and nanogen."
+      "description": "/gamegen: describe a game and get a finished, play-tested one: designed, reviewed, illustrated, animated, scored and built. Installs imagegen2, anim8gen, audiogen and nanogen with it."
+    },
+    {
+      "name": "imagegen2",
+      "source": { "source": "git-subdir", "url": "https://github.com/zeveck/imagegen2.git", "path": "skills" },
+      "description": "Game art with OpenAI GPT Image: sprites, tiles, icons, with clean transparent backgrounds."
+    },
+    {
+      "name": "anim8gen",
+      "source": { "source": "git-subdir", "url": "https://github.com/zeveck/anim8gen.git", "path": ".codex/skills" },
+      "description": "Short game sprite animations, drawn with imagegen2.",
+      "dependencies": ["imagegen2"]
+    },
+    {
+      "name": "audiogen",
+      "source": { "source": "git-subdir", "url": "https://github.com/zeveck/audiogen.git", "path": "skills" },
+      "description": "Game music, sound effects and voices with ElevenLabs."
+    },
+    {
+      "name": "nanogen",
+      "source": { "source": "git-subdir", "url": "https://github.com/zeveck/nanogen.git", "path": "skills" },
+      "description": "Game art with Google Gemini (Nano Banana): backgrounds, scenery, tiles and items."
     }
   ]
 }
