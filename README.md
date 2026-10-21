@@ -5,63 +5,14 @@
 gamegen is a [Claude Code](https://claude.com/claude-code) plugin that turns one line into a finished, playable game. It plans the game, has a team of review agents poke holes in the design and polish it, makes all the art, animation, music and sound effects, builds it, plays every level to make sure it works, and tells you when it's ready.
 
 ```
-/gamegen a tiny dragon who hops through caves collecting treasure for his hoard
+/gamegen a frog who hops between lily pads before they sink
 ```
 
 By default you get a web game that plays on desktop and on phones, with nothing to install: open it in a browser, or publish it free on GitHub Pages.
 
-[![Hoard Hopper's title screen](https://raw.githubusercontent.com/zeveck/hoardhopper/main/media/screenshots/title.png)](https://github.com/zeveck/hoardhopper)
-
-gamegen grew out of [Hoard Hopper](https://github.com/zeveck/hoardhopper) (above), a dragon platformer made from a single request with the same four plugins gamegen uses. gamegen packages up how that game was made, so every game gets the same care: a reviewed design, consistent art, real music, and a full play-test before it's called done.
-
-## What it uses
-
-gamegen does the planning, building and testing itself, and uses four companion plugins for the art and sound:
-
-| Plugin | What it makes |
-|---|---|
-| [nanogen](https://github.com/zeveck/nanogen) | Backgrounds, scenery, tiles, items (Google Gemini) |
-| [imagegen2](https://github.com/zeveck/imagegen2) | Characters and sprites with clean transparent edges, icons (OpenAI GPT Image) |
-| [anim8gen](https://github.com/zeveck/anim8gen) | Character animations: running, jumping, idling, attacking |
-| [audiogen](https://github.com/zeveck/audiogen) | Music and sound effects (ElevenLabs) |
-
-gamegen installs them for you.
-
-## Before you start
-
-- [Claude Code](https://claude.com/claude-code)
-- [Node.js](https://nodejs.org/) and Python 3 (the art and sound plugins use them)
-- At least one API key (below)
-
-gamegen plays your game in a real browser to test it, using `playwright-cli`, which comes with the [zeveck dev container](https://github.com/zeveck/devcontainers). Without it, gamegen tries Playwright, and if that's not possible either, it tells you the game wasn't play-tested in a browser.
-
-## Install
-
-In Claude Code, add the companion plugins' marketplaces, then install gamegen (which installs the four plugins too):
-
-```
-/plugin marketplace add zeveck/imagegen2
-/plugin marketplace add zeveck/anim8gen
-/plugin marketplace add zeveck/audiogen
-/plugin marketplace add zeveck/nanogen
-/plugin install gamegen --marketplace zeveck/gamegen
-```
-
-Already have the four plugins? Just run the last line.
-
-## Your API keys
-
-The plugins make art and sound with online services, so they need your keys. You get them from each service's website: [OpenAI](https://platform.openai.com/), [Google AI Studio](https://aistudio.google.com/) and [ElevenLabs](https://elevenlabs.io/). Put them in a `.env` file in the folder where you'll make the game (and keep that file out of git):
-
-```
-OPENAI_API_KEY=...       # imagegen2 and anim8gen
-GEMINI_API_KEY=...       # nanogen
-ELEVENLABS_API_KEY=...   # audiogen
-```
-
-**One key is enough to start.** With just an OpenAI key, gamegen makes all the art and the animations with it, and makes simple sound effects in code. Add the others for more variety and real music. With no keys at all, gamegen draws everything in code. Either way, it tells you what it did.
-
 ## Make a game
+
+Once it's [installed](#install), type your idea:
 
 ```
 /gamegen <your idea>
@@ -131,6 +82,53 @@ then open http://localhost:8000.
 
 Working in a [zeveck dev container](https://github.com/zeveck/devcontainers)? On your computer, run `dc forward 8000` in the project folder, then open `http://localhost:8000`. Add `--network` to try it on your phone over Wi-Fi.
 
+## What it uses
+
+gamegen does the planning, building and testing itself, and uses four companion plugins for the art and sound:
+
+| Plugin | What it makes |
+|---|---|
+| [nanogen](https://github.com/zeveck/nanogen) | Backgrounds, scenery, tiles, items (Google Gemini) |
+| [imagegen2](https://github.com/zeveck/imagegen2) | Characters and sprites with clean transparent edges, icons (OpenAI GPT Image) |
+| [anim8gen](https://github.com/zeveck/anim8gen) | Character animations: running, jumping, idling, attacking |
+| [audiogen](https://github.com/zeveck/audiogen) | Music and sound effects (ElevenLabs) |
+
+gamegen installs them for you.
+
+## Before you start
+
+- [Claude Code](https://claude.com/claude-code)
+- [Node.js](https://nodejs.org/) and Python 3 (the art and sound plugins use them)
+- At least one API key (below)
+
+gamegen plays your game in a real browser to test it, using `playwright-cli`, which comes with the [zeveck dev container](https://github.com/zeveck/devcontainers). Without it, gamegen tries Playwright, and if that's not possible either, it tells you the game wasn't play-tested in a browser.
+
+## Install
+
+In Claude Code, add the companion plugins' marketplaces, then install gamegen (which installs the four plugins too):
+
+```
+/plugin marketplace add zeveck/imagegen2
+/plugin marketplace add zeveck/anim8gen
+/plugin marketplace add zeveck/audiogen
+/plugin marketplace add zeveck/nanogen
+/plugin install gamegen --marketplace zeveck/gamegen
+```
+
+Already have the four plugins? Just run the last line.
+
+## Your API keys
+
+The plugins make art and sound with online services, so they need your keys. You get them from each service's website: [OpenAI](https://platform.openai.com/), [Google AI Studio](https://aistudio.google.com/) and [ElevenLabs](https://elevenlabs.io/). Put them in a `.env` file in the folder where you'll make the game (and keep that file out of git):
+
+```
+OPENAI_API_KEY=...       # imagegen2 and anim8gen
+GEMINI_API_KEY=...       # nanogen
+ELEVENLABS_API_KEY=...   # audiogen
+```
+
+**One key is enough to start.** With just an OpenAI key, gamegen makes all the art and the animations with it, and makes simple sound effects in code. Add the others for more variety and real music. With no keys at all, gamegen draws everything in code. Either way, it tells you what it did.
+
 ## How it works
 
 1. **Brief.** gamegen reads your idea, looks up any style references, and writes a one-page creative brief.
@@ -156,6 +154,12 @@ gamegen also uses your Claude Code usage while it works, which for a whole game 
 - **Look at the design first** with `--plan-only` when you have strong opinions.
 - **Keep your keys in `.env`** and that file out of git.
 - **Style references inspire, they don't copy.** A link or a game's name sets the mood, look and feel; gamegen always makes original characters, art, music and names.
+
+## An example: Hoard Hopper
+
+[![Hoard Hopper's title screen](https://raw.githubusercontent.com/zeveck/hoardhopper/main/media/screenshots/title.png)](https://github.com/zeveck/hoardhopper)
+
+[Hoard Hopper](https://github.com/zeveck/hoardhopper) is a dragon platformer made from a single request with the same four plugins gamegen uses: four scrolling caves, animated characters, a theme for each cave, and a pile of treasure that grows every time you play. gamegen packages up how it was made, so every game gets the same care: a reviewed design, consistent art, real music, and a full play-test before it's called done.
 
 ## Development
 
