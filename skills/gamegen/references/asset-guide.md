@@ -157,9 +157,16 @@ Spend in order:
 - **Fonts:** use a font under the SIL Open Font License (Google Fonts has
   many), bundle the font file in the game, and copy its license file next to
   it.
-- **ElevenLabs:** audio made on ElevenLabs' free tier must credit ElevenLabs
-  (see audiogen's licensing notes). Say so in the game's README credits, unless
-  the person's account is a paid one.
+- **ElevenLabs:** only audio made on ElevenLabs' free plan must credit
+  ElevenLabs. Go by the plan the setup check reported (it's in
+  `design/STATUS.md`), never by guessing:
+  - `free`: add "Music and sound effects created with ElevenLabs." to the
+    README's credits.
+  - any other plan (`starter`, `creator`, `pro` and so on): no credit line, and
+    nothing about it in the report.
+  - unknown (the key couldn't read the account): no credit line, and one plain
+    line in the report: "If your ElevenLabs plan is the free one, add a credit
+    to ElevenLabs in the README."
 
 ## Where files go
 

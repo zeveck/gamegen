@@ -137,8 +137,9 @@ Python with Pillow and `playwright-cli`:
 
 - `OPENAI_API_KEY`: imagegen2, and anim8gen (which draws with imagegen2)
 - `GEMINI_API_KEY` or `GOOGLE_API_KEY`: nanogen
-- `ELEVENLABS_API_KEY`: audiogen (the check also reports the account's tier;
-  free-tier audio must credit ElevenLabs)
+- `ELEVENLABS_API_KEY`: audiogen. The check also reports the account's plan
+  (`tier`). Write it in `design/STATUS.md`: only the free plan's audio needs a
+  credit (see asset-guide.md), so later steps go by this, never a guess.
 
 **Every key the game needs must pass before anything else happens.** If one is
 missing or refused, stop right there, before any design work or spending, and

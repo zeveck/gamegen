@@ -63,9 +63,9 @@ then open http://localhost:8000.
 
 ## Credits
 
-<The font, with its license (bundled next to the font file). Music and sound
-made on ElevenLabs' free tier: "Music and sound effects created with
-ElevenLabs." Anything else bundled, with its license.>
+<The font, with its license (bundled next to the font file). Only if the
+setup check reported ElevenLabs' free plan: "Music and sound effects created
+with ElevenLabs." Anything else bundled, with its license.>
 ```
 
 For targets other than web, replace "Playing locally" with how to open and run
