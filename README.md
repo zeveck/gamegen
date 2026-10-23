@@ -139,7 +139,7 @@ GEMINI_API_KEY=...       # nanogen
 ELEVENLABS_API_KEY=...   # audiogen
 ```
 
-Before it starts, gamegen tries each key with a free request. If one is missing or doesn't work, it stops right away, before spending anything, and tells you how to fix it.
+Before it starts, gamegen tries each key with a free request. If one is missing or doesn't work, it stops right away, before spending anything, and tells you how to fix it. No `.env` yet? gamegen makes one for you, with links to where you get each key, and keeps it out of git: just paste your keys in and run your command again.
 
 Don't have all three? Say what to do without one in your idea: "no music" or "no sound" skips ElevenLabs, "only use OpenAI for the art" skips Gemini, and `--budget 0` needs no keys at all (everything is drawn and made in code).
 

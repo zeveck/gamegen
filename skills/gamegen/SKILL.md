@@ -7,7 +7,7 @@ description: >-
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
 argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--out <folder>]"
-allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(python3 -m http.server *), Bash(playwright-cli *)"
+allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(python3 -m http.server *), Bash(playwright-cli *)"
 ---
 
 # /gamegen — make a game from a description
@@ -143,9 +143,22 @@ Python with Pillow and `playwright-cli`:
 **Every key the game needs must pass before anything else happens.** If one is
 missing or refused, stop right there, before any design work or spending, and
 tell the person in plain words: which service, what the check said, and how
-to fix it (get a key from platform.openai.com, aistudio.google.com or
-elevenlabs.io, and add it to `.env` in this folder). Don't quietly fall back
-to something worse.
+to fix it. Don't quietly fall back to something worse.
+
+When keys are missing, first run
+
+```bash
+bash "${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh"
+```
+
+It creates a `.env` with a line for each key and where to get it (or adds
+lines for just the missing keys to an existing `.env`, leaving the rest
+alone), and lists `.env` in the `.gitignore` beside it so keys never get
+committed. Then tell them, for example: "I've made a `.env` file in this
+folder for your keys, with links to where you get each one. Paste them in,
+save, and run your `/gamegen` command again." When a key is refused, say it
+looks wrong or expired, and where to get a new one (the links are in that
+file).
 
 A key isn't needed only when the person has said so:
 

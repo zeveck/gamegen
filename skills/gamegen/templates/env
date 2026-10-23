@@ -1,0 +1,18 @@
+# API keys for the tools gamegen uses to make art and sound.
+# Paste each key right after its = sign (no spaces, no quotes needed), save,
+# and run /gamegen again.
+#
+# This file holds secrets. It's listed in .gitignore so it never gets
+# committed; keep it that way.
+
+# OpenAI, for characters, sprites and animations (imagegen2, anim8gen).
+# Get a key at https://platform.openai.com/api-keys
+OPENAI_API_KEY=
+
+# Google Gemini, for backgrounds, scenery and items (nanogen).
+# Get a key at https://aistudio.google.com/apikey
+GEMINI_API_KEY=
+
+# ElevenLabs, for music and sound effects (audiogen).
+# Get a key at https://elevenlabs.io/app/developers/api-keys
+ELEVENLABS_API_KEY=

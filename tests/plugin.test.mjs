@@ -171,6 +171,72 @@ test('setup check: finds the .env in a folder above', (t) => {
   assert.match(r.stdout, /elevenlabs \(audiogen\): ok \(tier: free, 9,900 of 10,000 credits left\)/);
 });
 
+// prepare-env.sh, run in a scratch folder.
+const PREPARE = join(ROOT, 'skills/gamegen/scripts/prepare-env.sh');
+// HOME is a separate empty folder unless a test says otherwise.
+function prepare(cwd, home) {
+  const tmpHome = home ? null : scratch();
+  try {
+    return spawnSync('bash', [PREPARE], { cwd, encoding: 'utf8', env: { PATH: '/usr/bin:/bin', HOME: home || tmpHome } });
+  } finally {
+    if (tmpHome) rmSync(tmpHome, { recursive: true, force: true });
+  }
+}
+
+test('prepare-env: makes a .env from the template and keeps it out of git', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const r = prepare(dir);
+  assert.equal(r.status, 0, r.stderr);
+  const env = readFileSync(join(dir, '.env'), 'utf8');
+  for (const key of ['OPENAI_API_KEY', 'GEMINI_API_KEY', 'ELEVENLABS_API_KEY']) assert.match(env, new RegExp(`^${key}=$`, 'm'), key);
+  assert.match(readFileSync(join(dir, '.gitignore'), 'utf8'), /^\.env$/m);
+  // Running it again changes nothing.
+  prepare(dir);
+  assert.equal(readFileSync(join(dir, '.env'), 'utf8'), env);
+  assert.equal((readFileSync(join(dir, '.gitignore'), 'utf8').match(/^\.env$/gm) || []).length, 1);
+  // And the setup check then reports the empty placeholders as missing.
+  assert.equal((runCheck(dir).stdout.match(/: missing [A-Z_]+_API_KEY/g) || []).length, 3);
+});
+
+test('prepare-env: adds only the missing keys to an existing .env, keeping the rest', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-keep-this\nOTHER=1');
+  writeFileSync(join(dir, '.gitignore'), 'node_modules');
+  const sub = join(dir, 'games'); mkdirSync(sub);
+  const r = prepare(sub);
+  assert.equal(r.status, 0, r.stderr);
+  const env = readFileSync(join(dir, '.env'), 'utf8');
+  assert.ok(env.startsWith('OPENAI_API_KEY=sk-keep-this\nOTHER=1\n'), env);
+  assert.match(env, /^GEMINI_API_KEY=$/m);
+  assert.match(env, /^ELEVENLABS_API_KEY=$/m);
+  assert.equal((env.match(/OPENAI_API_KEY/g) || []).length, 1);
+  assert.equal(readFileSync(join(dir, '.gitignore'), 'utf8'), 'node_modules\n.env\n');
+  assert.ok(!r.stdout.includes('sk-keep-this'), 'never prints a key');
+  assert.ok(!existsSync(join(sub, '.env')), 'no second .env');
+});
+
+test('prepare-env: leaves a .env above the git repository alone', (t) => {
+  const top = scratch(); t.after(() => rmSync(top, { recursive: true, force: true }));
+  writeFileSync(join(top, '.env'), 'OPENAI_API_KEY=x\n');
+  const proj = join(top, 'proj'); mkdirSync(proj);
+  spawnSync('git', ['init', '-q', proj]);
+  const r = prepare(proj);
+  assert.equal(r.status, 0, r.stderr);
+  assert.equal(readFileSync(join(top, '.env'), 'utf8'), 'OPENAI_API_KEY=x\n');
+  assert.ok(!existsSync(join(top, '.gitignore')), 'no .gitignore above the repository');
+  assert.match(r.stdout, /outside this project/);
+});
+
+test('prepare-env: leaves ~/.env alone', (t) => {
+  const home = scratch(); t.after(() => rmSync(home, { recursive: true, force: true }));
+  writeFileSync(join(home, '.env'), 'OPENAI_API_KEY=x\n');
+  const games = join(home, 'games'); mkdirSync(games);
+  const r = prepare(games, home);
+  assert.equal(readFileSync(join(home, '.env'), 'utf8'), 'OPENAI_API_KEY=x\n');
+  assert.ok(!existsSync(join(home, '.gitignore')), 'no .gitignore in the home folder');
+  assert.match(r.stdout, /outside this project/);
+});
+
 test('every reference file the skill names exists, and none is orphaned', () => {
   const files = readdirSync(join(ROOT, REFS)).filter((f) => f.endsWith('.md'));
   const all = [skill, ...files.map((f) => read(`${REFS}/${f}`))].join('\n');
