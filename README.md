@@ -181,11 +181,25 @@ gamegen also uses your Claude Code usage while it works, which for a whole game 
 - **Keep your keys in `.env`** and that file out of git.
 - **Style references inspire, they don't copy.** A link or a game's name sets the mood, look and feel; gamegen always makes original characters, art, music and names.
 
-## An example: Hoard Hopper
+## Examples
+
+### Bloom Hop
+
+[![Bloom Hop's title screen](https://raw.githubusercontent.com/zeveck/bloom-hop/main/media/screenshots/title.png)](https://github.com/zeveck/bloom-hop)
+
+[Bloom Hop](https://github.com/zeveck/bloom-hop) is a cozy frog puzzle that gamegen made from this one request:
+
+> /gg:gamegen Make an overhead puzzle game in which you're a frog hopping from lilipad to lilipad and each one can only handle so many hops before it sinks and the goal is to hop on every lilipad, perhaps each one has a fly on it or something, and there's music and maybe a dozen level that get harder as you go. They can be generated, but, should always be possible to beat. You could also use your tongue to nudge enemies or something. There could also be turtle pads that surface and sink or fish that come up and give you power ups. When you hop to every lilipad flowers around the level all bloom and you celebrate before moving on.
+
+It came out as twelve ponds that are always beatable (each one is built by walking a frog through it, then checked again by a solver), plus 150 more in a Wild Pond mode. There are beetles to flick away with your tongue, turtles that dive on a rhythm, koi that leap out with gifts, a song for each time of day, and a pond that bursts into bloom every time you clear it.
+
+[![A cleared pond in full bloom](https://raw.githubusercontent.com/zeveck/bloom-hop/main/media/screenshots/bloom.png)](https://github.com/zeveck/bloom-hop)
+
+### Hoard Hopper
 
 [![Hoard Hopper's title screen](https://raw.githubusercontent.com/zeveck/hoardhopper/main/media/screenshots/title.png)](https://github.com/zeveck/hoardhopper)
 
-[Hoard Hopper](https://github.com/zeveck/hoardhopper) is a dragon platformer made from a single request with the same four plugins gamegen uses: four scrolling caves, animated characters, a theme for each cave, and a pile of treasure that grows every time you play. gamegen packages up how it was made, so every game gets the same care: a reviewed design, consistent art, real music, and a full play-test before it's called done.
+[Hoard Hopper](https://github.com/zeveck/hoardhopper) came just before gamegen: a dragon platformer made from a single request with the same four plugins, with four scrolling caves, animated characters, a theme for each cave, and a pile of treasure that grows every time you play. gamegen packages up how it was made, so every game gets the same care: a reviewed design, consistent art, real music, and a full play-test before it's called done.
 
 ## Development
 
