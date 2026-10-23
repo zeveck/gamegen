@@ -193,6 +193,8 @@ gamegen also uses your Claude Code usage while it works, which for a whole game 
 
 It came out as twelve ponds that are always beatable (each one is built by walking a frog through it, then checked again by a solver), plus 150 more in a Wild Pond mode. There are beetles to flick away with your tongue, turtles that dive on a rhythm, koi that leap out with gifts, a song for each time of day, and a pond that bursts into bloom every time you clear it.
 
+**[▶ Play Bloom Hop](https://bloomhop.synapticnoise.com)** · [How it was made](https://github.com/zeveck/bloom-hop#how-it-was-made)
+
 [![A cleared pond in full bloom](https://raw.githubusercontent.com/zeveck/bloom-hop/main/media/screenshots/bloom.png)](https://github.com/zeveck/bloom-hop)
 
 ### Hoard Hopper
@@ -200,6 +202,8 @@ It came out as twelve ponds that are always beatable (each one is built by walki
 [![Hoard Hopper's title screen](https://raw.githubusercontent.com/zeveck/hoardhopper/main/media/screenshots/title.png)](https://github.com/zeveck/hoardhopper)
 
 [Hoard Hopper](https://github.com/zeveck/hoardhopper) came just before gamegen: a dragon platformer made from a single request with the same four plugins, with four scrolling caves, animated characters, a theme for each cave, and a pile of treasure that grows every time you play. gamegen packages up how it was made, so every game gets the same care: a reviewed design, consistent art, real music, and a full play-test before it's called done.
+
+**[▶ Play Hoard Hopper](https://hoardhopper.synapticnoise.com)** · [How it was made](https://github.com/zeveck/hoardhopper#how-it-was-made)
 
 ## Development
 
