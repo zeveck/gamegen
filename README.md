@@ -1,22 +1,18 @@
 # gamegen
 
-*Describe a game. Get a game.*
+*Describe your game. Play it.*
 
-gamegen is a [Claude Code](https://claude.com/claude-code) plugin that turns your description of a game (how it looks, how it plays, what makes it fun) into a finished, playable game. It works out what you're after, plans the game, has a team of review agents poke holes in the design and polish it, makes all the art, animation, music and sound effects, builds it, plays every level to make sure it works, and hands you a link to play it.
-
-```
-/gamegen <your game idea>
-```
-
-For example:
+You have a game in mind. [gamegen](https://github.com/zeveck/gamegen) is a [Claude Code](https://claude.com/claude-code) plugin that makes it: describe what you play, how it works, and how it should look and feel, and gamegen works out what you're after, plans the game, has a team of review agents poke holes in the design and polish it, makes all the art, animation, music and sound effects, builds it, plays every level to make sure it works, and hands you a link to play it.
 
 ```
-/gamegen a frog who hops between lily pads before they sink
-/gamegen a cozy farming game where you grow glowing mushrooms under the sea
-/gamegen a space shooter where your ship grows bigger with every enemy you eat
+/gamegen <describe your game>
 ```
 
-You get a web game that plays on desktop and on phones, with nothing to install: open it in a browser, or publish it free on GitHub Pages. Have something particular in mind, like a game just for phones, a certain look, or a game engine such as Godot? There are [options](#options) for that, or just say so in your idea.
+For example, this is the whole request that [Bloom Hop](#bloom-hop) was made from:
+
+> /gamegen Make an overhead puzzle game in which you're a frog hopping from lilipad to lilipad and each one can only handle so many hops before it sinks and the goal is to hop on every lilipad, perhaps each one has a fly on it or something, and there's music and maybe a dozen level that get harder as you go. They can be generated, but, should always be possible to beat. You could also use your tongue to nudge enemies or something. There could also be turtle pads that surface and sink or fish that come up and give you power ups. When you hop to every lilipad flowers around the level all bloom and you celebrate before moving on.
+
+The more of your idea you describe, the more of it ends up in the game: every mechanic, creature and moment above is in Bloom Hop. A short idea works too; gamegen fills in the rest in the same spirit. Have a platform, a look or an engine in mind? There are [options](#options) for that, or just say so in your description.
 
 ## Contents
 
@@ -33,16 +29,19 @@ You get a web game that plays on desktop and on phones, with nothing to install:
 - [Tips](#tips)
 - [Examples](#examples)
   - [Bloom Hop](#bloom-hop)
+  - [Porchlight](#porchlight)
+  - [Sim Shire](#sim-shire)
+  - [Pomegranate Panic 2](#pomegranate-panic-2)
   - [Hoard Hopper](#hoard-hopper)
 - [Development](#development)
 - [License](#license)
 
 ## Make a game
 
-Once it's [installed](#install), type your idea:
+Once it's [installed](#install), describe your game:
 
 ```
-/gamegen <your game idea>
+/gamegen <describe your game>
 ```
 
 Then walk away. A game takes a good while to make: planning and review, art and sound, building, and play-testing every level. gamegen first checks that your [API keys](#your-api-keys) work, posts a short update after each step, and tells you the estimated cost before it spends anything. Press Esc to stop it at any time.
@@ -51,19 +50,17 @@ When it's done, you get a link to play your game, plus what's in it and what it 
 
 Think of it as a great first version. gamegen tells you plainly about anything that didn't work out, and you can [change anything you like](#change-your-game) afterwards.
 
-More ideas:
+The [examples](#examples) below show full requests and the games they became. You can add options too:
 
 ```
-/gamegen a one-button game where a frog jumps between lily pads --scope small
-/gamegen a rhythm game where you tap falling stars --platform mobile
-/gamegen a puzzle game about guiding light beams with mirrors --style "clean, calm, pastel"
-/gamegen a racing game with paper boats in a rain gutter --style https://example.com/screenshot.png
-/gamegen a word puzzle about building sandcastles --budget 0
+/gamegen <describe your game> --platform mobile
+/gamegen <describe your game> --style "like an old Game Boy game"
+/gamegen <describe your game> --scope small --budget 5
 ```
 
 ### Options
 
-All optional. You can also just say these things in your idea ("for phones", "keep it tiny", "in Godot"). `/gamegen help` lists them, and `/gamegen help <option>` explains one, such as `/gamegen help style`.
+All optional. Unless you say otherwise, gamegen makes a web game that plays in any browser on desktop and phones, with nothing to install. You can also just say these things in your description ("for phones", "keep it tiny", "in Godot"). `/gamegen help` lists them, and `/gamegen help <option>` explains one, such as `/gamegen help style`.
 
 | Option | What it does | Default |
 |---|---|---|
@@ -160,7 +157,7 @@ ELEVENLABS_API_KEY=...   # audiogen
 
 Before it starts, gamegen tries each key with a free request. If one is missing or doesn't work, it stops right away, before spending anything, and tells you how to fix it. No `.env` yet? gamegen makes one for you, with links to where you get each key, and keeps it out of git: just paste your keys in and run your command again.
 
-Don't have all three? Say what to do without one in your idea: "no music" or "no sound" skips ElevenLabs, "only use OpenAI for the art" skips Gemini, and `--budget 0` needs no keys at all (everything is drawn and made in code).
+Don't have all three? Say what to do without one in your description: "no music" or "no sound" skips ElevenLabs, "only use OpenAI for the art" skips Gemini, and `--budget 0` needs no keys at all (everything is drawn and made in code).
 
 ## What it uses
 
@@ -176,7 +173,7 @@ gamegen does the planning, building and testing itself, and uses four companion 
 ## How it works
 
 1. **Check.** gamegen makes sure your keys and tools work.
-2. **Brief.** It reads your idea, looks up any style references, and writes a one-page creative brief.
+2. **Brief.** It reads your description, looks up any style references, and writes a one-page creative brief.
 3. **Design.** It writes a full game design: the core idea, controls for every platform, levels and difficulty, art and audio direction, every asset it'll need, and what to cut if things get tight.
 4. **Review.** Three review agents read the design independently: a **player** who wants it to be fun, a **builder** who looks for everything that could go wrong, and an **art and sound director** who makes sure it'll look and sound like one game. A fourth agent fixes the design based on what they found. This repeats for a couple of rounds.
 5. **Art, animation and sound.** It makes the main character first, so everything else can match it, then the rest: backgrounds, items, animations, music and sound effects. It looks at every image and redoes the ones that aren't right, and keeps track of the cost.
@@ -203,25 +200,73 @@ gamegen also uses your Claude Code usage while it works, which for a whole game 
 
 ## Examples
 
+Every game below was made by gamegen from the request shown with it, then play-tested. Click a picture to play.
+
 ### Bloom Hop
 
-[![Bloom Hop's title screen](https://raw.githubusercontent.com/zeveck/bloom-hop/main/media/screenshots/title.png)](https://github.com/zeveck/bloom-hop)
+[![A cleared pond in full bloom](https://raw.githubusercontent.com/zeveck/bloom-hop/main/media/screenshots/bloom.png)](https://bloomhop.synapticnoise.com)
 
-[Bloom Hop](https://github.com/zeveck/bloom-hop) is a cozy frog puzzle that gamegen made from this request:
-
-> /gg:gamegen Make an overhead puzzle game in which you're a frog hopping from lilipad to lilipad and each one can only handle so many hops before it sinks and the goal is to hop on every lilipad, perhaps each one has a fly on it or something, and there's music and maybe a dozen level that get harder as you go. They can be generated, but, should always be possible to beat. You could also use your tongue to nudge enemies or something. There could also be turtle pads that surface and sink or fish that come up and give you power ups. When you hop to every lilipad flowers around the level all bloom and you celebrate before moving on.
-
-It came out as twelve ponds that are always beatable (each one is built by walking a frog through it, then checked again by a solver), plus 150 more in a Wild Pond mode. There are beetles to flick away with your tongue, turtles that dive on a rhythm, koi that leap out with gifts, a song for each time of day, and a pond that bursts into bloom every time you clear it.
+A cozy frog puzzle on a lily pond: hop every pad before it sinks, eat every fly, flick beetles away with your tongue, ride turtles before they dive, and catch gifts from friendly koi. Twelve ponds that are always beatable (each one is built by walking a frog through it, then checked again by a solver), 150 more in Wild Pond, a song for each time of day, and a pond that bursts into bloom every time you clear it.
 
 **[▶ Play Bloom Hop](https://bloomhop.synapticnoise.com)** · [How it was made](https://github.com/zeveck/bloom-hop#how-it-was-made)
 
-[![A cleared pond in full bloom](https://raw.githubusercontent.com/zeveck/bloom-hop/main/media/screenshots/bloom.png)](https://github.com/zeveck/bloom-hop)
+<details>
+<summary>The request</summary>
+
+> /gg:gamegen Make an overhead puzzle game in which you're a frog hopping from lilipad to lilipad and each one can only handle so many hops before it sinks and the goal is to hop on every lilipad, perhaps each one has a fly on it or something, and there's music and maybe a dozen level that get harder as you go. They can be generated, but, should always be possible to beat. You could also use your tongue to nudge enemies or something. There could also be turtle pads that surface and sink or fish that come up and give you power ups. When you hop to every lilipad flowers around the level all bloom and you celebrate before moving on.
+
+</details>
+
+### Porchlight
+
+[![Trick-or-treating on a moonlit street of houses with glowing jack-o'-lanterns](https://raw.githubusercontent.com/zeveck/porchlight/main/media/screenshots/night.png)](https://porchlight.synapticnoise.com)
+
+A cozy pixel-art Halloween puzzle: every house with a pumpkin loves one costume, so read the clues, bribe other kids with candy to swap outfits, and light every jack-o'-lantern. A brand new town every night, fifty costumes that each have a power, and when the last jack is lit, the whole town comes out to dance with you.
+
+**[▶ Play Porchlight](https://porchlight.synapticnoise.com)** · [How it was made](https://github.com/zeveck/porchlight#how-it-was-made)
+
+<details>
+<summary>The request</summary>
+
+> /gg:gamegen I want a game about Halloween in which you select from a small collection of costumes and go trick or treating around a large down, probably pixely, maybe 3/4 overhead view. The town should have dozens of houses. Each house likes a given costume more/less and you get more/better candy the more they like your costume. A bunch of other kids are also trick-or-treating. You can bribe other kids to swap costumes if you have enough candy, and once you gain a costume its in your initial set next time you play. Costumes have powers and some costumes cost more than othes. There should probably be like 50 total costumes, though maybe any given run of the game only includes 20-50 with more as levels get harder. Costumes can repeat a bit, maybe with color swaps in a given run. Not every house has candy every game. The streets should probably layout differently each game. Any house with candy has a pumpkin in the yard, and once you trick-or-treat there with the costume that house likes best, it becomes a jack-o-lantern so you know, and you get that jack-o-lantern in your jack collection. For a given run you can solve it by properly matching up enough houses. In early runs you may only need 10, but as you do better there are more. More houses offer candy on future runs, but you need more jack-o-lanterns to solve that board. it's fundamentally a puzzle game in which you're trying to match the costume to the house while keeping the most candy and there should always be the right costumes on the board to fulfill enough houses and you can always get more candy by re-trick-or-treating a house after a while, so you can always solve a board, but it gets harder as there are more kids and you need more houses. There should be music and effects and some costumes should have fun powers. Once you've gotten a house's jack-o-lantern instead of having a pumpkin it starts with that jack, just not lit yet, and if you go near it it'll let you just switch to the right costume, so you don't have to resolve every house every time if you don't want. In the final run you use every costume and match it to the right house and all the kids dance with you Thriller style and you all share the massive candy haul or something.
+
+</details>
+
+### Sim Shire
+
+[![A busy shire village of burrows, farms and a river, with a dragon among the folk](https://raw.githubusercontent.com/zeveck/simshire/main/media/screenshots/village.png)](https://simshire.synapticnoise.com)
+
+A cozy village builder in the spirit of SimCity, set in a Hobbit-like shire: arrange burrows, halls, farms, orchards and bridges so halflings, dwarves, elves, trolls, goblins and finally a dragon all live happily side by side, then gather for a lantern-lit festival with fireworks.
+
+**[▶ Play Sim Shire](https://simshire.synapticnoise.com)** · [How it was made](https://github.com/zeveck/simshire#how-it-was-made)
+
+<details>
+<summary>The request</summary>
+
+> /gg:gamegen I want a game called Sim Shire that harkens to games like SimCity or Civ but in which you're building a shire evocing The Hobbit and such. Your goal is to build a large, peaceful settlement in which lots of different fantasy races live together. there are elements of balancing different desires and tensions to avoid conflict and maximize communal happiness and chill. Levels get harder by having you try to have a wider range of fantasy creates/races live together. even monsters/dragons should be able to live peacfull if it's all well arranged. You get food, build houses, commmunity structures, bridges, orchads, whatever, and in the final level you win by including every face/creature in one large happy community and they come together for a party with fireworks and such. it's friendly fun.
+
+</details>
+
+### Pomegranate Panic 2
+
+<a href="https://pomegranatepanic2.synapticnoise.com"><img src="https://raw.githubusercontent.com/zeveck/pomegranatepanic2/main/media/screenshots/hades-rises.png" alt="Hades rising from the flames beneath a tumbling pomegranate" width="300"></a>
+
+A sequel, made by pointing gamegen at the original game and its code: slap marble ramps into thin air to keep a pomegranate bouncing down through the underworld, grab Persephone's six stolen seeds, then bounce off Hades' face, again and again as he gets angrier, until he lets her go. With music that speeds up as you go, boss music, and a Hall of Heroes high-score table.
+
+**[▶ Play Pomegranate Panic 2](https://pomegranatepanic2.synapticnoise.com)** · [How it was made](https://github.com/zeveck/pomegranatepanic2#how-it-was-made)
+
+<details>
+<summary>The request</summary>
+
+> /gg:gamegen We want to make Pomegranate Panic 2. It's based on https://pomegranatepanic.synapticnoise.com/. https://github.com/zeveck/pomegranatepanic. We want the same basic game idea, but with better graphics and sound fx and there should maybe be a tiny cooldown if you spam placement too fast. Also, if you get all 6 pomegranite seeds you should get to "fight" Hades. My idea there is that a Hades face will come up and fill the bottom of the screen and you just let yourself bounce off him, which throws you back up, and Hades vanishes for a bit then comes back, and gets angrier each time, and you do that enough times to defeat him and free Persephone or something. The music should probably get faster as the game does and there should be boss music. There should probably be the ability to capture your high score locally if you want and you're above a certain reasonably high threshold. Maybe it keeps top 5 with initials after you clear 10000 points or something. High score would probably care how many seeds you had and whether you beat hades.
+
+</details>
 
 ### Hoard Hopper
 
-[![Hoard Hopper's title screen](https://raw.githubusercontent.com/zeveck/hoardhopper/main/media/screenshots/title.png)](https://github.com/zeveck/hoardhopper)
+[![Hoard Hopper's title screen](https://raw.githubusercontent.com/zeveck/hoardhopper/main/media/screenshots/title.png)](https://hoardhopper.synapticnoise.com)
 
-[Hoard Hopper](https://github.com/zeveck/hoardhopper) came just before gamegen: a dragon platformer made from a single request with the same four plugins, with four scrolling caves, animated characters, a theme for each cave, and a pile of treasure that grows every time you play. gamegen packages up how it was made, so every game gets the same care: a reviewed design, consistent art, real music, and a full play-test before it's called done.
+Hoard Hopper came just before gamegen: a dragon platformer made from a single request with the same four plugins, with four scrolling caves, animated characters, a theme for each cave, and a pile of treasure that grows every time you play. gamegen packages up how it was made, so every game gets the same care: a reviewed design, consistent art, real music, and a full play-test before it's called done.
 
 **[▶ Play Hoard Hopper](https://hoardhopper.synapticnoise.com)** · [How it was made](https://github.com/zeveck/hoardhopper#how-it-was-made)
 
