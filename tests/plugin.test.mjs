@@ -77,6 +77,18 @@ test('the README installs everything with one line', () => {
   assert.doesNotMatch(readme, /\/plugin marketplace add/);
 });
 
+test('the README\'s Contents lists every section, and every link lands on one', () => {
+  const anchor = (t) => t.trim().toLowerCase().replace(/[^\w\- ]/g, '').replace(/\s/g, '-');
+  const headings = [...readme.matchAll(/^(#{2,3}) (.+)$/gm)].map((m) => m[2]).filter((t) => t !== 'Contents');
+  const toc = readme.split('## Contents')[1].split('\n## ')[0];
+  const listed = [...toc.matchAll(/\[(.+?)\]\(#([^)]+)\)/g)];
+  assert.deepEqual(listed.map((m) => m[1]), headings, 'Contents matches the headings, in order');
+  for (const [, title, link] of listed) assert.equal(link, anchor(title), `${title} links to #${anchor(title)}`);
+  // And every in-page link elsewhere in the README points at a real section.
+  const anchors = new Set(headings.map(anchor));
+  for (const [, link] of readme.matchAll(/\]\(#([^)]+)\)/g)) assert.ok(anchors.has(link), `#${link} exists`);
+});
+
 test('SKILL.md has the frontmatter Claude Code needs', () => {
   const fm = skill.match(/^---\n([\s\S]*?)\n---\n/);
   assert.ok(fm, 'frontmatter block');

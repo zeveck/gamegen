@@ -18,6 +18,25 @@ For example:
 
 You get a web game that plays on desktop and on phones, with nothing to install: open it in a browser, or publish it free on GitHub Pages. Have something particular in mind, like a game just for phones, a certain look, or a game engine such as Godot? There are [options](#options) for that, or just say so in your idea.
 
+## Contents
+
+- [Make a game](#make-a-game)
+  - [Options](#options)
+  - [Change your game](#change-your-game)
+- [What you get](#what-you-get)
+  - [Playing it](#playing-it)
+- [Install](#install)
+  - [Your API keys](#your-api-keys)
+- [What it uses](#what-it-uses)
+- [How it works](#how-it-works)
+- [Costs](#costs)
+- [Tips](#tips)
+- [Examples](#examples)
+  - [Bloom Hop](#bloom-hop)
+  - [Hoard Hopper](#hoard-hopper)
+- [Development](#development)
+- [License](#license)
+
 ## Make a game
 
 Once it's [installed](#install), type your idea:
