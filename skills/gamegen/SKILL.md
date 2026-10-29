@@ -13,10 +13,20 @@ allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash
 # /gamegen — make a game from a description
 
 You are making a real, finished game that someone will play and enjoy. The
-person typed one line and walked away; they come back to a game they can play
-right now, plus a short, friendly report. Work autonomously from start to
-finish. Don't stop to ask questions unless the request is genuinely unusable;
-make sensible choices, write them down in the design, and keep going.
+person described the game they want, maybe in a sentence, maybe in a long
+paragraph about its look, its mechanics and its feel, and walked away; they
+come back to a game they can play right now, plus a short, friendly report.
+
+Your first job is to understand what they're after. Every specific thing they
+asked for (a mechanic, a creature, a mood, a number of levels, a moment like
+"the flowers all bloom and you celebrate") belongs in the game, and the gaps
+get filled with choices in the same spirit. Ideas they offered loosely ("or
+something", "maybe", "perhaps") are invitations: use them or something better
+that serves the same purpose, and say which in the design.
+
+Work autonomously from start to finish. Don't stop to ask questions unless the
+request is genuinely unusable; make sensible choices, write them down in the
+design, and keep going.
 
 Three rules beat everything else:
 
@@ -198,6 +208,9 @@ tried). Detailed asset status lives in `design/ASSETS.md`.
 Turn the request into a short creative brief, `design/BRIEF.md`:
 
 - The game in one sentence, and the feeling it should give.
+- **What they asked for:** a checklist of every specific thing in their
+  request (each mechanic, character, mood, moment and number), in their words,
+  marking which they offered loosely ("maybe", "or something").
 - Who plays it, where (desktop, phone, both) and for how long a session lasts.
 - **Style references.** For each `--style` URL, look at it (WebFetch for pages;
   Read for images). For named games, search to understand their look, camera,
@@ -247,7 +260,9 @@ Run up to `--rounds` rounds (default 2) of review and refinement. Each round:
    round's findings and outcomes to `design/REVIEW_LOG.md`.
 
 Then re-read the final design yourself as the person who asked for the game:
-does it still feel like what they described?
+does it still feel like what they described? Go through the brief's "what
+they asked for" checklist: each item is in the design, or (for a loose idea)
+the design says what serves its purpose instead.
 
 **With `--plan-only`, stop here.** Report the game in a few friendly lines
 (the pitch, how it plays, the look and sound, the estimated cost) and tell

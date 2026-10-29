@@ -2,7 +2,7 @@
 
 *Describe a game. Get a game.*
 
-gamegen is a [Claude Code](https://claude.com/claude-code) plugin that turns one line into a finished, playable game. It plans the game, has a team of review agents poke holes in the design and polish it, makes all the art, animation, music and sound effects, builds it, plays every level to make sure it works, and hands you a link to play it.
+gamegen is a [Claude Code](https://claude.com/claude-code) plugin that turns your description of a game (how it looks, how it plays, what makes it fun) into a finished, playable game. It works out what you're after, plans the game, has a team of review agents poke holes in the design and polish it, makes all the art, animation, music and sound effects, builds it, plays every level to make sure it works, and hands you a link to play it.
 
 ```
 /gamegen <your game idea>
@@ -193,6 +193,7 @@ gamegen also uses your Claude Code usage while it works, which for a whole game 
 
 ## Tips
 
+- **Describe as much as you like.** A sentence works; a paragraph about the look, the mechanics and the feel works better. Bloom Hop's request below was a paragraph, and the game has every idea in it.
 - **Say what makes it fun.** "A platformer" is fine; "a platformer where you can only jump while the music is playing" is better.
 - **Name the feel you want.** A game, a film, an era ("like an old Game Boy game"), a mood ("cozy", "frantic").
 - **Start small.** `--scope small` games come out polished and quick to make. You can always add more with `--change`.
@@ -206,7 +207,7 @@ gamegen also uses your Claude Code usage while it works, which for a whole game 
 
 [![Bloom Hop's title screen](https://raw.githubusercontent.com/zeveck/bloom-hop/main/media/screenshots/title.png)](https://github.com/zeveck/bloom-hop)
 
-[Bloom Hop](https://github.com/zeveck/bloom-hop) is a cozy frog puzzle that gamegen made from this one request:
+[Bloom Hop](https://github.com/zeveck/bloom-hop) is a cozy frog puzzle that gamegen made from this request:
 
 > /gg:gamegen Make an overhead puzzle game in which you're a frog hopping from lilipad to lilipad and each one can only handle so many hops before it sinks and the goal is to hop on every lilipad, perhaps each one has a fly on it or something, and there's music and maybe a dozen level that get harder as you go. They can be generated, but, should always be possible to beat. You could also use your tongue to nudge enemies or something. There could also be turtle pads that surface and sink or fish that come up and give you power ups. When you hop to every lilipad flowers around the level all bloom and you celebrate before moving on.
 
