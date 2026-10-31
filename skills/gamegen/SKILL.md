@@ -26,7 +26,9 @@ that serves the same purpose, and say which in the design.
 
 Work autonomously from start to finish. Don't stop to ask questions unless the
 request is genuinely unusable; make sensible choices, write them down in the
-design, and keep going.
+design, and keep going. When you do need to ask, ask in plain words as the
+last line of your reply and end your turn to wait for the answer; never use a
+question tool or a multiple-choice prompt.
 
 Three rules beat everything else:
 
