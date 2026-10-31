@@ -281,6 +281,7 @@ function publish(dir, args, { signedIn = true, cert = 'approved', env = {} } = {
 echo "$*" >> "$GH_LOG"
 case "$*" in
   "api user --jq .login") [ "$SIGNED_IN" = 1 ] && echo zeveck || exit 1 ;;
+  "api user --jq .name // .login") [ "$SIGNED_IN" = 1 ] && echo "Rich Conlan" || exit 1 ;;
   "repo view me/taken --json"*) printf 'me/taken\tpublic | A frog game | 2026-04-25\n' ;;
   "repo view me/renamed --json"*) printf 'me/renamed-old\tprivate | An old game | 2026-04-25\n' ;;
   "repo view me/offline"*) echo "error connecting to api.github.com" >&2; exit 1 ;;
@@ -340,7 +341,24 @@ test('publish: settings come from the environment or the .env, and never the key
   writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_DOMAIN="example.com"  # mine\n# GAMEGEN_GALLERY=me/old-games\n');
   const deep = join(dir, 'frog'); mkdirSync(deep);
   const r = publish(deep, ['settings'], { env: { GAMEGEN_MAKING_OF: 'on' } });
-  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_MAKING_OF: on\n');
+  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\n');
+});
+
+test('publish: the credit comes from the .env, then GitHub, then git, and is never made up', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const deep = join(dir, 'frog'); mkdirSync(deep);
+  // Nothing known: no name at all, rather than a stand-in like "the player".
+  assert.equal(publish(deep, ['credit'], { signedIn: false }).stdout, 'credit: not known\n');
+  // git's user.name (HOME is the game folder here, so this is its only git config).
+  writeFileSync(join(deep, '.gitconfig'), '[user]\n\tname = R. Conlan\n');
+  assert.equal(publish(deep, ['credit'], { signedIn: false }).stdout, 'credit: R. Conlan\nfrom: git\n');
+  // The GitHub profile name beats git's.
+  assert.equal(publish(deep, ['credit']).stdout, 'credit: Rich Conlan\nfrom: github\n');
+  // And GAMEGEN_CREDIT beats both.
+  writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_CREDIT="Rich & friends"  # us\n');
+  const r = publish(deep, ['credit']);
+  assert.equal(r.stdout, 'credit: Rich & friends\nfrom: GAMEGEN_CREDIT\n');
+  assert.ok(!r.stdout.includes('SECRET'));
 });
 
 test('publish: a new gallery is served straight from its main branch', (t) => {

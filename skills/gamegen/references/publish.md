@@ -85,7 +85,7 @@ then ask. For example:
 > public repo, zeveck/barbarain-2, with the game, its README (screenshots and
 > your prompts) and the design notes. Then I'll add BarbarAIn to the top of
 > synapticnoise.com, linking to the game. HTTPS can take a few minutes to
-> switch on after that. Go ahead?
+> switch on after that. It credits the idea to Rich Conlan. Go ahead?
 
 - **Start with the address**, since that's what they care about most.
 - **Then what you'll do, in things they'd recognise:** the repo (and why, if
@@ -93,6 +93,13 @@ then ask. For example:
   adventure"), what goes in it (the game, the README, and the design notes
   with `--making-of`), and where it goes in the gallery ("the top of
   synapticnoise.com", or "just before Pomegranate Panic 2" for a sequel).
+- **The credit.** Say whose name the game and README credit (from
+  `design/STATUS.md`, or `publish.sh credit`), since this is when it goes
+  public: "It credits the idea to Rich Conlan." If no name is known, say it
+  credits no one, and they can give a name. A name they give replaces it
+  everywhere it appears (in-game credits, end screen, README, gallery) before
+  committing, and `design/STATUS.md` notes it as confirmed. Never fill the gap
+  with a stand-in.
 - **A name that only redirects** (`publish.sh repo` says so): say that
   taking it ends the redirect, so old links reach the new game instead
   ("That name now just redirects to your renamed zeveck/barbarain-april26,
@@ -163,12 +170,13 @@ correction: adjust, show the line again, and ask again.
 
 **Starting a new gallery:** make it in `.gamegen/gallery/` from
 `templates/gallery.html`, saved as `index.html`: replace `GALLERY_TITLE`
-with "<their name>'s games" (`gh api user --jq '.name // .login'`), and fill
+with "<their name>'s games" (the confirmed credit, or `publish.sh credit`;
+with no name known, just "Games"), and fill
 in the example game with this one: `GAME_URL` is the game's address,
 `GAME_IMAGE` the full address of its `social-card.jpg` (watch for a doubled
 `/`), `GAME_TITLE` its name and `GAME_DESCRIPTION` the README's tagline or
 first sentence. Add a short `README.md` ("<Name>'s games, to play at
-<gallery address>"). Then `git init -b main`, commit, `gh repo create
+<gallery address>", or "Games to play at …" with no name). Then `git init -b main`, commit, `gh repo create
 <repo> --public --description "<Name>'s games"`, push, and
 `publish.sh gallery-pages <repo>`. Check the gallery's address loads, then go
 on to step 6.
@@ -213,7 +221,7 @@ requests in `design/STATUS.md` since then):
 When it moves, say so in the same sentence: "…and move it from
 https://zeveck.github.io/barbarain-2/ to https://barbarain.synapticnoise.com,
 now that its DNS is set up." Mention the gallery only when something there
-changes.
+changes, and the credit only if it's changed or was never confirmed.
 
 Then:
 

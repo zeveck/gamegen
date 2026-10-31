@@ -189,6 +189,11 @@ nothing.
 Publishing again after a `--change` updates the live game. To use the same
 domain every time, put `GAMEGEN_DOMAIN=example.com` in your `.env`.
 
+Before it goes online, gamegen also tells you whose name the game credits
+for the idea: `GAMEGEN_CREDIT` from your `.env` if you've set one, otherwise
+your GitHub or git name. If it can't find a name, it leaves the credit out
+rather than guess. Give it another name when it asks, if you like.
+
 ## --gallery
 
 **Show your published games together** on one page, a gallery kept in a

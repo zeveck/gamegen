@@ -21,6 +21,7 @@ Two or three sentences: what you do, why it's fun, what makes it different.
 - Scope: small | medium | large
 - Budget: $<n> for generated art and audio
 - Tools available: <which generators, which keys, play-test tools>
+- Credit: <the name from `publish.sh credit`, or none; never a stand-in>
 - Decisions made on the player's behalf: <list>
 
 ## The player's fantasy

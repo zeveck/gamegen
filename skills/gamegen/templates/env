@@ -22,3 +22,4 @@ ELEVENLABS_API_KEY=
 # GAMEGEN_DOMAIN=example.com     # games go to <game>.example.com (or github.io)
 # GAMEGEN_GALLERY=you/my-games   # a GitHub repo showing all your games together
 # GAMEGEN_MAKING_OF=on           # READMEs show the prompts and how it was made
+# GAMEGEN_CREDIT=Your Name       # who games credit (else your GitHub or git name)

@@ -119,7 +119,10 @@ To use the same settings every time, put them in your `.env`:
 GAMEGEN_DOMAIN=example.com
 GAMEGEN_GALLERY=you/my-games
 GAMEGEN_MAKING_OF=on
+GAMEGEN_CREDIT=Your Name
 ```
+
+`GAMEGEN_CREDIT` is the name your games' credits give for the idea. Without it, gamegen uses your GitHub name, or your git name, and if it can't find one it leaves the credit out rather than guess. Either way, it checks the name with you before the game goes online.
 
 ## What you get
 

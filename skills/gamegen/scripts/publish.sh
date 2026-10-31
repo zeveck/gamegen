@@ -6,6 +6,9 @@
 #   publish.sh settings                    the GAMEGEN_ settings, from the
 #                                          environment or the nearest .env (only
 #                                          those lines are read: never the keys)
+#   publish.sh credit                      the name to credit the game to:
+#                                          GAMEGEN_CREDIT, else the GitHub
+#                                          profile name, else git's user.name
 #   publish.sh check                       signed in to GitHub? prints the account
 #   publish.sh repo <owner/name>           is that repo name free? if not, what's
 #                                          there, and the next free name; a name
@@ -25,23 +28,42 @@ die() { echo "$1"; exit 1; }
 # GitHub Pages serves every custom domain from these four addresses.
 PAGES_IPS="185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153"
 
-cmd="${1:-}"; shift || true
-case "$cmd" in
-  settings)
-    envfile=""; dir="$PWD"
+# A GAMEGEN_ setting from the environment, or else the nearest .env (only
+# that line is read: never the keys).
+setting() {
+  local value="${!1:-}" dir="$PWD"
+  if [ -z "$value" ]; then
     while :; do
-      if [ -f "$dir/.env" ]; then envfile="$dir/.env"; break; fi
+      if [ -f "$dir/.env" ]; then
+        value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$1[[:space:]]*=" "$dir/.env" | tail -1 \
+          | sed -E "s/^[^=]*=[[:space:]]*//; s/[[:space:]]+#.*$//; s/^[\"']//; s/[\"'][[:space:]]*$//")"
+        break
+      fi
       [ "$dir" = "/" ] && break
       dir="$(dirname "$dir")"
     done
-    for name in GAMEGEN_DOMAIN GAMEGEN_GALLERY GAMEGEN_MAKING_OF; do
-      value="${!name:-}"
-      if [ -z "$value" ] && [ -n "$envfile" ]; then
-        value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$name[[:space:]]*=" "$envfile" | tail -1 \
-          | sed -E "s/^[^=]*=[[:space:]]*//; s/[[:space:]]+#.*$//; s/^[\"']//; s/[\"'][[:space:]]*$//")"
-      fi
+  fi
+  printf '%s' "$value"
+}
+
+cmd="${1:-}"; shift || true
+case "$cmd" in
+  settings)
+    for name in GAMEGEN_DOMAIN GAMEGEN_GALLERY GAMEGEN_MAKING_OF GAMEGEN_CREDIT; do
+      value="$(setting "$name")"
       echo "$name: ${value:-not set}"
     done
+    ;;
+
+  credit)
+    # A suggestion only: the skill never invents a name, and confirms this
+    # one before it goes public.
+    if name="$(setting GAMEGEN_CREDIT)" && [ -n "$name" ]; then from=GAMEGEN_CREDIT
+    elif command -v gh >/dev/null 2>&1 && name="$(gh api user --jq '.name // .login' 2>/dev/null)" && [ -n "$name" ]; then from=github
+    elif name="$(git config user.name 2>/dev/null)" && [ -n "$name" ]; then from=git
+    else echo "credit: not known"; exit 0; fi
+    echo "credit: $name"
+    echo "from: $from"
     ;;
 
   check)
@@ -155,5 +177,5 @@ except OSError: pass" "$host")"
     done
     ;;
 
-  *) die "usage: publish.sh settings | check | repo <owner/name> | dns <host> <owner> | pages <owner/name> [host] | gallery-pages <owner/name> | https <owner/name>" ;;
+  *) die "usage: publish.sh settings | credit | check | repo <owner/name> | dns <host> <owner> | pages <owner/name> [host] | gallery-pages <owner/name> | https <owner/name>" ;;
 esac

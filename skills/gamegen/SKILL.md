@@ -49,6 +49,15 @@ levels and about 30 pieces of art."). A long run with no word feels broken,
 and it lets them stop you (Esc) if it's heading the wrong way. Talk about
 their game, not about phases, agents or files.
 
+**Never make up anything about the person.** When the game names who made
+it (credits, an author line, a copyright notice, an "about" screen, the
+README), use the name `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" credit`
+suggests (their `GAMEGEN_CREDIT`, GitHub name or git name), and if it says
+`not known`, leave the line out. No credit is better than a made-up one ("the
+player", "you", a guess). The same goes for any other personal detail: use
+only what they've told you. Nothing personal goes public without their say:
+publishing confirms the credit before anything goes online.
+
 The reference files in `references/` hold the detail for each phase. Read each
 one when you reach its phase, not all up front.
 
@@ -220,7 +229,8 @@ it, then the real one, and the new one whenever a change renames the game.
 gamegen shows it above the prompt, so the person knows which game they're on.
 Then add a "Requests" list starting
 with the request exactly as typed (later `--change` and `--continue` notes are
-added to it, also exactly as typed), the settings you settled on, what's available, and a checklist of the phases
+added to it, also exactly as typed), the settings you settled on, the credit
+(what `publish.sh credit` said, or "none"), what's available, and a checklist of the phases
 below. Keep it current as you go, because it's what you (or a later
 `--continue`) read to pick up after an interruption or a long gap: tick each
 phase off with one line on what happened, and within a phase note where you
@@ -419,6 +429,9 @@ second round only if the first found must-fix problems.
      engine, and clearly what couldn't be play-tested here.
    - What's in it (levels, characters, music) and the controls.
    - What it cost, against the estimate.
+   - Who it credits and where the name came from ("The credits say it's your
+     idea, Rich Conlan, from your GitHub name."), or that it credits no one
+     because no name was known, and that they can tell you what it should say.
    - Anything that didn't make it in, or doesn't work, said plainly.
    - How to share it (web games): `/gamegen --publish` puts it online, free,
      with GitHub Pages.

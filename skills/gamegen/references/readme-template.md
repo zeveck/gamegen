@@ -70,7 +70,8 @@ then open http://localhost:8000.
 
 ## Credits
 
-<The font, with its license (bundled next to the font file). Only if the
+<Whose idea it is: the credit in design/STATUS.md, or leave this out if
+there's none. Never a stand-in like "the player". Then the font, with its license (bundled next to the font file). Only if the
 setup check reported ElevenLabs' free plan: "Music and sound effects created
 with ElevenLabs." Anything else bundled, with its license.>
 ```

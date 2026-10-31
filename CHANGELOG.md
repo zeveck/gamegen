@@ -4,6 +4,15 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.10.31.6
+
+- Games credit the right person. The name comes from `GAMEGEN_CREDIT` in
+  your `.env`, or else your GitHub or git name, and with no name at all the
+  credit is left out. gamegen never fills in a made-up one like "the player"
+  (#2).
+- Publishing tells you whose name the game credits before it goes online,
+  so you can change it. The wrap-up report says which name was used.
+
 ## v2026.10.31.5
 
 - When the repo name only redirects to one you renamed, publishing says
