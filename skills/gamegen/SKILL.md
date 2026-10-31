@@ -6,8 +6,8 @@ description: >-
   sound effects with imagegen2, nanogen, anim8gen and audiogen, builds it (a
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
-argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--out <folder>]"
-allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(python3 -m http.server *), Bash(playwright-cli *)"
+argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--publish [address]] [--site <address or none>] [--making-of] [--out <folder>]"
+allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(python3 -m http.server *), Bash(playwright-cli *)"
 ---
 
 # /gamegen — make a game from a description
@@ -85,7 +85,15 @@ value) is the game description. Flags and defaults:
 | `--plan-only` | stop after the reviewed design, before spending anything on assets | off |
 | `--continue` | pick up an earlier run (after `--plan-only`, or one that was interrupted) | off |
 | `--change` | change a finished game: the words after it (other than other flags and their values) describe what to change | off |
+| `--publish` | put a finished web game online with GitHub Pages: optionally the address, such as `synapticnoise.com` (giving `<game>.synapticnoise.com`), a full address, or `github.io` | off |
+| `--site` | with `--publish`: the website that lists the person's games (an address or a repo), or `none` | the site at the publish domain, if it's theirs |
+| `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
 | `--out` | folder for the game | see below |
+
+`--publish`, `--site` and `--making-of` can also be set as defaults in the
+nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_SITE`, `GAMEGEN_MAKING_OF=on`);
+read them with `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" settings`, never
+by opening `.env` (it holds the keys). Flags win over these.
 
 The description can also carry these wishes in plain words ("for phones", "in
 the style of an old Game Boy game", "for Godot", "keep it tiny"). Honor them
@@ -103,7 +111,7 @@ such as `hoard-hopper`). Never overwrite someone's files: an existing
 `design/GAME_DESIGN.md`, when `--continue` wasn't given) means a new folder.
 Say which folder you chose in your first update.
 
-**Finding an existing game** (for `--continue` and `--change`): use `--out`
+**Finding an existing game** (for `--continue`, `--change` and `--publish`): use `--out`
 if given. Otherwise the current folder, if it holds a game (a
 `design/STATUS.md`). Otherwise the game folders directly below it: if there's
 one, use it; if there are several, use the one changed most recently and say
@@ -111,17 +119,17 @@ which in your first update (they can pick another with `--out`).
 
 **Continuing.** With `--continue`, read the game's `design/STATUS.md` and
 design, and resume at the first unfinished phase. A description given with
-`--continue` is a note on what to change; apply it to the design before
-resuming. On a finished game, treat it as `--change`.
+`--continue` is a note on what to change; add it to the requests list in
+`design/STATUS.md` and apply it to the design before resuming. On a finished game, treat it as `--change`.
 
 **Changing a finished game.** `--change <what to change>` (or `--continue`
 with notes, on a finished game) means: keep everything they didn't mention,
 and change what they asked for, whether it's small (the font, the title, one
-character's look) or big (a new level, a double jump, a boss, publishing at a
-web address). If there's no game, say so and suggest starting one; if the
+character's look) or big (a new level, a double jump, a boss). If there's no game, say so and suggest starting one; if the
 game isn't finished yet, suggest `--continue`. Then:
 
-1. Update the design with the change, and follow it through: a new title also
+1. Add the change request, exactly as typed, to the requests list in
+   `design/STATUS.md`. Update the design with the change, and follow it through: a new title also
    means the title screen, logo, app name and icon labels, social card and
    README; new art matches the style anchor and style line.
 2. For anything that changes how the game plays, run one short design review
@@ -131,7 +139,16 @@ game isn't finished yet, suggest `--continue`. Then:
 4. Build it, play-test what changed, and replay every level's solution to make
    sure nothing else broke.
 5. Wrap up as usual: update the README and screenshots, start the game, and
-   report with a fresh link and what changed.
+   report with a fresh link and what changed. If the game is published, end
+   with "Run `/gamegen --publish` to put this version online." Never publish
+   without being asked.
+
+**Publishing.** `--publish` on its own (or with `--site`, `--out`) publishes
+the finished game: follow `references/publish.md`, and do nothing else. With a
+game description, or "and publish it" in one, make the game first, then
+publish it at the end of Phase 8. With `--change`, make the change, then
+publish. A game that isn't finished can't be published yet: suggest
+`--continue`.
 
 ### 3. Check everything works, before spending anything
 
@@ -195,8 +212,9 @@ have. Don't swap in code-drawn art unless they agree.
 
 ### 4. Start the progress file
 
-Create `design/STATUS.md` in the game folder: the request exactly as typed,
-the settings you settled on, what's available, and a checklist of the phases
+Create `design/STATUS.md` in the game folder: a "Requests" list starting
+with the request exactly as typed (later `--change` and `--continue` notes are
+added to it, also exactly as typed), the settings you settled on, what's available, and a checklist of the phases
 below. Keep it current as you go, because it's what you (or a later
 `--continue`) read to pick up after an interruption or a long gap: tick each
 phase off with one line on what happened, and within a phase note where you
@@ -358,9 +376,9 @@ second round only if the first found must-fix problems.
    screenshotted with `playwright-cli`, plus the title, description and
    preview tags. See "Sharing and search" in `references/web-target.md`.
 2. **Write the game's README** from `references/readme-template.md`: what the
-   game is, how to play on desktop and phone, screenshots, how to run it, and
-   how it was made (the original request and the plugins that made the art and
-   sound).
+   game is, how to play on desktop and phone, screenshots, and how to run it.
+   With `--making-of`, also how it was made: every request in
+   `design/STATUS.md`, exactly as typed, and what gamegen and each plugin did.
 3. **Add the GitHub Pages workflow** (web games) from
    `references/web-target.md`, so publishing is just a push and a switch. If
    the game folder is inside a git repository, put it at that repository's
@@ -396,8 +414,8 @@ second round only if the first found must-fix problems.
    - What's in it (levels, characters, music) and the controls.
    - What it cost, against the estimate.
    - Anything that didn't make it in, or doesn't work, said plainly.
-   - How to share it (web games): push the folder to GitHub and turn on Pages
-     (Settings, Pages, Source: GitHub Actions).
+   - How to share it (web games): `/gamegen --publish` puts it online, free,
+     with GitHub Pages.
    - Two or three ideas for what to add next, as ready-to-paste commands
      (`/gamegen --change add a boss at the end of the last cave`).
 

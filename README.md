@@ -19,6 +19,7 @@ The more of your idea you describe, the more of it ends up in the game: every me
 - [Make a game](#make-a-game)
   - [Options](#options)
   - [Change your game](#change-your-game)
+  - [Share your game](#share-your-game)
 - [What you get](#what-you-get)
   - [Playing it](#playing-it)
 - [Install](#install)
@@ -73,6 +74,9 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--plan-only` | Stop after the design, before spending anything, so you can read it and suggest changes. | off |
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
 | `--change <what to change>` | Change something in a finished game, keeping everything else. | off |
+| `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |
+| `--site <address>` or `none` | With `--publish`: the website that lists your games, so the new one is added to it. | the site at your domain, if it's yours |
+| `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
 
 ### Change your game
@@ -85,7 +89,6 @@ Like your game but want something different? Say what to change, and gamegen kee
 /gamegen --change make the frog green instead of blue
 /gamegen --change add a double jump
 /gamegen --change make the first level easier
-/gamegen --change it'll be published at games.example.com/frog
 ```
 
 It follows each change through (a new name also updates the logo, the link preview and the README), makes any new art in the game's existing style, plays the game again to make sure nothing broke, and gives you a fresh link.
@@ -96,6 +99,28 @@ Want a say before anything's made? Run with `--plan-only`, read `design/GAME_DES
 /gamegen --continue make the levels shorter and add a double jump
 ```
 
+### Share your game
+
+When you like it, put it online:
+
+```
+/gamegen --publish
+```
+
+gamegen makes a GitHub repository for it and publishes it at `https://<you>.github.io/<game>/`, free. You need a GitHub account, signed in here (`gh auth login`, or `auth` in the dev container). Before it changes anything, it shows you where the game will go and asks.
+
+Have your own domain? `/gamegen --publish example.com` puts it at `<game>.example.com`, and gamegen tells you the one DNS record to add. If example.com is your own site on GitHub Pages, the game is added to its list of games too (`--site` picks a different site).
+
+Made a change? `/gamegen --publish` again updates the live game.
+
+To use the same settings every time, put them in your `.env`:
+
+```
+GAMEGEN_DOMAIN=example.com
+GAMEGEN_SITE=example.com
+GAMEGEN_MAKING_OF=on
+```
+
 ## What you get
 
 ```
@@ -103,12 +128,12 @@ your-game/
   game/               the game itself
   design/             the design, review notes, asset list with costs, and every play-test screenshot
   media/screenshots/  the best screenshots, for the README
-  README.md           a README for your game, with how to play and how it was made
+  README.md           a README for your game, with screenshots and how to play (and how it was made, with --making-of)
 ```
 
 gamegen makes the game right where you run it if the folder is empty, or in a new folder named after the game if it isn't. It never overwrites your files.
 
-Web games save your progress, come with a link-preview image for sharing, and are ready to publish on GitHub Pages: push the folder to a GitHub repository and turn on Pages (Settings → Pages → Source: GitHub Actions). Once published, players can install your game as an app on their phone and play it offline.
+Web games save your progress, come with a link-preview image for sharing, and are ready to put online with `/gamegen --publish`. Once published, players can install your game as an app on their phone and play it offline.
 
 ### Playing it
 

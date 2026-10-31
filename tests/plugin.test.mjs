@@ -270,3 +270,67 @@ test('the service worker template and the Pages workflow agree on placeholders',
 test('the plugin folder carries the license', () => {
   assert.equal(read('skills/LICENSE'), read('LICENSE'));
 });
+
+// publish.sh, run against a stand-in gh (no network). It logs every call and
+// answers the few the script makes, as an account with one repo, "taken".
+const PUBLISH = join(ROOT, 'skills/gamegen/scripts/publish.sh');
+function publish(dir, args, { signedIn = true, cert = 'approved', env = {} } = {}) {
+  const bin = join(dir, '.stub-bin');
+  mkdirSync(bin, { recursive: true });
+  writeFileSync(join(bin, 'gh'), `#!/bin/sh
+echo "$*" >> "$GH_LOG"
+case "$*" in
+  "api user --jq .login") [ "$SIGNED_IN" = 1 ] && echo zeveck || exit 1 ;;
+  "repo view me/taken --json"*) echo "public | A frog game | 2026-04-25" ;;
+  "repo view"*) exit 1 ;;
+  *"--jq .html_url") echo "https://frog.example.com/" ;;
+  *"https_certificate"*) echo "$CERT" ;;
+esac
+`);
+  chmodSync(join(bin, 'gh'), 0o755);
+  const log = join(dir, 'gh.log');
+  const r = spawnSync('bash', [PUBLISH, ...args], {
+    cwd: dir, encoding: 'utf8',
+    env: { PATH: `${bin}:/usr/bin:/bin`, HOME: dir, GH_LOG: log, SIGNED_IN: signedIn ? '1' : '0',
+      CERT: cert, PUBLISH_WAIT: '0', PUBLISH_POLL: '0', ...env },
+  });
+  return { ...r, calls: existsSync(log) ? readFileSync(log, 'utf8').trim().split('\n') : [] };
+}
+
+test('publish: not signed in to GitHub says how, and changes nothing', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const r = publish(dir, ['check'], { signedIn: false });
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /not signed in \(run 'gh auth login'/);
+});
+
+test('publish: a taken repo name says what is there and offers the next free one', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  assert.equal(publish(dir, ['repo', 'me/free']).stdout, 'free: me/free\n');
+  assert.equal(publish(dir, ['repo', 'me/taken']).stdout,
+    'taken: me/taken (public | A frog game | 2026-04-25)\nfree: me/taken-2\n');
+});
+
+test('publish: turns on Pages at the custom address, then requires HTTPS', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const r = publish(dir, ['pages', 'me/frog', 'frog.example.com']);
+  assert.equal(r.stdout, 'url: https://frog.example.com/\n');
+  assert.deepEqual(r.calls, [
+    'api -X POST repos/me/frog/pages -f build_type=workflow',
+    'api -X PUT repos/me/frog/pages -f cname=frog.example.com',
+    'api repos/me/frog/pages --jq .html_url',
+    'repo edit me/frog --homepage https://frog.example.com',
+  ]);
+  assert.equal(publish(dir, ['https', 'me/frog']).stdout, 'https: on\n');
+  const waiting = publish(dir, ['https', 'me/frog'], { cert: 'authorization_pending' });
+  assert.equal(waiting.status, 2);
+  assert.match(waiting.stdout, /still waiting/);
+});
+
+test('publish: settings come from the environment or the .env, and never the keys', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_DOMAIN="example.com"  # mine\n# GAMEGEN_SITE=old.example.com\n');
+  const deep = join(dir, 'frog'); mkdirSync(deep);
+  const r = publish(deep, ['settings'], { env: { GAMEGEN_MAKING_OF: 'on' } });
+  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_SITE: not set\nGAMEGEN_MAKING_OF: on\n');
+});

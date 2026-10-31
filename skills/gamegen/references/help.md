@@ -36,6 +36,9 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--plan-only` | Stop after the design, before spending anything |
 | `--continue` | Build a saved design, or finish an interrupted game |
 | `--change <what>` | Change something in a finished game, keeping the rest |
+| `--publish [address]` | Put a finished game online, free, with GitHub Pages |
+| `--site <address>` or `none` | With `--publish`: the website that lists your games |
+| `--making-of` | Show in the README how the game was made |
 | `--out <folder>` | Where to put the game |
 
 `/gamegen help <option>` explains one, for example `/gamegen help style`.
@@ -153,13 +156,66 @@ big or small:
 /gamegen --change make the frog green instead of blue
 /gamegen --change add a double jump
 /gamegen --change make the first level easier
-/gamegen --change it'll be published at games.example.com/frog
 ```
 
 gamegen changes what you asked for and follows it through (a new name also
 updates the logo, the link preview and the README), makes any new art in the
 game's existing style, plays the game again to make sure nothing broke, and
 gives you a fresh link.
+
+## --publish
+
+**Put a finished game online**, free, with GitHub Pages. You need a GitHub
+account, signed in here (`gh auth login`, or `auth` in the dev container).
+
+```
+/gamegen --publish
+```
+
+That makes a public repository for the game and publishes it at
+`https://<you>.github.io/<game>/`. To use a web address of your own, give
+the domain (the game gets `<game>.example.com`) or the full address:
+
+```
+/gamegen --publish example.com
+/gamegen --publish frog.example.com
+```
+
+For your own address, add a DNS record pointing it at `<you>.github.io`
+(gamegen checks, and tells you exactly what to add if it's missing). Before
+changing anything, gamegen shows you where it'll go and asks; "no" changes
+nothing.
+
+Publishing again after a `--change` updates the live game. To use the same
+domain every time, put `GAMEGEN_DOMAIN=example.com` in your `.env`.
+
+## --site
+
+**The website that lists your games**, so publishing adds the new one to it:
+an address or a GitHub repository. gamegen adds a card in the same style as
+the others, at the top unless the page is ordered some other way.
+
+```
+/gamegen --publish example.com --site example.com
+```
+
+When you publish to your own domain and the site at that domain is one of
+your GitHub repositories, gamegen uses it without being told; `--site none`
+skips it. If the site isn't a repository of yours, you get the card to paste
+in. To set it once, put `GAMEGEN_SITE=example.com` in your `.env`.
+
+## --making-of
+
+**Show how the game was made**, in its README: every request you typed,
+exactly as you typed it, and what gamegen and each art and sound plugin did,
+with pictures. Publishing then includes the design notes too.
+
+```
+/gamegen a frog who hops between lily pads --making-of
+```
+
+Without it, the README is all about the game. To always have it, put
+`GAMEGEN_MAKING_OF=on` in your `.env`.
 
 ## --out
 

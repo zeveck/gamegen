@@ -36,10 +36,16 @@ side works well.
 
 ## How it was made
 
+<!-- Only with --making-of (or GAMEGEN_MAKING_OF=on); otherwise leave this
+section out, and don't mention gamegen or the plugins anywhere. -->
+
 <Game name> was made by [Claude Code](https://claude.com/claude-code) with
 [gamegen](https://github.com/zeveck/gamegen), from this request:
 
-> <the request, exactly as typed>
+> <the first request in design/STATUS.md, exactly as typed>
+
+<If there were later requests (changes, notes when continuing), list each one
+the same way, with a few words on what it changed: "Then, to add a boss:".>
 
 gamegen designed the game, had review agents polish the design, made the art,
 animation, music and sound with these plugins, built it, and play-tested it:
@@ -49,7 +55,8 @@ animation, music and sound with these plugins, built it, and play-tested it:
 - [anim8gen](https://github.com/zeveck/anim8gen): <what it animated>
 - [audiogen](https://github.com/zeveck/audiogen): <the music and sounds>
 
-<Leave out any plugin that wasn't used.>
+<Leave out any plugin that wasn't used. A picture of something each plugin
+made, beside its line, shows it off (as Hoard Hopper's README does).>
 
 ## Playing locally
 

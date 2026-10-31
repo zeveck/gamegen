@@ -189,8 +189,8 @@ understand it:
      stop that server.
   3. Look at it, then save it as `game/social-card.jpg` (Pillow, quality
      about 85).
-- **Once the game's web address is known** (the person tells you, or with
-  `--change` later): a `<link rel="canonical">`, absolute URLs in the preview
+- **Once the game's web address is known** (when publishing, see
+  publish.md): a `<link rel="canonical">`, absolute URLs in the preview
   tags (some sites need them for the image), `robots.txt` and a one-page
   `sitemap.xml`. Until then, leave those out rather than guess an address.
 

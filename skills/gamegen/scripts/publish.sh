@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+# The GitHub side of `/gamegen --publish`, so it runs the same way every time.
+# Each command prints plain "label: value" lines; the skill reads them and
+# explains the result to the person.
+#
+#   publish.sh settings                    the GAMEGEN_ settings, from the
+#                                          environment or the nearest .env (only
+#                                          those lines are read: never the keys)
+#   publish.sh check                       signed in to GitHub? prints the account
+#   publish.sh repo <owner/name>           is that repo name free? if not, what's
+#                                          there, and the next free name
+#   publish.sh dns <host> <owner>          does <host> point at GitHub Pages yet?
+#   publish.sh pages <owner/name> [host]   turn on Pages (from the workflow), set
+#                                          the custom address, the repo's homepage
+#   publish.sh https <owner/name>          wait for the certificate, then make
+#                                          HTTPS required (PUBLISH_WAIT seconds,
+#                                          default 600)
+set -u
+
+die() { echo "$1"; exit 1; }
+
+# GitHub Pages serves every custom domain from these four addresses.
+PAGES_IPS="185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153"
+
+cmd="${1:-}"; shift || true
+case "$cmd" in
+  settings)
+    envfile=""; dir="$PWD"
+    while :; do
+      if [ -f "$dir/.env" ]; then envfile="$dir/.env"; break; fi
+      [ "$dir" = "/" ] && break
+      dir="$(dirname "$dir")"
+    done
+    for name in GAMEGEN_DOMAIN GAMEGEN_SITE GAMEGEN_MAKING_OF; do
+      value="${!name:-}"
+      if [ -z "$value" ] && [ -n "$envfile" ]; then
+        value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$name[[:space:]]*=" "$envfile" | tail -1 \
+          | sed -E "s/^[^=]*=[[:space:]]*//; s/[[:space:]]+#.*$//; s/^[\"']//; s/[\"'][[:space:]]*$//")"
+      fi
+      echo "$name: ${value:-not set}"
+    done
+    ;;
+
+  check)
+    command -v gh >/dev/null 2>&1 \
+      || die "github: gh isn't installed (it comes with the dev container, or see cli.github.com)"
+    login="$(gh api user --jq .login 2>/dev/null)" \
+      || die "github: not signed in (run 'gh auth login', or 'auth' in the dev container)"
+    echo "github: $login"
+    ;;
+
+  repo)
+    full="${1:?repo needs owner/name}"
+    info="$(gh repo view "$full" --json visibility,description,pushedAt \
+      --jq '"\(.visibility|ascii_downcase) | \(.description // "") | \(.pushedAt[:10])"' 2>/dev/null)"
+    if [ -z "$info" ]; then echo "free: $full"; exit 0; fi
+    echo "taken: $full ($info)"
+    n=2
+    while gh repo view "$full-$n" --json name >/dev/null 2>&1; do n=$((n + 1)); done
+    echo "free: $full-$n"
+    ;;
+
+  dns)
+    host="${1:?dns needs a host}"; owner="${2:?dns needs the GitHub account}"
+    ips="$(python3 -c "import socket,sys
+try: print(' '.join(sorted({a[4][0] for a in socket.getaddrinfo(sys.argv[1], 443, socket.AF_INET)})))
+except OSError: pass" "$host")"
+    if [ -z "$ips" ]; then
+      echo "dns: missing (add a CNAME record: $host -> $owner.github.io)"; exit 1
+    fi
+    for ip in $ips; do
+      case " $PAGES_IPS " in *" $ip "*) ;; *)
+        echo "dns: points elsewhere ($ips; it needs a CNAME record: $host -> $owner.github.io)"; exit 1 ;;
+      esac
+    done
+    echo "dns: ok"
+    ;;
+
+  pages)
+    full="${1:?pages needs owner/name}"; host="${2:-}"
+    # Create the Pages site, or switch an existing one to the workflow.
+    gh api -X POST "repos/$full/pages" -f build_type=workflow >/dev/null 2>&1 \
+      || gh api -X PUT "repos/$full/pages" -f build_type=workflow >/dev/null 2>&1 \
+      || die "pages: couldn't turn on GitHub Pages for $full"
+    if [ -n "$host" ]; then
+      gh api -X PUT "repos/$full/pages" -f cname="$host" >/dev/null 2>&1 \
+        || die "pages: couldn't set the address $host (is it used by another repo?)"
+    fi
+    url="$(gh api "repos/$full/pages" --jq .html_url 2>/dev/null)"
+    [ -n "$url" ] || die "pages: turned on, but GitHub didn't report the address"
+    gh repo edit "$full" --homepage "${url%/}" >/dev/null 2>&1 || true
+    echo "url: $url"
+    ;;
+
+  https)
+    full="${1:?https needs owner/name}"
+    deadline=$(( $(date +%s) + ${PUBLISH_WAIT:-600} ))
+    while :; do
+      state="$(gh api "repos/$full/pages" --jq '.https_certificate.state // "none"' 2>/dev/null)"
+      if [ "$state" = approved ] || [ "$state" = issued ]; then
+        if gh api -X PUT "repos/$full/pages" -F https_enforced=true >/dev/null 2>&1; then
+          echo "https: on"; exit 0
+        fi
+      fi
+      case "$state" in errored|bad_authz|authorization_revoked)
+        echo "https: stuck (certificate $state; remove the custom domain in the repo's Pages settings and add it back)"; exit 1 ;;
+      esac
+      if [ "$(date +%s)" -ge "$deadline" ]; then
+        echo "https: still waiting (certificate $state; run --publish again in a few minutes)"; exit 2
+      fi
+      sleep "${PUBLISH_POLL:-15}"
+    done
+    ;;
+
+  *) die "usage: publish.sh settings | check | repo <owner/name> | dns <host> <owner> | pages <owner/name> [host] | https <owner/name>" ;;
+esac
