@@ -170,9 +170,7 @@ Spend in order:
     is a paid one: record that in `design/STATUS.md`, and no credit line. If
     audiogen reports the free-tier `output_format` restriction instead, it's
     the free plan: use `--output-format mp3_44100_64` from then on, and add
-    the credit. Only if no audio gets made at all: no credit line, and one
-    plain line in the report: "If your ElevenLabs plan is the free one, add a
-    credit to ElevenLabs in the README."
+    the credit. If no audio gets made at all, there's nothing to credit.
 
 ## Where files go
 
