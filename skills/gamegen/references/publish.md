@@ -77,29 +77,31 @@ Change nothing until the person confirms in step 2.
 
 ## 2. Confirm, in one line
 
-Show one line with everything, and ask. For example:
+Ask one short question that says where it goes, and nothing else. For example:
 
-> Publish Pomegranate Panic 3 as a new public repo, zeveck/pomegranate-panic-3,
-> at https://pomegranatepanic3.synapticnoise.com, and add it to the top of your
-> games gallery, zeveck/synapticnoise? (yes/no)
+> Publish BarbarAIn at https://barbarain.synapticnoise.com (new repo
+> zeveck/barbarain-2, since zeveck/barbarain is taken) and add it to the top
+> of your gallery? (yes/no)
 
-Add what applies, briefly:
+Keep it to that one sentence. Add a note only for something unusual, in a
+few words in brackets:
 
-- The name was taken: "zeveck/barbarain already exists (a private Conan text
-  adventure, last updated April 25), so this uses zeveck/barbarain-2."
-- DNS isn't set up yet: "Its DNS isn't set up yet, so it'll start at
-  https://zeveck.github.io/barbarain-2/ and move once you add the record."
-- Inside a bigger repository: "It becomes its own repo, so my-project will
-  ignore the barbarain folder."
-- A new gallery: "…and start your games gallery, zeveck/my-games, at
-  https://zeveck.github.io/my-games/?"
-- The gallery can't be used, saying why: "you can't push to
-  someone/their-games, so it won't be added there", or "other/games doesn't
-  exist and isn't yours to start, so…".
-- The gallery: "at the top", or "just before Pomegranate Panic 2" for a
-  sequel. If it isn't clear how the gallery shows games,
-  say you'll show what you'd add before changing it. If the person asks for
-  another place ("after Hoard Hopper"), put it there.
+- The repo name was taken: "(new repo zeveck/barbarain-2, since
+  zeveck/barbarain is taken)". Otherwise just "(new repo zeveck/barbarain)".
+- DNS isn't set up yet: "(at https://zeveck.github.io/barbarain/ until you
+  add its DNS record)".
+- Inside a bigger repository: "(as its own repo; my-project will skip the
+  folder)".
+- A new gallery: "and start your gallery, zeveck/my-games?".
+- The gallery can't be used: "(not added to someone/games: you can't push
+  to it)".
+- The gallery's spot: "to the top", or "just before Pomegranate Panic 2" for
+  a sequel. If it isn't clear how the gallery shows games, say you'll show
+  the change first. If the person asks for another place ("after Hoard
+  Hopper"), put it there.
+
+Don't explain settings (making-of, the domain) or say what's left out of the
+repo: those are already decided.
 
 A plain "no": say nothing was published, and how to change it
 (`/gamegen --publish <address>`, `--gallery none`). Anything else ("yes, but
@@ -199,9 +201,8 @@ github.io waiting for DNS that's now ready. Confirm in one line:
 
 or, when it moves: "Update Barbarain and move it from
 https://zeveck.github.io/barbarain-2/ to https://barbarain.synapticnoise.com?"
-Add the gallery when it changes ("…and add it to your games gallery,
-zeveck/synapticnoise", "…and start your games gallery…", or why it can't),
-as in step 2.
+Add the gallery only when it changes ("…and add it to your gallery?"), as
+briefly as in step 2.
 
 Then:
 

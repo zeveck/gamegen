@@ -31,7 +31,7 @@ const SOURCES = {
 };
 
 test('version is date-based CalVer and matches the first CHANGELOG heading', () => {
-  assert.match(plugin.version, /^\d{4}\.\d{1,2}\.\d{1,2}$/);
+  assert.match(plugin.version, /^\d{4}\.\d{1,2}\.\d{1,2}(\.\d+)?$/);
   const first = read('CHANGELOG.md').match(/^## v(\S+)/m);
   assert.ok(first, 'CHANGELOG.md has a "## v" heading');
   assert.equal(first[1], plugin.version);

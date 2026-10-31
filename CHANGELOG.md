@@ -1,9 +1,18 @@
 # Changelog
 
-gamegen uses date-based versions: `vYYYY.M.D` (for example `v2026.10.20`),
-which are also valid semver. For a second release on the same day, use the next
-day's date rather than a `-1` suffix, because semver sorts `2026.10.20-1`
-before `2026.10.20`.
+gamegen uses the release date as its version: `vYYYY.M.D` (for example
+`v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
+so on (`v2026.10.20.2`).
+
+## v2026.10.31.2
+
+Versions are now the release date, with `.2`, `.3` for later releases the
+same day. v2026.11.1 to v2026.11.6 were all released on October 31, under an
+older rule that used the next day's date for each same-day release.
+
+- Publishing's question is one short sentence: where the game goes, with a
+  few words in brackets only when something's unusual (a taken repo name,
+  DNS not ready yet).
 
 ## v2026.11.6
 
