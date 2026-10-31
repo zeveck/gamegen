@@ -1,15 +1,16 @@
 {
   "template": "zeveck/devcontainer-plus",
-  "version": "02d564fb7d23c0944cfa0e552627e43b64b7dcbf",
+  "version": "b2f6758b125ea187c7ab1d9ef97c7a9f69bbdb7e",
   "files": {
     "auth": "e9d845300eeac29bd5db7d9e9d4d9d280b52afe0a9ae87e66fd5182e00d9b4d1",
     "dc": "6ac8838843d9a8899099abbf625a8cddf495f5e9f2281f2edfeaf82fc36e4c94",
     "dc.cmd": "2e463fba40a7fc35f3369f359ce5aa5acafbce8d6e7696bb947a6fa052bbb072",
-    "dc.mjs": "bae96201466efe6d0b758de850d3893667621b7fb089ebae75f1d13edecf1612",
+    "dc.mjs": "8d95d524a7a13c620e5877b427bddea85ab5f88a669b644e4332fce90c8fb977",
     "dc.ps1": "3cae59c810001ec1d7a1d903a4a233f763afa440393324f5d09e477b65dcc003",
     "devcontainer.json": "94a9abd1bc6b4e9123a236fcd36509e0fad40d48c11437fcba84e0027f0e82ef",
     "on-create.sh": "71f01c5f9caf585bde5e0a4306d02398db8bbaab00e68daccf9dc8fc8c45182c",
-    "setup.sh": "600748c8fde4b40729c59ca63fb68a7cd92bd9047a428816edae21ca2927dc7d",
+    "setup.sh": "99b9d97bd526eee7efdce85c0364e35b74fb9eccae53a3be5926ddfe806c8b23",
+    "statusline.py": "f9cb4448e3dd882e53309795c927394e0cc3ed33ba2aeec798fb43dd27f425f4",
     "statusline.sh": "680bf157a84993eaf0c88391ad58aea25882c0edaa077a5c97a8145209cb559f"
   }
 }

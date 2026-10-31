@@ -17,6 +17,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { homedir, networkInterfaces, platform, tmpdir } from 'node:os';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+// The installed commands pass their own name first (`--dc-name=dcp`), so
+// messages say what you typed. Taken off before anything reads the arguments.
+const NAME_ARG = /^--dc-name=[\w.-]+$/.test(process.argv[2] || '') ? process.argv.splice(2, 1)[0] : '';
+const NAME = NAME_ARG.slice('--dc-name='.length) || 'dc';
 const IS_WIN = platform() === 'win32';
 const LABEL = 'devcontainer.local_folder';
 
@@ -93,14 +97,14 @@ export function preflightError(hasDocker, daemonRunning, plat = platform()) {
       + (desktop
         ? '  Install Docker Desktop: https://www.docker.com/products/docker-desktop/'
         : '  Install Docker: https://docs.docker.com/engine/install/')
-      + '\n  Then run `dc doctor` to verify.';
+      + `\n  Then run \`${NAME} doctor\` to verify.`;
   }
   if (!daemonRunning) {
     return 'Docker is installed but not running.\n'
       + (desktop
         ? '  Start Docker Desktop and wait for it to report "running", then try again.'
         : '  Start the daemon (e.g. sudo systemctl start docker), then try again.')
-      + '\n  `dc doctor` will confirm.';
+      + `\n  \`${NAME} doctor\` will confirm.`;
   }
   return null;
 }
@@ -248,7 +252,7 @@ function preflight() {
   const hasDocker = has('docker');
   const daemon = hasDocker && capture('docker', ['info']).status === 0;
   const err = preflightError(hasDocker, daemon);
-  if (err) { console.error(`dc: ${err}`); return false; }
+  if (err) { console.error(`${NAME}: ${err}`); return false; }
   return true;
 }
 
@@ -283,7 +287,7 @@ async function confirm(question, flags) {
   if (flags.has('--yes')) return true;
   if (!process.stdin.isTTY) {
     console.error(question);
-    console.error('dc: not going ahead without confirmation; rerun with --yes.');
+    console.error(`${NAME}: not going ahead without confirmation; rerun with --yes.`);
     return false;
   }
   // Imported here so an old Node still reaches the friendly version check.
@@ -298,15 +302,15 @@ async function confirm(question, flags) {
 function removeContainersAndVolumes(containers, volumes) {
   for (const c of containers) {
     if ((runQuiet('docker', ['rm', '-f', c.id]).status ?? 1) !== 0) {
-      console.error(`dc: could not remove container ${c.id} (see above); nothing was deleted.`);
+      console.error(`${NAME}: could not remove container ${c.id} (see above); nothing was deleted.`);
       return 1;
     }
   }
   if (!volumes.length) return 0;
   const status = runQuiet('docker', ['volume', 'rm', ...volumes]).status ?? 1;
   if (status !== 0) {
-    console.error('dc: could not delete every volume (see above).'
-      + (containers.length ? ' The container was removed; `dc up` starts it again.' : ''));
+    console.error(`${NAME}: could not delete every volume (see above).`
+      + (containers.length ? ` The container was removed; \`${NAME} up\` starts it again.` : ''));
   }
   return status;
 }
@@ -319,14 +323,14 @@ async function cmdPrune(flags) {
   const orphans = agentVolumesOnMachine({ danglingOnly: true });
   if (!orphans.length) { console.log('no unused agent volumes.'); return 0; }
   console.log('Agent volumes no container uses, from any project on this machine that was');
-  console.log('moved, renamed, or removed with `dc rm` and not started again:');
+  console.log(`moved, renamed, or removed with \`${NAME} rm\` and not started again:`);
   listVolumes(orphans);
-  console.log('\nA project removed with `dc rm` picks its data up again on its next `dc up`;');
+  console.log(`\nA project removed with \`${NAME} rm\` picks its data up again on its next \`${NAME} up\`;`);
   console.log('deleting it here loses that history.');
   if (!(await confirm(`Delete these ${orphans.length} volume(s)?`, flags))) return 1;
   const status = runQuiet('docker', ['volume', 'rm', ...orphans]).status ?? 1;
   if (status === 0) console.log('Deleted.');
-  else console.error('dc: could not delete every volume (see above).');
+  else console.error(`${NAME}: could not delete every volume (see above).`);
   return status;
 }
 
@@ -337,7 +341,7 @@ async function cmdVolumes(root, flags) {
     console.log('this project has no saved agent data.');
     if (!cs.length) {
       const n = agentVolumesOnMachine({ danglingOnly: true }).length;
-      if (n) console.log(`(${n} agent volume(s) on this machine are unused; \`dc volumes --prune\` lists them.)`);
+      if (n) console.log(`(${n} agent volume(s) on this machine are unused; \`${NAME} volumes --prune\` lists them.)`);
     }
     return 0;
   }
@@ -345,21 +349,21 @@ async function cmdVolumes(root, flags) {
     console.log('Saved agent data for this project (history, memory, settings, plugins; no sign-ins):');
     listVolumes(volumes);
     console.log(cs.length
-      ? '\n`dc up --fresh` clears it and starts a new container. To delete it for good, `dc rm --volumes`.'
-      : '\n`dc volumes --rm` deletes it.');
+      ? `\n\`${NAME} up --fresh\` clears it and starts a new container. To delete it for good, \`${NAME} rm --volumes\`.`
+      : `\n\`${NAME} volumes --rm\` deletes it.`);
     return 0;
   }
   // Docker won't delete a volume a container still uses, even a stopped one,
   // and --rm deletes only data, so leave removing the container to the user.
   if (cs.length) {
-    console.error('dc volumes: this project\'s container is still using its saved agent data.\n'
-      + 'Run `dc rm --volumes` to remove the container and delete the data together.\n'
-      + 'Or run `dc up --fresh` to clear the data and start a new container.');
+    console.error(`${NAME} volumes: this project's container is still using its saved agent data.\n`
+      + `Run \`${NAME} rm --volumes\` to remove the container and delete the data together.\n`
+      + `Or run \`${NAME} up --fresh\` to clear the data and start a new container.`);
     return 1;
   }
   if (!(await confirm('Delete this project\'s saved agent history (sessions, memory, settings, plugins)?', flags))) return 1;
   const status = removeContainersAndVolumes([], volumes);
-  if (status === 0) console.log('Deleted. The next `dc up` starts with empty agent folders.');
+  if (status === 0) console.log(`Deleted. The next \`${NAME} up\` starts with empty agent folders.`);
   return status;
 }
 
@@ -378,7 +382,7 @@ async function cmdRmVolumes(root, flags) {
     return 1;
   }
   const status = removeContainersAndVolumes(cs, volumes);
-  if (status === 0 && volumes.length) console.log('Deleted. The next `dc up` starts with empty agent folders.');
+  if (status === 0 && volumes.length) console.log(`Deleted. The next \`${NAME} up\` starts with empty agent folders.`);
   return status;
 }
 
@@ -597,22 +601,22 @@ async function resumeForwards(root) {
   const s = await ensureForwarding(root, ports);
   for (const p of ports) {
     if (s?.listening?.includes(p)) console.log(`Forwarding ${describeForward(p, s)}.`);
-    else console.error(`dc: ${describeForward(p, s)}`);
+    else console.error(`${NAME}: ${describeForward(p, s)}`);
   }
   networkHint(ports, s);
-  console.log('`dc forward --rm <port>` stops a forward.');
+  console.log(`\`${NAME} forward --rm <port>\` stops a forward.`);
 }
 
 const nodeInContainer = (c) => capture('docker', ['exec', c.id, 'node', '--version']).status === 0;
-const NO_NODE = 'dc forward: the container has no `node` on its PATH, which forwarding uses.\n'
+const NO_NODE = `${NAME} forward: the container has no \`node\` on its PATH, which forwarding uses.\n`
   + 'The template installs it with the Node dev container feature.';
 
 async function cmdForward(root, flags, rest) {
   let ports;
-  try { ports = parsePorts(rest); } catch (e) { console.error(`dc forward: ${e.message}`); return 1; }
+  try { ports = parsePorts(rest); } catch (e) { console.error(`${NAME} forward: ${e.message}`); return 1; }
 
   if (flags.has('--rm')) {
-    if (!ports.length) { console.error('dc forward --rm: name the port(s) to stop, e.g. `dc forward --rm 8999`.'); return 1; }
+    if (!ports.length) { console.error(`${NAME} forward --rm: name the port(s) to stop, e.g. \`${NAME} forward --rm 8999\`.`); return 1; }
     const gone = withListLock(root, () => {
       const saved = readForwards(root);
       writeForwards(root, saved.filter((p) => !ports.includes(p)));
@@ -628,7 +632,7 @@ async function cmdForward(root, flags, rest) {
   const c = runningContainer(root);
   if (!ports.length) {
     const saved = readForwards(root);
-    if (!saved.length) { console.log('No ports forwarded. `dc forward <port>` adds one.'); return 0; }
+    if (!saved.length) { console.log(`No ports forwarded. \`${NAME} forward <port>\` adds one.`); return 0; }
     // A running container with no relay (started by VS Code, say): start one.
     const s = c ? await ensureForwarding(root, saved) : { network: readNetworkForwards(root), listening: [], errors: {} };
     for (const p of saved) console.log(describeForward(p, s));
@@ -650,7 +654,7 @@ async function cmdForward(root, flags, rest) {
   });
   for (const p of narrowed) console.log(`${p} is now forwarded to localhost only, not your network.`);
   if (!c) {
-    console.log(`Saved. ${ports.join(', ')} will be forwarded when the container starts (\`dc up\`).`);
+    console.log(`Saved. ${ports.join(', ')} will be forwarded when the container starts (\`${NAME} up\`).`);
     return 0;
   }
   // Wait until the relay has each port open in the mode just asked for.
@@ -658,11 +662,11 @@ async function cmdForward(root, flags, rest) {
     (st) => ports.every((p) => st.errors[p] || (st.listening.includes(p) && st.network.includes(p) === wide)));
   let status = 0;
   for (const p of ports) {
-    if (s?.listening?.includes(p)) console.log(`Forwarding ${describeForward(p, s)}. \`dc forward --rm ${p}\` stops it.`);
-    else { status = 1; console.error(`dc forward: ${describeForward(p, s)}`); }
+    if (s?.listening?.includes(p)) console.log(`Forwarding ${describeForward(p, s)}. \`${NAME} forward --rm ${p}\` stops it.`);
+    else { status = 1; console.error(`${NAME} forward: ${describeForward(p, s)}`); }
   }
   networkHint(ports, s);
-  if (!s) console.error(`dc forward: the forwarding process didn't start; see ${forwardFiles(root).log}`);
+  if (!s) console.error(`${NAME} forward: the forwarding process didn't start; see ${forwardFiles(root).log}`);
   return status;
 }
 
@@ -926,7 +930,7 @@ function helperImage(containers, saved) {
   if (capture('docker', ['image', 'inspect', FALLBACK_HELPER_IMAGE]).status === 0) return FALLBACK_HELPER_IMAGE;
   console.log(`Fetching a small helper image (${FALLBACK_HELPER_IMAGE}) for the copying...`);
   if (runQuiet('docker', ['pull', '-q', FALLBACK_HELPER_IMAGE]).status === 0) return FALLBACK_HELPER_IMAGE;
-  console.error(`dc: couldn't get the helper image ${FALLBACK_HELPER_IMAGE} (it needs an internet connection the first time). Nothing was changed.`);
+  console.error(`${NAME}: couldn't get the helper image ${FALLBACK_HELPER_IMAGE} (it needs an internet connection the first time). Nothing was changed.`);
   return null;
 }
 
@@ -983,7 +987,7 @@ function listSnapshots(root) {
 
 function refuseOverlap(root, cmd) {
   if (!overlaps(snapshotsDir(root), root)) return false;
-  console.error(`dc ${cmd}: snapshots would be kept inside the project (${snapshotsDir(root)}), where restoring would delete them. `
+  console.error(`${NAME} ${cmd}: snapshots would be kept inside the project (${snapshotsDir(root)}), where restoring would delete them. `
     + 'Point DC_STATE_DIR (or XDG_STATE_HOME) somewhere outside the project.');
   return true;
 }
@@ -1065,26 +1069,26 @@ async function okToInterrupt(cs, doing, flags) {
 async function cmdSnapshot(root, flags, rest) {
   if (flags.has('--list')) {
     const snaps = listSnapshots(root);
-    if (!snaps.length) { console.log('No snapshots yet. `dc snapshot <name>` makes one.'); return 0; }
+    if (!snaps.length) { console.log(`No snapshots yet. \`${NAME} snapshot <name>\` makes one.`); return 0; }
     for (const s of snaps) console.log(`${s.name.padEnd(20)}  ${new Date(s.created).toLocaleString()}  ${humanSize(s.bytes)}`);
     return 0;
   }
   const name = rest[0];
   if (!name || !SNAPSHOT_NAME.test(name) || PARTIAL.test(name) || rest.length > 1) {
-    console.error('dc snapshot: give one name, such as `dc snapshot clean` (letters, digits, dots, dashes, underscores; up to 40).');
+    console.error(`${NAME} snapshot: give one name, such as \`${NAME} snapshot clean\` (letters, digits, dots, dashes, underscores; up to 40).`);
     return 1;
   }
   const base = snapshotsDir(root);
   const dir = join(base, name);
   if (flags.has('--rm')) {
-    if (!existsSync(dir)) { console.error(`dc snapshot: no snapshot named ${name}.`); return 1; }
+    if (!existsSync(dir)) { console.error(`${NAME} snapshot: no snapshot named ${name}.`); return 1; }
     rmSync(dir, { recursive: true, force: true });
     console.log(`Deleted snapshot ${name}.`);
     return 0;
   }
   const replacing = existsSync(dir);
   if (replacing && !flags.has('--overwrite')) {
-    console.error(`dc snapshot: ${name} already exists. Add --overwrite to replace it, or pick another name.`);
+    console.error(`${NAME} snapshot: ${name} already exists. Add --overwrite to replace it, or pick another name.`);
     return 1;
   }
   if (refuseOverlap(root, 'snapshot')) return 1;
@@ -1128,7 +1132,7 @@ async function cmdSnapshot(root, flags, rest) {
     // Stop the container so nothing is half-written while it's copied.
     for (const c of running) {
       if ((runQuiet('docker', ['stop', c.id]).status ?? 1) !== 0) {
-        console.error(`dc snapshot: couldn't stop container ${c.id}, so nothing was saved.`);
+        console.error(`${NAME} snapshot: couldn't stop container ${c.id}, so nothing was saved.`);
         ok = false;
         break;
       }
@@ -1138,11 +1142,11 @@ async function cmdSnapshot(root, flags, rest) {
     const snapMount = ok && mountArg('bind', tmp, '/snap');
     for (const v of ok ? volumes : []) {
       const r = helper(image, [mountArg('volume', v, '/v', true), snapMount], save('/v', `${toolOf(v)}.tgz`));
-      if (r.status !== 0 || interrupted) { ok = false; if (!interrupted) console.error(`dc snapshot: couldn't save ${v}:\n${(r.stderr || '').trim()}`); break; }
+      if (r.status !== 0 || interrupted) { ok = false; if (!interrupted) console.error(`${NAME} snapshot: couldn't save ${v}:\n${(r.stderr || '').trim()}`); break; }
     }
     if (ok) {
       const r = helper(image, [mountArg('bind', root, '/proj', true), snapMount], save('/proj', 'project.tgz'));
-      if (r.status !== 0 || interrupted) { ok = false; if (!interrupted) console.error(`dc snapshot: couldn't save the project folder:\n${(r.stderr || '').trim()}`); }
+      if (r.status !== 0 || interrupted) { ok = false; if (!interrupted) console.error(`${NAME} snapshot: couldn't save the project folder:\n${(r.stderr || '').trim()}`); }
     }
     if (ok) {
       writeJson(join(tmp, 'snapshot.json'), {
@@ -1165,21 +1169,21 @@ async function cmdSnapshot(root, flags, rest) {
     process.removeListener('SIGINT', onInt);
   }
   if (stopped.length) await resumeForwards(root);
-  if (interrupted) { console.error('dc snapshot: stopped; nothing was saved.'); return 130; }
+  if (interrupted) { console.error(`${NAME} snapshot: stopped; nothing was saved.`); return 130; }
   if (!ok) return 1;
   console.log(`${replacing ? 'Replaced' : 'Saved'} snapshot ${name}: the project folder${volumes.length ? ` and ${volumes.map(toolOf).join(', ')} data` : ''} (${humanSize(dirSize(dir))}).`);
-  console.log(`\`dc restore ${name}\` puts it all back.`);
+  console.log(`\`${NAME} restore ${name}\` puts it all back.`);
   return 0;
 }
 
 async function cmdRestore(root, flags, rest) {
   const name = rest[0];
-  if (!name || rest.length > 1) { console.error('dc restore: give the snapshot\'s name, such as `dc restore clean` (`dc snapshot --list` shows them).'); return 1; }
+  if (!name || rest.length > 1) { console.error(`${NAME} restore: give the snapshot's name, such as \`${NAME} restore clean\` (\`${NAME} snapshot --list\` shows them).`); return 1; }
   const dir = join(snapshotsDir(root), name);
   const meta = SNAPSHOT_NAME.test(name) && !PARTIAL.test(name) && readJson(join(dir, 'snapshot.json'));
-  if (!meta) { console.error(`dc restore: no snapshot named ${name}. \`dc snapshot --list\` shows them.`); return 1; }
+  if (!meta) { console.error(`${NAME} restore: no snapshot named ${name}. \`${NAME} snapshot --list\` shows them.`); return 1; }
   if (normalizeLocalFolder(meta.root) !== normalizeLocalFolder(root)) {
-    console.error(`dc restore: ${name} was taken of ${meta.root}, not this folder.`);
+    console.error(`${NAME} restore: ${name} was taken of ${meta.root}, not this folder.`);
     return 1;
   }
   if (refuseOverlap(root, 'restore')) return 1;
@@ -1203,7 +1207,7 @@ async function cmdRestore(root, flags, rest) {
     archives.map((a) => `tar -tzf /snap/${a} >/dev/null || { echo "damaged: ${a}" >&2; exit 1; }`).join('; ')
     + "; tar -tzf /snap/project.tgz | grep -q -E '^(\\./)?\\.devcontainer/devcontainer\\.json$' || { echo 'no .devcontainer/devcontainer.json in the project archive' >&2; exit 1; }");
   if (check.status !== 0) {
-    console.error(`dc restore: snapshot ${name} can't be used, so nothing was changed:\n${(check.stderr || '').trim()}`);
+    console.error(`${NAME} restore: snapshot ${name} can't be used, so nothing was changed:\n${(check.stderr || '').trim()}`);
     return 1;
   }
 
@@ -1217,28 +1221,28 @@ async function cmdRestore(root, flags, rest) {
   const quick = flags.has('--quick');
   for (const c of cs) {
     if ((runQuiet('docker', quick ? ['stop', c.id] : ['rm', '-f', c.id]).status ?? 1) !== 0) {
-      console.error(`dc restore: couldn't ${quick ? 'stop' : 'remove'} container ${c.id}, so nothing was changed.`);
+      console.error(`${NAME} restore: couldn't ${quick ? 'stop' : 'remove'} container ${c.id}, so nothing was changed.`);
       return 1;
     }
   }
 
-  const retry = `Run \`dc restore ${name}\` from ${root} to try again; the snapshot is unchanged.`;
+  const retry = `Run \`${NAME} restore ${name}\` from ${root} to try again; the snapshot is unchanged.`;
   for (const t of tools) {
     const vol = target(t);
     runQuiet('docker', ['volume', 'create', vol]);
     const r = helper(image, [mountArg('volume', vol, '/v'), snapMount], refill('/v', `${t}.tgz`, true));
-    if (r.status !== 0) { console.error(`dc restore: couldn't restore ${vol}:\n${(r.stderr || '').trim()}\n${retry}`); return 1; }
+    if (r.status !== 0) { console.error(`${NAME} restore: couldn't restore ${vol}:\n${(r.stderr || '').trim()}\n${retry}`); return 1; }
   }
   // Docker Desktop's shared folders (macOS, Windows) refuse ownership changes.
   const r = helper(image, [mountArg('bind', root, '/proj'), snapMount], refill('/proj', 'project.tgz', platform() === 'linux'));
   let status = 0;
   if (r.status === 4) {
     const left = (r.stderr || '').split('\n').filter((l) => l.startsWith('left: ')).map((l) => l.slice(6));
-    console.error(`dc restore: everything from the snapshot is back, but these couldn't be removed (a program may have them open): ${left.join(', ')}. `
+    console.error(`${NAME} restore: everything from the snapshot is back, but these couldn't be removed (a program may have them open): ${left.join(', ')}. `
       + 'Close that program and delete them, or run the restore again.');
     status = 1;
   } else if (r.status !== 0) {
-    console.error(`dc restore: couldn't restore the project folder. If a file in it is open in another program, close it.\n${(r.stderr || '').trim()}\n${retry}`);
+    console.error(`${NAME} restore: couldn't restore the project folder. If a file in it is open in another program, close it.\n${(r.stderr || '').trim()}\n${retry}`);
     return 1;
   } else {
     console.log(`Restored ${name}.`);
@@ -1258,7 +1262,7 @@ async function cmdRestore(root, flags, rest) {
 function requireRoot() {
   const root = findProjectRoot(process.cwd());
   if (!root) {
-    console.error('dc: no .devcontainer/devcontainer.json found in this directory or any parent.');
+    console.error(`${NAME}: no .devcontainer/devcontainer.json found in this directory or any parent.`);
     process.exit(1);
   }
   return root;
@@ -1308,6 +1312,7 @@ function reportNoMatch(root) {
 
 const TEMPLATE_REPO = 'zeveck/devcontainer-plus';
 const RECORD = '.dcp.json';
+const WHATS_NEW = 'https://dcp.synapticnoise.com/whats-new/';
 // Line endings don't count as a change: a Windows checkout has CRLF.
 const lf = (text) => text.replace(/\r\n/g, '\n');
 const fingerprint = (text) => createHash('sha256').update(lf(text)).digest('hex');
@@ -1398,19 +1403,54 @@ function gitHasIt(path) {
   return !r.error && r.status === 0 && tracked.status === 0;
 }
 
+/** The record of what was installed, for the next `update` to compare against. */
+function templateRecord(template) {
+  return {
+    template: TEMPLATE_REPO,
+    version: template.version,
+    files: Object.fromEntries(template.files.map((f) => [f.name, fingerprint(f.text)])),
+  };
+}
+
+/** `init`: put the latest .devcontainer into a folder that doesn't have one. */
+async function cmdInit(rest) {
+  const root = process.cwd();
+  const target = join(root, '.devcontainer');
+  if (existsSync(target)) {
+    console.log(`This folder already has a .devcontainer. To bring it up to date: ${NAME} update`);
+    return 0;
+  }
+  console.log(rest[0] ? `Getting devcontainer-plus from ${resolve(rest[0])}...` : 'Getting the latest devcontainer-plus...');
+  let template;
+  try { template = await loadTemplate(rest[0]); }
+  catch (e) { console.error(`${NAME} init: ${e.message}`); return 1; }
+  mkdirSync(target, { recursive: true });
+  for (const f of template.files) {
+    const path = join(target, f.name);
+    writeFileSync(path, withEol(f.name, f.text));
+    if (f.executable && !IS_WIN) chmodSync(path, 0o755);
+  }
+  writeFileSync(join(target, RECORD), JSON.stringify(templateRecord(template), null, 2) + '\n');
+  const parent = findProjectRoot(dirname(root));
+  console.log(`Added devcontainer-plus to ${root}.`);
+  if (parent) console.log(`(${parent} has its own .devcontainer too; this one is just for this folder.)`);
+  console.log(`Next: ${NAME} up, then ${NAME} claude. What's in it: https://dcp.synapticnoise.com/`);
+  return 0;
+}
+
 async function cmdUpdate(root, flags, rest) {
   const target = join(root, '.devcontainer');
   const origin = spawnSync('git', ['-C', root, 'remote', 'get-url', 'origin'], { encoding: 'utf8' });
   if (/zeveck\/devcontainer(s|-plus)(\.git)?\s*$/.test(origin.stdout || '') || (rest[0] && resolve(rest[0]) === root)) {
-    console.log('This is devcontainer-plus itself, so there\'s nothing to update. Run dc update in a project that uses it.');
+    console.log(`This is devcontainer-plus itself, so there's nothing to update. Run ${NAME} update in a project that uses it.`);
     return 0;
   }
   const recordPath = join(target, RECORD);
   const record = readJson(recordPath) || null;
-  console.log(rest[0] ? `Reading the template from ${resolve(rest[0])}...` : `Fetching the latest ${TEMPLATE_REPO}...`);
+  console.log(rest[0] ? `Checking ${resolve(rest[0])} for a newer devcontainer-plus...` : 'Checking for a newer devcontainer-plus...');
   let template;
   try { template = await loadTemplate(rest[0]); }
-  catch (e) { console.error(`dc update: ${e.message}`); return 1; }
+  catch (e) { console.error(`${NAME} update: ${e.message}`); return 1; }
 
   const plan = []; // { name, action, text?, executable?, note?, existing? }
   const recorded = record?.files || {};
@@ -1443,33 +1483,33 @@ async function cmdUpdate(root, flags, rest) {
   }
   const leftovers = readdirSync(target).filter((n) => n.endsWith('.new') && !plan.some((p) => p.action === 'keep' && `${p.name}.new` === n));
 
-  const newRecord = {
-    template: TEMPLATE_REPO,
-    version: template.version,
-    files: Object.fromEntries(template.files.map((f) => [f.name, fingerprint(f.text)])),
-  };
+  const newRecord = templateRecord(template);
   const remindLeftovers = () => {
     for (const n of leftovers) console.log(`${n} is still here from an earlier update: compare it with ${n.slice(0, -4)}, keep what you want, then delete it.`);
   };
   if (!plan.length) {
     if (record?.version !== template.version || !record) writeFileSync(recordPath, JSON.stringify(newRecord, null, 2) + '\n');
-    console.log('Already up to date.');
+    console.log('This project\'s dev container is up to date.');
     remindLeftovers();
     return 0;
   }
 
-  const say = {
-    add: () => 'new',
-    update: () => 'updated',
-    merge: () => 'updated, keeping your changes',
-    replace: (p) => `replaced (it differs from the template: an older copy, or your own changes${p.backup ? `; your copy is kept as ${p.name}.orig` : ''})`,
-    keep: (p) => `kept as you have it, and the new version saved beside it as ${p.name}.new (${p.note})`,
-    remove: () => 'removed (the template no longer has it)',
-  };
-  console.log('');
-  for (const p of plan) console.log(`  ${p.name}: ${say[p.action](p)}`);
-  console.log('');
-  if (!(await confirm('Update .devcontainer?', flags))) return 1;
+  // Most people don't know these files, so name one only when it needs them:
+  // their own changes that overlap the update, or a first update replacing
+  // files that differ.
+  const keeps = plan.filter((p) => p.action === 'keep');
+  const replaced = plan.filter((p) => p.action === 'replace');
+  for (const p of keeps) {
+    const why = p.note === 'you both changed the same lines' ? 'has changes of yours that overlap the update' : `has changes of yours, and ${p.note}`;
+    console.log(`${p.name} ${why}, so yours stays as it is and the new version is saved beside it as ${p.name}.new to compare.`);
+  }
+  if (replaced.length) {
+    const backups = replaced.filter((p) => p.backup);
+    console.log('Some of its files differ from devcontainer-plus (an older copy, or changes of your own), so they\'ll be replaced. '
+      + (backups.length === replaced.length ? 'The old ones are kept beside them as .orig files.' : '`git diff .devcontainer` will show what changed.'));
+  }
+  console.log(`A newer devcontainer-plus is out. What's new: ${WHATS_NEW}`);
+  if (!(await confirm('Update this project\'s dev container?', flags))) return 1;
 
   for (const p of plan) {
     const path = join(target, p.name);
@@ -1481,19 +1521,14 @@ async function cmdUpdate(root, flags, rest) {
   }
   writeFileSync(recordPath, JSON.stringify(newRecord, null, 2) + '\n');
 
-  console.log('Updated. Rebuild to use it: dc up --rebuild');
-  if (plan.some((p) => p.action === 'replace' && !p.backup)) {
-    console.log('Files that differed were replaced. If any had changes of your own, `git diff .devcontainer` shows them, so you can put them back.');
-  }
-  if (plan.some((p) => p.action === 'keep')) {
-    console.log('Where a .new file was saved, compare it with yours, keep what you want from it, then delete it.');
-  }
+  console.log(`Updated. Rebuild to use it: ${NAME} up --rebuild`);
+  if (keeps.length) console.log('Compare each .new file with yours, keep what you want from it, then delete it.');
   remindLeftovers();
   // The dc command on your PATH is a separate copy; say if it's now older.
   const installed = join(installPaths(['dc']).payload, 'dc.mjs');
   const latest = template.files.find((f) => f.name === 'dc.mjs');
   if (latest && existsSync(installed) && fingerprint(readFileSync(installed, 'utf8')) !== fingerprint(latest.text)) {
-    console.log(`Your dc command is older than this project's. To update it: ${IS_WIN ? '.\\.devcontainer\\dc install' : './.devcontainer/dc install'}`);
+    console.log(`Your ${NAME} command is older than this project's. To update it: ${IS_WIN ? '.\\.devcontainer\\dc install' : './.devcontainer/dc install'}`);
   }
   return 0;
 }
@@ -1521,10 +1556,10 @@ function installNames(rest) {
 }
 
 /** Body for a generated shim, with the payload path baked in absolutely. */
-export function shimBody(kind, target) {
-  if (kind === 'cmd') return `@node "${target}" %*\r\n`;
-  if (kind === 'ps1') return `node "${target}" @args\r\nexit $LASTEXITCODE\r\n`;
-  return `#!/bin/sh\nexec node "${target}" "$@"\n`;
+export function shimBody(kind, target, name = 'dc') {
+  if (kind === 'cmd') return `@node "${target}" --dc-name=${name} %*\r\n`;
+  if (kind === 'ps1') return `node "${target}" --dc-name=${name} @args\r\nexit $LASTEXITCODE\r\n`;
+  return `#!/bin/sh\nexec node "${target}" --dc-name=${name} "$@"\n`;
 }
 
 function cmdInstall(flags, rest) {
@@ -1544,7 +1579,7 @@ function cmdInstall(flags, rest) {
   for (const shim of shims) {
     const shimPath = join(binDir, shim);
     const kind = shim.endsWith('.cmd') ? 'cmd' : shim.endsWith('.ps1') ? 'ps1' : 'sh';
-    writeFileSync(shimPath, shimBody(kind, target));
+    writeFileSync(shimPath, shimBody(kind, target, shim.replace(/\.(cmd|ps1)$/, '')));
     if (kind === 'sh') chmodSync(shimPath, 0o755);
     console.log(`installed: ${shimPath}${link ? '  (linked to repo)' : ''}`);
   }
@@ -1572,7 +1607,7 @@ function cmdInstall(flags, rest) {
   const found = calculator && capture('which', ['dc']).stdout?.trim();
   if (found && normalizeLocalFolder(found) === normalizeLocalFolder(join(binDir, 'dc'))) {
     console.log('\nNOTE: your system already had a `dc` command (a desk calculator), and this one now hides it.');
-    console.log('To get the calculator back, run `dcp uninstall dc` and use `dcp` instead.');
+    console.log(`To get the calculator back, run \`dcp uninstall dc\` and use \`dcp\` instead.`);
   }
   return 0;
 }
@@ -1642,29 +1677,31 @@ function cmdDoctor() {
 
 // ── commands ────────────────────────────────────────────────────────────────
 
-const HELP = `dc — dev containers without VS Code
+const HELP = `${NAME} — dev containers without VS Code
 
-  dc up [--rebuild] [--no-cache]   create/start the container
-  dc up --fresh [--yes]            rebuild with empty agent folders (deletes history)
-  dc build                         build the image
-  dc shell                         interactive shell inside it
-  dc exec <cmd> [args...]          run a command inside it
-  dc claude|codex|gemini|pw [...]  run an agent inside it
-  dc down [--yes]                  stop the container
-  dc rm [--volumes] [--yes]        stop and remove it (--volumes: delete agent data too)
-  dc volumes [--rm | --prune]      list or delete saved agent data (--yes: don't ask)
-  dc forward [<port>...]           forward ports to localhost, or list them
-  dc forward <port>... --network   ...and to other devices on your network
-  dc forward --rm <port>...        stop forwarding them
-  dc snapshot <name> [--overwrite] save the project folder and agent data
-  dc snapshot --list | --rm <name> list snapshots, or delete one
-  dc restore <name> [--quick]      put a snapshot back (--yes: don't ask)
-  dc status                        show this project's containers
-  dc logs [--follow]               container logs
-  dc update [template folder]      bring .devcontainer up to the latest template
-  dc doctor                        check prerequisites
-  dc install [name] [--link]       install to your PATH (as dc and dcp, or just [name])
-  dc uninstall [name]              remove it (both names, or just [name])
+  ${NAME} up [--rebuild] [--no-cache]   create/start the container
+  ${NAME} up --fresh [--yes]            rebuild with empty agent folders (deletes history)
+  ${NAME} build                         build the image
+  ${NAME} shell                         interactive shell inside it
+  ${NAME} exec <cmd> [args...]          run a command inside it
+  ${NAME} claude|codex|gemini|pw [...]  run an agent inside it
+  ${NAME} down [--yes]                  stop the container
+  ${NAME} rm [--volumes] [--yes]        stop and remove it (--volumes: delete agent data too)
+  ${NAME} volumes [--rm | --prune]      list or delete saved agent data (--yes: don't ask)
+  ${NAME} forward [<port>...]           forward ports to localhost, or list them
+  ${NAME} forward <port>... --network   ...and to other devices on your network
+  ${NAME} forward --rm <port>...        stop forwarding them
+  ${NAME} snapshot <name> [--overwrite] save the project folder and agent data
+  ${NAME} snapshot --list | --rm <name> list snapshots, or delete one
+  ${NAME} restore <name> [--quick]      put a snapshot back (--yes: don't ask)
+  ${NAME} status                        show this project's containers
+  ${NAME} statusline                    switch Claude's status line: ours or yours
+  ${NAME} logs [--follow]               container logs
+  ${NAME} init [template folder]        add devcontainer-plus to this folder
+  ${NAME} update [template folder]      bring .devcontainer up to the latest template
+  ${NAME} doctor                        check prerequisites
+  ${NAME} install [name] [--link]       install to your PATH (as ${NAME} and dcp, or just [name])
+  ${NAME} uninstall [name]              remove it (both names, or just [name])
 `;
 
 const FORWARDING = new Set(['exec', 'claude', 'codex', 'gemini', 'pw']);
@@ -1677,46 +1714,50 @@ async function main(argv) {
   const { flags, rest } = FORWARDING.has(cmd) ? { flags: new Set(), rest: raw } : parseArgs(raw);
 
   if (Number(process.versions.node.split('.')[0]) < 18) {
-    console.error(`dc: Node 18+ required (found ${process.versions.node}).`);
+    console.error(`${NAME}: Node 18+ required (found ${process.versions.node}).`);
     return 1;
   }
   if (!cmd || cmd === 'help' || cmd === '--help' || cmd === '-h' || flags.has('--help')) { console.log(HELP); return 0; }
-  if (cmd === 'version' || cmd === '--version' || flags.has('--version')) { console.log('dc 1.0.0'); return 0; }
+  if (cmd === 'version' || cmd === '--version' || flags.has('--version')) { console.log(`${NAME} 1.0.0`); return 0; }
   if (cmd === 'install') return cmdInstall(flags, rest);
   if (cmd === 'uninstall') return cmdUninstall(flags, rest);
   if (cmd === 'doctor') return cmdDoctor();
   if (cmd === 'volumes') {
     const unknown = [...flags].filter((f) => !['--rm', '--prune', '--yes'].includes(f));
-    if (unknown.length) { console.error(`dc volumes: unknown option ${unknown.join(' ')}`); return 1; }
+    if (unknown.length) { console.error(`${NAME} volumes: unknown option ${unknown.join(' ')}`); return 1; }
   }
   // The background relay `dc forward` starts; not a user command.
   if (cmd === '__relay') return relayMain(rest[0]);
   if (cmd === 'forward') {
     const unknown = [...flags].filter((f) => !['--rm', '--network'].includes(f));
-    if (unknown.length) { console.error(`dc forward: unknown option ${unknown.join(' ')}`); return 1; }
+    if (unknown.length) { console.error(`${NAME} forward: unknown option ${unknown.join(' ')}`); return 1; }
     if (flags.has('--rm') && flags.has('--network')) {
-      console.error('dc forward: --rm stops a forward; to keep it but make it localhost only, run `dc forward <port>` without --network.');
+      console.error(`${NAME} forward: --rm stops a forward; to keep it but make it localhost only, run \`${NAME} forward <port>\` without --network.`);
       return 1;
     }
   }
   if (cmd === 'snapshot' || cmd === 'restore') {
     const allowed = cmd === 'snapshot' ? ['--list', '--rm', '--yes', '--overwrite'] : ['--quick', '--yes'];
     const unknown = [...flags].filter((f) => !allowed.includes(f));
-    if (unknown.length) { console.error(`dc ${cmd}: unknown option ${unknown.join(' ')}`); return 1; }
+    if (unknown.length) { console.error(`${NAME} ${cmd}: unknown option ${unknown.join(' ')}`); return 1; }
   }
   if (cmd === 'rm') {
     const unknown = [...flags].filter((f) => !['--volumes', '--yes'].includes(f));
-    if (unknown.length) { console.error(`dc rm: unknown option ${unknown.join(' ')}`); return 1; }
+    if (unknown.length) { console.error(`${NAME} rm: unknown option ${unknown.join(' ')}`); return 1; }
   }
   if (cmd === 'volumes' && flags.has('--prune')) {
-    if (flags.has('--rm')) { console.error('dc volumes: use --rm or --prune, not both.'); return 1; }
+    if (flags.has('--rm')) { console.error(`${NAME} volumes: use --rm or --prune, not both.`); return 1; }
     // Works across projects, so it doesn't need to run inside one.
     return preflight() ? cmdPrune(flags) : 1;
   }
 
+  if (cmd === 'init') {
+    if (flags.size) { console.error(`${NAME} init: unknown option ${[...flags].join(' ')}`); return 1; }
+    return cmdInit(rest);
+  }
   if (cmd === 'update') {
     const unknown = [...flags].filter((f) => f !== '--yes');
-    if (unknown.length) { console.error(`dc update: unknown option ${unknown.join(' ')}`); return 1; }
+    if (unknown.length) { console.error(`${NAME} update: unknown option ${unknown.join(' ')}`); return 1; }
     return cmdUpdate(requireRoot(), flags, rest);
   }
 
@@ -1757,7 +1798,7 @@ async function main(argv) {
     case 'shell':
       return dc(buildExecArgs(root, ['bash', '-l'], { login: false, env: process.env }));
     case 'exec': {
-      if (!raw.length) { console.error('dc exec: need a command'); return 1; }
+      if (!raw.length) { console.error(`${NAME} exec: need a command`); return 1; }
       // Login shell here too: node/npm resolve via /etc/profile.d in this image,
       // so a non-login exec would not find them either.
       return dc(buildExecArgs(root, raw, { env: process.env }));
@@ -1778,12 +1819,12 @@ async function main(argv) {
         runQuiet('docker', cmd === 'rm' ? ['rm', '-f', c.id] : ['stop', c.id]);
       }
       if (volumes.length) {
-        console.log('agent data kept for the next `dc up`:');
+        console.log(`agent data kept for the next \`${NAME} up\`:`);
         listVolumes(volumes);
-        console.log('`dc volumes --rm` deletes it.');
+        console.log(`\`${NAME} volumes --rm\` deletes it.`);
       }
       const ports = readForwards(root);
-      if (ports.length) console.log(`Forwarding of ${ports.join(', ')} stops with the container; \`dc up\` starts it again.`);
+      if (ports.length) console.log(`Forwarding of ${ports.join(', ')} stops with the container; \`${NAME} up\` starts it again.`);
       return 0;
     }
     case 'volumes':
@@ -1794,6 +1835,19 @@ async function main(argv) {
       return cmdSnapshot(root, flags, rest);
     case 'restore':
       return cmdRestore(root, flags, rest);
+    case 'statusline': {
+      // Switch Claude Code's status line between devcontainer-plus's and yours,
+      // in the running container (statusline.py does the switching).
+      if (!existsSync(join(root, '.devcontainer', 'statusline.py'))) {
+        console.error(`${NAME} statusline: this project's dev container is older than that. Run ${NAME} update, then ${NAME} up --rebuild.`);
+        return 1;
+      }
+      if (!findContainers(root).some((c) => c.state === 'running')) {
+        console.error(`${NAME} statusline: the container isn't running. Start it with ${NAME} up, then try again.`);
+        return 1;
+      }
+      return dc(buildExecArgs(root, ['python3', '.devcontainer/statusline.py', 'switch'], { env: process.env }));
+    }
     case 'status': {
       const cs = findContainers(root);
       if (!cs.length) { reportNoMatch(root); return 0; }
@@ -1812,7 +1866,7 @@ async function main(argv) {
       return run('docker', ['logs', ...(flags.has('--follow') ? ['-f'] : []), c.id]).status ?? 1;
     }
     default:
-      console.error(`dc: unknown command '${cmd}'\n`);
+      console.error(`${NAME}: unknown command '${cmd}'\n`);
       console.log(HELP);
       return 1;
   }
@@ -1825,6 +1879,6 @@ const realOrSelf = (p) => { try { return realpathSync(p); } catch { return p; } 
 if (process.argv[1] && fileURLToPath(import.meta.url) === realOrSelf(resolve(process.argv[1]))) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
-    (err) => { console.error(`dc: ${err && err.message ? err.message : err}`); process.exit(1); },
+    (err) => { console.error(`${NAME}: ${err && err.message ? err.message : err}`); process.exit(1); },
   );
 }
