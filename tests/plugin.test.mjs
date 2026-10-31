@@ -312,7 +312,8 @@ test('publish: a taken repo name says what is there and offers the next free one
   assert.equal(publish(dir, ['repo', 'me/taken']).stdout,
     'taken: me/taken (public | A frog game | 2026-04-25)\nfree: me/taken-2\n');
   // A name left behind by a rename only redirects, so it's free.
-  assert.equal(publish(dir, ['repo', 'me/renamed']).stdout, 'free: me/renamed\n');
+  assert.equal(publish(dir, ['repo', 'me/renamed']).stdout,
+    'free: me/renamed (it redirects to me/renamed-old, which using it ends)\n');
   // A failed lookup is never taken for a free name.
   const offline = publish(dir, ['repo', 'me/offline']);
   assert.equal(offline.status, 1);

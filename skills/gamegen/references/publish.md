@@ -93,6 +93,10 @@ then ask. For example:
   adventure"), what goes in it (the game, the README, and the design notes
   with `--making-of`), and where it goes in the gallery ("the top of
   synapticnoise.com", or "just before Pomegranate Panic 2" for a sequel).
+- **A name that only redirects** (`publish.sh repo` says so): say that
+  taking it ends the redirect, so old links reach the new game instead
+  ("That name now just redirects to your renamed zeveck/barbarain-april26,
+  so old links to it will reach the new game instead.").
 - **Anything that won't happen straight away or at all**, in the same voice:
   DNS not set up yet ("It'll be at https://zeveck.github.io/barbarain-2/ for
   now, and move to barbarain.synapticnoise.com once you add its DNS

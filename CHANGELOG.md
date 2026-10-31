@@ -4,6 +4,11 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.10.31.5
+
+- When the repo name only redirects to one you renamed, publishing says
+  that using it ends the redirect, so old links reach the new game.
+
 ## v2026.10.31.4
 
 - Publishing sees a repo name you've renamed away from as free (GitHub only

@@ -8,7 +8,8 @@
 #                                          those lines are read: never the keys)
 #   publish.sh check                       signed in to GitHub? prints the account
 #   publish.sh repo <owner/name>           is that repo name free? if not, what's
-#                                          there, and the next free name
+#                                          there, and the next free name; a name
+#                                          left by a rename says where it redirects
 #   publish.sh dns <host> <owner>          does <host> point at GitHub Pages yet?
 #   publish.sh pages <owner/name> [host]   turn on Pages (from the workflow), set
 #                                          the custom address, the repo's homepage
@@ -61,14 +62,18 @@ case "$cmd" in
       if out="$(gh repo view "$1" --json nameWithOwner,visibility,description,pushedAt \
         --jq '"\(.nameWithOwner)\t\(.visibility|ascii_downcase) | \(.description // "") | \(.pushedAt[:10])"' 2>&1)"; then
         local actual="${out%%$'\t'*}"
-        [ "${actual,,}" = "${1,,}" ] || return 1
+        if [ "${actual,,}" != "${1,,}" ]; then printf '%s' "$actual"; return 1; fi
         printf '%s' "${out#*$'\t'}"; return 0
       fi
       case "$out" in *"Could not resolve to a Repository"*) return 1 ;; *) return 2 ;; esac
     }
     info="$(lookup "$full")"; rc=$?
     [ $rc = 2 ] && die "repo: couldn't check whether $full exists; try again"
-    if [ $rc = 1 ]; then echo "free: $full"; exit 0; fi
+    if [ $rc = 1 ]; then
+      if [ -n "$info" ]; then echo "free: $full (it redirects to $info, which using it ends)"
+      else echo "free: $full"; fi
+      exit 0
+    fi
     echo "taken: $full ($info)"
     n=2
     while :; do
