@@ -5,6 +5,14 @@ which are also valid semver. For a second release on the same day, use the next
 day's date rather than a `-1` suffix, because semver sorts `2026.10.20-1`
 before `2026.10.20`.
 
+## v2026.11.2
+
+- A new game goes at the top of your gallery, newest first, or just before
+  the game it's a sequel to (Pomegranate Panic 3 before Pomegranate Panic 2).
+  Publishing says where when it asks, and you can name another place. It no
+  longer works out an order from the page, and never moves the games already
+  there.
+
 ## v2026.11.1
 
 - `--site` is now `--gallery` (and `GAMEGEN_SITE` is `GAMEGEN_GALLERY`): a

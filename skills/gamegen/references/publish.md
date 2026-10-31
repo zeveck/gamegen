@@ -44,9 +44,13 @@ Change nothing until the person confirms in step 2.
    - It exists and they can push to it
      (`gh api repos/<repo> --jq .permissions.push`): clone it into
      `.gamegen/gallery/` now (changing nothing yet) and find how it shows
-     the games and where a new one goes: at the top, unless they're clearly
-     in another order (alphabetical, oldest first). If it shows no games yet,
-     or it isn't clear how, plan to show the person what you'd add.
+     the games. A new game goes first, at the top, or, if it's a sequel to a
+     game already there (the same name with a number, like Pomegranate
+     Panic 3 to Pomegranate Panic 2), right before that game, so a series
+     reads newest first. Never work out any other order from the page or
+     its history, and don't move the games already there. If it shows no
+     games yet, or it isn't clear how, plan to show the person what you'd
+     add.
    - It doesn't exist (`publish.sh repo` says it's free) and it's under
      their own account: offer to start it, in the confirmation. Its address
      will be `https://<account>.github.io/<name>/`, or
@@ -87,8 +91,10 @@ Add what applies, briefly:
 - The gallery can't be used, saying why: "you can't push to
   someone/their-games, so it won't be added there", or "other/games doesn't
   exist and isn't yours to start, so…".
-- Where it goes in the gallery, as found in step 1.4. If it isn't clear,
-  say you'll show what you'd add before changing the gallery.
+- The gallery: "at the top", or "just before Pomegranate Panic 2" for a
+  sequel. If it isn't clear how the gallery shows games,
+  say you'll show what you'd add before changing it. If the person asks for
+  another place ("after Hoard Hopper"), put it there.
 
 A plain "no": say nothing was published, and how to change it
 (`/gamegen --publish <address>`, `--gallery none`). Anything else ("yes, but

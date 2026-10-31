@@ -201,7 +201,7 @@ GitHub repository of yours:
 The first time, if `you/my-games` doesn't exist yet, gamegen offers to start
 it: a page with each game's picture, name, a line about it and a Play
 button, at `https://<you>.github.io/my-games/`. Each game you publish after
-that is added at the top. Change the page however you like; gamegen adds new
+that is added at the top, or just before the game it's a sequel to, so a series reads newest first (say where instead when it asks, if you like). Change the page however you like; gamegen adds new
 games the way the page already shows the others. A games page you already
 have works too, if it's a GitHub repository you can push to.
 
