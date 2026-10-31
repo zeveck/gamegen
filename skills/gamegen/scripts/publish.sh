@@ -14,7 +14,7 @@
 #                                          the custom address, the repo's homepage
 #   publish.sh https <owner/name>          wait for the certificate, then make
 #                                          HTTPS required (PUBLISH_WAIT seconds,
-#                                          default 600)
+#                                          default 540, under a 10-minute call)
 set -u
 
 die() { echo "$1"; exit 1; }
@@ -51,12 +51,27 @@ case "$cmd" in
 
   repo)
     full="${1:?repo needs owner/name}"
-    info="$(gh repo view "$full" --json visibility,description,pushedAt \
-      --jq '"\(.visibility|ascii_downcase) | \(.description // "") | \(.pushedAt[:10])"' 2>/dev/null)"
-    if [ -z "$info" ]; then echo "free: $full"; exit 0; fi
+    # Only "Could not resolve" means free: any other failure (network, rate
+    # limit) must not pass for a free name.
+    lookup() { # owner/name -> prints the details; returns 1 if free, 2 if unsure
+      local out
+      if out="$(gh repo view "$1" --json visibility,description,pushedAt \
+        --jq '"\(.visibility|ascii_downcase) | \(.description // "") | \(.pushedAt[:10])"' 2>&1)"; then
+        printf '%s' "$out"; return 0
+      fi
+      case "$out" in *"Could not resolve to a Repository"*) return 1 ;; *) return 2 ;; esac
+    }
+    info="$(lookup "$full")"; rc=$?
+    [ $rc = 2 ] && die "repo: couldn't check whether $full exists; try again"
+    if [ $rc = 1 ]; then echo "free: $full"; exit 0; fi
     echo "taken: $full ($info)"
     n=2
-    while gh repo view "$full-$n" --json name >/dev/null 2>&1; do n=$((n + 1)); done
+    while :; do
+      lookup "$full-$n" >/dev/null; rc=$?
+      [ $rc = 1 ] && break
+      [ $rc = 2 ] && die "repo: couldn't check whether $full-$n exists; try again"
+      n=$((n + 1))
+    done
     echo "free: $full-$n"
     ;;
 
@@ -65,12 +80,17 @@ case "$cmd" in
     ips="$(python3 -c "import socket,sys
 try: print(' '.join(sorted({a[4][0] for a in socket.getaddrinfo(sys.argv[1], 443, socket.AF_INET)})))
 except OSError: pass" "$host")"
+    # A subdomain needs a CNAME; a bare domain needs A records.
+    case "$host" in
+      *.*.*) record="a CNAME record: $host -> $owner.github.io" ;;
+      *) record="A records for $host: $PAGES_IPS" ;;
+    esac
     if [ -z "$ips" ]; then
-      echo "dns: missing (add a CNAME record: $host -> $owner.github.io)"; exit 1
+      echo "dns: missing (add $record)"; exit 1
     fi
     for ip in $ips; do
       case " $PAGES_IPS " in *" $ip "*) ;; *)
-        echo "dns: points elsewhere ($ips; it needs a CNAME record: $host -> $owner.github.io)"; exit 1 ;;
+        echo "dns: points elsewhere ($ips; it needs $record, or, behind a proxy such as Cloudflare's, the proxy turned off for it)"; exit 1 ;;
       esac
     done
     echo "dns: ok"
@@ -86,7 +106,10 @@ except OSError: pass" "$host")"
       gh api -X PUT "repos/$full/pages" -f cname="$host" >/dev/null 2>&1 \
         || die "pages: couldn't set the address $host (is it used by another repo?)"
     fi
-    url="$(gh api "repos/$full/pages" --jq .html_url 2>/dev/null)"
+    # GitHub reports a custom domain as http:// until HTTPS is required, so
+    # build that address here.
+    if [ -n "$host" ]; then url="https://$host/"
+    else url="$(gh api "repos/$full/pages" --jq .html_url 2>/dev/null)"; fi
     [ -n "$url" ] || die "pages: turned on, but GitHub didn't report the address"
     gh repo edit "$full" --homepage "${url%/}" >/dev/null 2>&1 || true
     echo "url: $url"
@@ -94,7 +117,7 @@ except OSError: pass" "$host")"
 
   https)
     full="${1:?https needs owner/name}"
-    deadline=$(( $(date +%s) + ${PUBLISH_WAIT:-600} ))
+    deadline=$(( $(date +%s) + ${PUBLISH_WAIT:-540} ))
     while :; do
       state="$(gh api "repos/$full/pages" --jq '.https_certificate.state // "none"' 2>/dev/null)"
       if [ "$state" = approved ] || [ "$state" = issued ]; then

@@ -282,7 +282,8 @@ echo "$*" >> "$GH_LOG"
 case "$*" in
   "api user --jq .login") [ "$SIGNED_IN" = 1 ] && echo zeveck || exit 1 ;;
   "repo view me/taken --json"*) echo "public | A frog game | 2026-04-25" ;;
-  "repo view"*) exit 1 ;;
+  "repo view me/offline"*) echo "error connecting to api.github.com" >&2; exit 1 ;;
+  "repo view"*) echo "GraphQL: Could not resolve to a Repository with the name 'x'." >&2; exit 1 ;;
   *"--jq .html_url") echo "https://frog.example.com/" ;;
   *"https_certificate"*) echo "$CERT" ;;
 esac
@@ -309,6 +310,10 @@ test('publish: a taken repo name says what is there and offers the next free one
   assert.equal(publish(dir, ['repo', 'me/free']).stdout, 'free: me/free\n');
   assert.equal(publish(dir, ['repo', 'me/taken']).stdout,
     'taken: me/taken (public | A frog game | 2026-04-25)\nfree: me/taken-2\n');
+  // A failed lookup is never taken for a free name.
+  const offline = publish(dir, ['repo', 'me/offline']);
+  assert.equal(offline.status, 1);
+  assert.match(offline.stdout, /couldn't check/);
 });
 
 test('publish: turns on Pages at the custom address, then requires HTTPS', (t) => {
@@ -318,7 +323,6 @@ test('publish: turns on Pages at the custom address, then requires HTTPS', (t) =
   assert.deepEqual(r.calls, [
     'api -X POST repos/me/frog/pages -f build_type=workflow',
     'api -X PUT repos/me/frog/pages -f cname=frog.example.com',
-    'api repos/me/frog/pages --jq .html_url',
     'repo edit me/frog --homepage https://frog.example.com',
   ]);
   assert.equal(publish(dir, ['https', 'me/frog']).stdout, 'https: on\n');
