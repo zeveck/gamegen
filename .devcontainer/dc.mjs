@@ -9,7 +9,7 @@
 // installed copy works in any project.
 
 import { spawn, spawnSync, execFile } from 'node:child_process';
-import { existsSync, mkdirSync, copyFileSync, writeFileSync, rmSync, chmodSync, readdirSync, readFileSync, renameSync, appendFileSync, linkSync, statSync } from 'node:fs';
+import { existsSync, mkdirSync, copyFileSync, writeFileSync, rmSync, chmodSync, readdirSync, readFileSync, renameSync, appendFileSync, linkSync, statSync, realpathSync } from 'node:fs';
 import { createServer } from 'node:net';
 import { dirname, join, posix, resolve, win32 } from 'node:path';
 import { createHash } from 'node:crypto';
@@ -282,7 +282,7 @@ function projectVolumes(root, containers) {
 async function confirm(question, flags) {
   if (flags.has('--yes')) return true;
   if (!process.stdin.isTTY) {
-    console.error('dc: not deleting without confirmation; rerun with --yes.');
+    console.error('dc: not going ahead without confirmation; rerun with --yes.');
     return false;
   }
   // Imported here so an old Node still reaches the friendly version check.
@@ -862,6 +862,367 @@ async function relayMain(root) {
   }
 }
 
+// ── snapshots ───────────────────────────────────────────────────────────────
+//
+// `dc snapshot <name>` saves this project's agent volumes (~/.claude, ~/.codex,
+// ~/.gemini) and the project folder; `dc restore <name>` puts them back exactly
+// and starts a brand-new container from the cached image, which drops anything
+// the work left inside the old container. The image is never saved: work never
+// changes it.
+//
+// The copying runs in a throwaway container (`docker run --rm`) from the
+// project's own image, so it's the same on every OS and needs nothing on the
+// host but Docker. Snapshots live in dc's state folder, never in the project:
+// they hold logins and .env files.
+
+export const SNAPSHOT_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,39}$/;
+const FALLBACK_HELPER_IMAGE = 'debian:stable-slim';
+const STAGING = '.dc-restore-staging';
+
+const projectKey = (root) => createHash('sha256').update(normalizeLocalFolder(root)).digest('hex').slice(0, 20);
+const snapshotsDir = (root) => join(stateDir(), 'snapshots', projectKey(root));
+
+/** True when the snapshots folder and the project folder overlap (restore would delete its own snapshot). */
+export function overlaps(a, b, plat = platform()) {
+  const x = normalizeLocalFolder(resolve(a), plat), y = normalizeLocalFolder(resolve(b), plat);
+  return x === y || x.startsWith(`${y}/`) || y.startsWith(`${x}/`);
+}
+
+/** One `--mount` value; a source with a comma or quote is quoted CSV-style. */
+export function mountArg(type, source, target, readonly = false) {
+  if (/[\r\n]/.test(source)) throw new Error(`can't use a path with a line break: ${JSON.stringify(source)}`);
+  const field = (kv) => (/[",]/.test(kv) ? `"${kv.replace(/"/g, '""')}"` : kv);
+  return [`type=${type}`, field(`source=${source}`), `target=${target}`, ...(readonly ? ['readonly'] : [])].join(',');
+}
+
+/** Run a shell script as root in a throwaway helper container. */
+function helper(image, mounts, script) {
+  const args = ['run', '--rm', '-u', '0', '--entrypoint', 'sh'];
+  for (const m of mounts) args.push('--mount', m);
+  args.push(image, '-c', script);
+  return spawnSmart('docker', args, { encoding: 'utf8' });
+}
+
+// Prefer GNU tar's --numeric-owner (keeps file owners exact across images);
+// fall back quietly where the helper's tar lacks it.
+const TAR_N = 'N=; tar --numeric-owner --version >/dev/null 2>&1 && N=--numeric-owner;';
+
+/**
+ * The image to run helpers from, by ID (a tag can be pruned; the ID of a
+ * container's image can't while the container exists): the project
+ * container's, the one saved with the snapshot, or a small default, pulled if
+ * needed. Returns null, with a message, if none can be had.
+ */
+function helperImage(containers, saved) {
+  for (const c of containers) {
+    const r = capture('docker', ['inspect', '--format', '{{.Image}}', c.id]);
+    if (r.status === 0 && r.stdout.trim()) return r.stdout.trim();
+  }
+  if (saved && capture('docker', ['image', 'inspect', saved]).status === 0) return saved;
+  if (capture('docker', ['image', 'inspect', FALLBACK_HELPER_IMAGE]).status === 0) return FALLBACK_HELPER_IMAGE;
+  console.log(`Fetching a small helper image (${FALLBACK_HELPER_IMAGE}) for the copying...`);
+  if (runQuiet('docker', ['pull', '-q', FALLBACK_HELPER_IMAGE]).status === 0) return FALLBACK_HELPER_IMAGE;
+  console.error(`dc: couldn't get the helper image ${FALLBACK_HELPER_IMAGE} (it needs an internet connection the first time). Nothing was changed.`);
+  return null;
+}
+
+/** The agent volumes the containers mount, by tool. */
+function mountedVolumes(containers) {
+  const byTool = {};
+  for (const c of containers) {
+    const r = capture('docker', ['inspect', '--format', '{{json .Mounts}}', c.id]);
+    if (r.status !== 0) continue;
+    try { for (const n of agentVolumesFromMounts(JSON.parse(r.stdout))) byTool[toolOf(n)] ??= n; } catch { /* skip */ }
+  }
+  return byTool;
+}
+
+// Archive a folder into /snap, readable only by the owner of the snapshots
+// folder (the helper runs as root, which would otherwise own the file).
+const save = (from, file) => `${TAR_N} umask 077 && tar $N --exclude=./${STAGING} -C ${from} -czf /snap/${file} . && `
+  + `chown "$(stat -c %u:%g /snap)" /snap/${file} 2>/dev/null; true`;
+
+/**
+ * Put an archive back into a folder without ever leaving it half-empty: unpack
+ * into a staging folder first (a damaged or oversized archive stops here, with
+ * nothing touched), then clear everything else, keeping on past anything that
+ * can't be removed, then copy the snapshot in over whatever remains. Anything
+ * left that the snapshot doesn't have is listed as "left: <name>"; exit 4.
+ * `exact` keeps owners and permissions (Linux file systems); without it, files
+ * get the folder's usual owner (Docker Desktop's shared folders refuse chown).
+ */
+const refill = (target, archive, exact) => {
+  const own = exact ? '$N -p' : '--no-same-owner --no-same-permissions';
+  const S = `${target}/${STAGING}`;
+  return `${TAR_N} rm -rf ${S} && mkdir ${S} && tar ${own} -C ${S} -xzf /snap/${archive} `
+    + `|| { rm -rf ${S}; echo "couldn't unpack ${archive}" >&2; exit 3; }; `
+    + `find ${target} -mindepth 1 -maxdepth 1 ! -name ${STAGING} -exec rm -rf {} + 2>/dev/null; `
+    + `ls -A ${S} > /tmp/want; (cd ${S} && tar cf - .) | (cd ${target} && tar ${own} -xf -) `
+    + `|| { echo "couldn't copy the snapshot in" >&2; rm -rf ${S}; exit 5; }; `
+    + `rm -rf ${S}; extra=$(ls -A ${target} | grep -v -x -F -f /tmp/want); `
+    + `[ -z "$extra" ] || { printf '%s\\n' "$extra" | sed 's/^/left: /' >&2; exit 4; }`;
+};
+
+const toolOf = (volume) => volume.match(AGENT_VOLUME)?.[1];
+const humanSize = (bytes) => (bytes >= 1e9 ? `${(bytes / 1e9).toFixed(1)} GB` : `${Math.max(0.1, bytes / 1e6).toFixed(1)} MB`);
+const dirSize = (dir) => readdirSync(dir).reduce((sum, f) => sum + statSync(join(dir, f)).size, 0);
+const PARTIAL = /\.(?:partial|old)-(\d+)$/;
+
+function listSnapshots(root) {
+  const dir = snapshotsDir(root);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((n) => SNAPSHOT_NAME.test(n) && !PARTIAL.test(n) && existsSync(join(dir, n, 'snapshot.json')))
+    .map((n) => ({ name: n, ...readJson(join(dir, n, 'snapshot.json')), bytes: dirSize(join(dir, n)) }))
+    .sort((a, b) => String(a.created).localeCompare(String(b.created)));
+}
+
+function refuseOverlap(root, cmd) {
+  if (!overlaps(snapshotsDir(root), root)) return false;
+  console.error(`dc ${cmd}: snapshots would be kept inside the project (${snapshotsDir(root)}), where restoring would delete them. `
+    + 'Point DC_STATE_DIR (or XDG_STATE_HOME) somewhere outside the project.');
+  return true;
+}
+
+// Lists a container's processes as "comm args" lines, read from /proc so it
+// works in any Linux container (no ps needed). Skips itself.
+const PROCESS_LIST = 'for d in /proc/[0-9]*; do [ "${d#/proc/}" = "$$" ] && continue; '
+  + 'c=$(cat "$d/comm" 2>/dev/null) || continue; a=$(tr "\\000\\n" "  " < "$d/cmdline" 2>/dev/null); '
+  + 'case "$a" in *"/proc/[0-9]"*) continue ;; esac; printf "%s %s\\n" "$c" "$a"; done';
+
+/**
+ * What's running in a container, in plain words, from "comm args" lines
+ * (PROCESS_LIST): friendly names where we know them, program names otherwise. The
+ * container's own startup loop doesn't count, so an idle container gives "".
+ */
+export function describeActivity(lines) {
+  const known = [];
+  const other = [];
+  for (const line of lines) {
+    const [comm, ...rest] = line.trim().split(/\s+/);
+    const args = rest.join(' ');
+    if (!comm || /while sleep|^sleep$/.test(args) || /^(sleep|docker-init|tini|ps|cat|tr)$/.test(comm)) continue;
+    if (comm === 'sh' && /while sleep/.test(args)) continue;
+    let name = null;
+    // Claude Code's native binary is named for its version (2.1.304), so its
+    // helper processes show that instead of "claude".
+    if (comm === 'claude' || /^\d+\.\d+\.\d+$/.test(comm) || /(^|\/)claude$/.test(args.split(' ')[0] || '')) name = 'a Claude session';
+    else if (/@openai\/codex|\bcodex(\s|$)/.test(args)) name = 'a Codex session';
+    else if (/@google\/gemini-cli|\bgemini(\s|$)/.test(args)) name = 'a Gemini session';
+    else if (/vscode-server/.test(args)) name = 'VS Code';
+    else if (/^(chrome|chromium|headless_shell)/.test(comm)) name = 'a browser';
+    else if (/^(bash|zsh|sh|fish)$/.test(comm)) name = 'a shell';
+    if (name) { if (!known.includes(name)) known.push(name); } else if (!other.includes(comm)) other.push(comm);
+  }
+  // Sessions first. A shell is how most other things start, so mention it only
+  // when nothing else is running.
+  const order = ['a Claude session', 'a Codex session', 'a Gemini session', 'VS Code', 'a browser'];
+  const all = [...order.filter((n) => known.includes(n)), ...other];
+  if (!all.length && known.includes('a shell')) all.push('a shell');
+  if (!all.length) return '';
+  const shown = all.length > 5 ? [...all.slice(0, 4), `${all.length - 4} more`] : all;
+  return shown.length === 1 ? shown[0] : `${shown.slice(0, -1).join(', ')} and ${shown.at(-1)}`;
+}
+
+async function cmdSnapshot(root, flags, rest) {
+  if (flags.has('--list')) {
+    const snaps = listSnapshots(root);
+    if (!snaps.length) { console.log('No snapshots yet. `dc snapshot <name>` makes one.'); return 0; }
+    for (const s of snaps) console.log(`${s.name.padEnd(20)}  ${new Date(s.created).toLocaleString()}  ${humanSize(s.bytes)}`);
+    return 0;
+  }
+  const name = rest[0];
+  if (!name || !SNAPSHOT_NAME.test(name) || PARTIAL.test(name) || rest.length > 1) {
+    console.error('dc snapshot: give one name, such as `dc snapshot clean` (letters, digits, dots, dashes, underscores; up to 40).');
+    return 1;
+  }
+  const base = snapshotsDir(root);
+  const dir = join(base, name);
+  if (flags.has('--rm')) {
+    if (!existsSync(dir)) { console.error(`dc snapshot: no snapshot named ${name}.`); return 1; }
+    rmSync(dir, { recursive: true, force: true });
+    console.log(`Deleted snapshot ${name}.`);
+    return 0;
+  }
+  const replacing = existsSync(dir);
+  if (replacing && !flags.has('--overwrite')) {
+    console.error(`dc snapshot: ${name} already exists. Add --overwrite to replace it, or pick another name.`);
+    return 1;
+  }
+  if (refuseOverlap(root, 'snapshot')) return 1;
+
+  // Private to this user: snapshots hold logins and .env files. Sweep up
+  // leftovers of snapshots that were interrupted.
+  mkdirSync(base, { recursive: true, mode: 0o700 });
+  for (const n of readdirSync(base)) {
+    const m = n.match(PARTIAL);
+    if (m && !pidAlive(Number(m[1]))) rmSync(join(base, n), { recursive: true, force: true });
+  }
+
+  const cs = findContainers(root);
+  // Snapshotting stops a running container for a moment. If that would
+  // interrupt something, say what and ask first; if it's idle, just go.
+  const running = cs.filter((x) => x.state === 'running');
+  if (running.length) {
+    let lines = [];
+    let looked = true;
+    for (const c of running) {
+      const r = capture('docker', ['exec', c.id, 'sh', '-c', PROCESS_LIST]);
+      if (r.status !== 0) { looked = false; break; }
+      lines = lines.concat(r.stdout.split('\n').filter(Boolean));
+    }
+    const what = looked ? describeActivity(lines) : '';
+    if (!looked || what) {
+      // Couldn't look inside? Ask anyway rather than assume it's idle.
+      const q = looked
+        ? `The container is running ${what}. Snapshotting stops it for a moment, which interrupts that. Go ahead?`
+        : 'Snapshotting stops the container for a moment, which interrupts anything running in it. Go ahead?';
+      if (!(await confirm(q, flags))) return 1;
+    } else {
+      console.log('Pausing the container while it copies...');
+    }
+  }
+  const volumes = projectVolumes(root, cs);
+  const image = helperImage(cs, null);
+  if (!image) return 1;
+
+  // Ctrl+C stops the copying (the helper container gets it too) but still
+  // reaches the cleanup below, so the container isn't left stopped.
+  let interrupted = false;
+  const onInt = () => { interrupted = true; };
+  process.on('SIGINT', onInt);
+  const stopped = [];
+  const tmp = `${dir}.partial-${process.pid}`;
+  let ok = true;
+  try {
+    // Stop the container so nothing is half-written while it's copied.
+    for (const c of running) {
+      if ((runQuiet('docker', ['stop', c.id]).status ?? 1) !== 0) {
+        console.error(`dc snapshot: couldn't stop container ${c.id}, so nothing was saved.`);
+        ok = false;
+        break;
+      }
+      stopped.push(c);
+    }
+    if (ok) mkdirSync(tmp, { mode: 0o700 });
+    const snapMount = ok && mountArg('bind', tmp, '/snap');
+    for (const v of ok ? volumes : []) {
+      const r = helper(image, [mountArg('volume', v, '/v', true), snapMount], save('/v', `${toolOf(v)}.tgz`));
+      if (r.status !== 0 || interrupted) { ok = false; if (!interrupted) console.error(`dc snapshot: couldn't save ${v}:\n${(r.stderr || '').trim()}`); break; }
+    }
+    if (ok) {
+      const r = helper(image, [mountArg('bind', root, '/proj', true), snapMount], save('/proj', 'project.tgz'));
+      if (r.status !== 0 || interrupted) { ok = false; if (!interrupted) console.error(`dc snapshot: couldn't save the project folder:\n${(r.stderr || '').trim()}`); }
+    }
+    if (ok) {
+      writeJson(join(tmp, 'snapshot.json'), {
+        name, root, created: new Date().toISOString(), image,
+        volumes: Object.fromEntries(volumes.map((v) => [toolOf(v), v])),
+      });
+      // Replace an old snapshot only now that the new one is complete.
+      if (replacing) {
+        const old = `${dir}.old-${process.pid}`;
+        renameSync(dir, old);
+        renameSync(tmp, dir);
+        rmSync(old, { recursive: true, force: true });
+      } else {
+        renameSync(tmp, dir);
+      }
+    }
+  } finally {
+    if (!ok) rmSync(tmp, { recursive: true, force: true });
+    for (const c of stopped) runQuiet('docker', ['start', c.id]);
+    process.removeListener('SIGINT', onInt);
+  }
+  if (stopped.length) await resumeForwards(root);
+  if (interrupted) { console.error('dc snapshot: stopped; nothing was saved.'); return 130; }
+  if (!ok) return 1;
+  console.log(`${replacing ? 'Replaced' : 'Saved'} snapshot ${name}: the project folder${volumes.length ? ` and ${volumes.map(toolOf).join(', ')} data` : ''} (${humanSize(dirSize(dir))}).`);
+  console.log(`\`dc restore ${name}\` puts it all back.`);
+  return 0;
+}
+
+async function cmdRestore(root, flags, rest) {
+  const name = rest[0];
+  if (!name || rest.length > 1) { console.error('dc restore: give the snapshot\'s name, such as `dc restore clean` (`dc snapshot --list` shows them).'); return 1; }
+  const dir = join(snapshotsDir(root), name);
+  const meta = SNAPSHOT_NAME.test(name) && !PARTIAL.test(name) && readJson(join(dir, 'snapshot.json'));
+  if (!meta) { console.error(`dc restore: no snapshot named ${name}. \`dc snapshot --list\` shows them.`); return 1; }
+  if (normalizeLocalFolder(meta.root) !== normalizeLocalFolder(root)) {
+    console.error(`dc restore: ${name} was taken of ${meta.root}, not this folder.`);
+    return 1;
+  }
+  if (refuseOverlap(root, 'restore')) return 1;
+  const tools = Object.keys(meta.volumes || {}).filter((t) => AGENT_TOOLS.includes(t));
+
+  const q = `Restore ${name} (${new Date(meta.created).toLocaleString()})? This replaces everything in ${root}, including its git history,`
+    + `${tools.length ? ' and this project\'s Claude, Codex, and Gemini data' : ''} with the snapshot.`;
+  if (!(await confirm(q, flags))) return 1;
+
+  const cs = findContainers(root);
+  const image = helperImage(cs, meta.image);
+  if (!image) return 1;
+  const snapMount = mountArg('bind', dir, '/snap', true);
+  const archives = [...tools.map((t) => `${t}.tgz`), 'project.tgz'];
+
+  // Check every archive is whole, and that the project archive is this kind of
+  // project, before changing anything.
+  const check = helper(image, [snapMount],
+    archives.map((a) => `tar -tzf /snap/${a} >/dev/null || { echo "damaged: ${a}" >&2; exit 1; }`).join('; ')
+    + "; tar -tzf /snap/project.tgz | grep -q -E '^(\\./)?\\.devcontainer/devcontainer\\.json$' || { echo 'no .devcontainer/devcontainer.json in the project archive' >&2; exit 1; }");
+  if (check.status !== 0) {
+    console.error(`dc restore: snapshot ${name} can't be used, so nothing was changed:\n${(check.stderr || '').trim()}`);
+    return 1;
+  }
+
+  // Fill the volumes the container actually uses (the dev container tool
+  // named them), else the ones the snapshot came from, else this folder's.
+  const mounted = mountedVolumes(cs);
+  const id = devcontainerId(idLabelsFor(root));
+  const target = (t) => mounted[t]
+    || (AGENT_VOLUME.test(meta.volumes[t] || '') && toolOf(meta.volumes[t]) === t ? meta.volumes[t] : `agent-${t}-${id}`);
+
+  const quick = flags.has('--quick');
+  for (const c of cs) {
+    if ((runQuiet('docker', quick ? ['stop', c.id] : ['rm', '-f', c.id]).status ?? 1) !== 0) {
+      console.error(`dc restore: couldn't ${quick ? 'stop' : 'remove'} container ${c.id}, so nothing was changed.`);
+      return 1;
+    }
+  }
+
+  const retry = `Run \`dc restore ${name}\` from ${root} to try again; the snapshot is unchanged.`;
+  for (const t of tools) {
+    const vol = target(t);
+    runQuiet('docker', ['volume', 'create', vol]);
+    const r = helper(image, [mountArg('volume', vol, '/v'), snapMount], refill('/v', `${t}.tgz`, true));
+    if (r.status !== 0) { console.error(`dc restore: couldn't restore ${vol}:\n${(r.stderr || '').trim()}\n${retry}`); return 1; }
+  }
+  // Docker Desktop's shared folders (macOS, Windows) refuse ownership changes.
+  const r = helper(image, [mountArg('bind', root, '/proj'), snapMount], refill('/proj', 'project.tgz', platform() === 'linux'));
+  let status = 0;
+  if (r.status === 4) {
+    const left = (r.stderr || '').split('\n').filter((l) => l.startsWith('left: ')).map((l) => l.slice(6));
+    console.error(`dc restore: everything from the snapshot is back, but these couldn't be removed (a program may have them open): ${left.join(', ')}. `
+      + 'Close that program and delete them, or run the restore again.');
+    status = 1;
+  } else if (r.status !== 0) {
+    console.error(`dc restore: couldn't restore the project folder. If a file in it is open in another program, close it.\n${(r.stderr || '').trim()}\n${retry}`);
+    return 1;
+  } else {
+    console.log(`Restored ${name}.`);
+  }
+
+  if (quick) {
+    for (const c of cs) runQuiet('docker', ['start', c.id]);
+    await resumeForwards(root);
+    return status;
+  }
+  console.log('Starting a fresh container. As with any rebuild, you\'ll sign in to Claude again (`--quick` keeps the container, and the sign-in).');
+  const up = dc(['up', '--workspace-folder', root]);
+  if (up === 0) await resumeForwards(root);
+  return up || status;
+}
+
 function requireRoot() {
   const root = findProjectRoot(process.cwd());
   if (!root) {
@@ -910,13 +1271,22 @@ function reportNoMatch(root) {
 // Windows gets BOTH shims. CMD cannot run a .ps1, and PowerShell going through
 // a .cmd loses arguments: PS does not quote a bare `a&b`, so cmd.exe splits on
 // the & and discards everything after it. Each shell needs its own entry point.
-const installPaths = (name = 'dc') => IS_WIN
+const installPaths = (names) => IS_WIN
   ? { payload: join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), 'Programs', 'dc'),
       binDir:  join(process.env.LOCALAPPDATA || join(homedir(), 'AppData', 'Local'), 'Programs', 'dc'),
-      shims: [`${name}.cmd`, `${name}.ps1`] }
+      shims: names.flatMap((n) => [`${n}.cmd`, `${n}.ps1`]) }
   : { payload: join(homedir(), '.local', 'share', 'dc'),
       binDir:  join(homedir(), '.local', 'bin'),
-      shims: [name] };
+      shims: names };
+
+// With no name, install (and uninstall) both `dc` and `dcp`. `dcp` is there for
+// anyone whose `dc` is already taken, such as by the POSIX desk calculator.
+function installNames(rest) {
+  if (!rest[0]) return ['dc', 'dcp'];
+  const name = rest[0].replace(/[^\w.-]/g, '');
+  if (!name || /^\.+$/.test(name)) throw new Error(`"${rest[0]}" can't be a command name. Try letters, like dc install dcx.`);
+  return [name];
+}
 
 /** Body for a generated shim, with the payload path baked in absolutely. */
 export function shimBody(kind, target) {
@@ -926,9 +1296,11 @@ export function shimBody(kind, target) {
 }
 
 function cmdInstall(flags, rest) {
-  const name = (rest[0] || 'dc').replace(/[^\w.-]/g, '');
+  const names = installNames(rest);
   const link = flags.has('--link');
-  const { payload, binDir, shims } = installPaths(name);
+  const { payload, binDir, shims } = installPaths(names);
+  // Look before writing our own shim, which could otherwise be what `which` finds.
+  const calculator = !IS_WIN && names.includes('dc') && !existsSync(join(binDir, 'dc')) && has('dc');
   mkdirSync(binDir, { recursive: true });
 
   // --link points the shim at the repo copy so edits take effect immediately.
@@ -964,26 +1336,27 @@ function cmdInstall(flags, rest) {
     console.log(`\nNOTE: ${binDir} is not on your PATH. Add to your shell profile:`);
     console.log(`  export PATH="${binDir}:$PATH"`);
   }
-  if (!IS_WIN && name === 'dc' && has('dc')) {
-    console.log('\nNOTE: a `dc` command already exists (POSIX desk calculator).');
-    console.log('This install shadows it. Re-run as `dc install dcx` to pick another name.');
+  // Only say so if ours is now the one that runs; otherwise nothing is hidden.
+  const found = calculator && capture('which', ['dc']).stdout?.trim();
+  if (found && normalizeLocalFolder(found) === normalizeLocalFolder(join(binDir, 'dc'))) {
+    console.log('\nNOTE: your system already had a `dc` command (a desk calculator), and this one now hides it.');
+    console.log('To get the calculator back, run `dcp uninstall dc` and use `dcp` instead.');
   }
   return 0;
 }
 
 function cmdUninstall(_flags, rest) {
-  const name = (rest[0] || 'dc').replace(/[^\w.-]/g, '');
-  const { payload, binDir, shims } = installPaths(name);
+  const { payload, binDir, shims } = installPaths(installNames(rest));
 
   let any = false;
   for (const shim of shims) {
     const shimPath = join(binDir, shim);
     if (existsSync(shimPath)) { rmSync(shimPath, { force: true }); console.log(`removed: ${shimPath}`); any = true; }
   }
-  if (!any) console.log(`not installed: ${join(binDir, shims[0])}`);
+  if (!any) console.log(`not installed: ${shims.map((f) => join(binDir, f)).join(', ')}`);
 
-  // Only drop the shared payload once no remaining shim references it — installing
-  // under a second name (dc install dcx) must not be broken by removing the first.
+  // Only drop the shared payload once no remaining shim references it — removing
+  // one name (dc uninstall dc) must not break the others.
   if (existsSync(payload)) {
     const target = join(payload, 'dc.mjs');
     const stillUsed = readdirSync(binDir).some((f) => {
@@ -1051,11 +1424,14 @@ const HELP = `dc — dev containers without VS Code
   dc forward [<port>...]           forward ports to localhost, or list them
   dc forward <port>... --network   ...and to other devices on your network
   dc forward --rm <port>...        stop forwarding them
+  dc snapshot <name> [--overwrite] save the project folder and agent data
+  dc snapshot --list | --rm <name> list snapshots, or delete one
+  dc restore <name> [--quick]      put a snapshot back (--yes: don't ask)
   dc status                        show this project's containers
   dc logs [--follow]               container logs
   dc doctor                        check prerequisites
-  dc install [name] [--link]       install to your PATH
-  dc uninstall [name]              remove it
+  dc install [name] [--link]       install to your PATH (as dc and dcp, or just [name])
+  dc uninstall [name]              remove it (both names, or just [name])
 `;
 
 const FORWARDING = new Set(['exec', 'claude', 'codex', 'gemini', 'pw']);
@@ -1089,6 +1465,11 @@ async function main(argv) {
       console.error('dc forward: --rm stops a forward; to keep it but make it localhost only, run `dc forward <port>` without --network.');
       return 1;
     }
+  }
+  if (cmd === 'snapshot' || cmd === 'restore') {
+    const allowed = cmd === 'snapshot' ? ['--list', '--rm', '--yes', '--overwrite'] : ['--quick', '--yes'];
+    const unknown = [...flags].filter((f) => !allowed.includes(f));
+    if (unknown.length) { console.error(`dc ${cmd}: unknown option ${unknown.join(' ')}`); return 1; }
   }
   if (cmd === 'rm') {
     const unknown = [...flags].filter((f) => !['--volumes', '--yes'].includes(f));
@@ -1163,6 +1544,10 @@ async function main(argv) {
       return cmdVolumes(root, flags);
     case 'forward':
       return cmdForward(root, flags, rest);
+    case 'snapshot':
+      return cmdSnapshot(root, flags, rest);
+    case 'restore':
+      return cmdRestore(root, flags, rest);
     case 'status': {
       const cs = findContainers(root);
       if (!cs.length) { reportNoMatch(root); return 0; }
@@ -1187,7 +1572,11 @@ async function main(argv) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+// Node loads modules by their real path, but argv keeps the path as typed, so
+// compare real paths: a symlink anywhere above dc.mjs (macOS's /var -> /private/var)
+// would otherwise make dc silently do nothing.
+const realOrSelf = (p) => { try { return realpathSync(p); } catch { return p; } };
+if (process.argv[1] && fileURLToPath(import.meta.url) === realOrSelf(resolve(process.argv[1]))) {
   main(process.argv.slice(2)).then(
     (code) => process.exit(code),
     (err) => { console.error(`dc: ${err && err.message ? err.message : err}`); process.exit(1); },

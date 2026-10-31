@@ -97,6 +97,18 @@ if [ "$LOGOUT" -eq 1 ]; then
   exit 0
 fi
 
+# Let plain git use the gh login too: git push, git clone of a private repo, and
+# anything built on them, such as installing a plugin from a private repo. gh's
+# browser sign-in offers this itself; signing in with a token does not. Safe to
+# repeat, so it also runs when already signed in.
+setup_git() {
+  if gh auth setup-git --hostname "$GH_HOST" >/dev/null 2>&1; then
+    echo "git will use this login too"
+  else
+    echo "warning: couldn't set git up to use this login; run \`gh auth setup-git\` to try again."
+  fi
+}
+
 if [ "$GH" -eq 1 ]; then
   echo "── GitHub ──────────────────────────────────────────────────"
   # `gh auth status` exits 0 even when it reports the stored token as invalid,
@@ -104,6 +116,7 @@ if [ "$GH" -eq 1 ]; then
   # revoked token is the main reason to run this. Make a real API call instead.
   if [ "$FORCE" -eq 0 ] && GH_HOST="$GH_HOST" gh api user >/dev/null 2>&1; then
     echo "already authenticated to $GH_HOST (use --force to replace)"
+    setup_git
   else
     echo "Create a token:"
     echo "  https://github.com/settings/tokens/new?scopes=repo,workflow,read:org,gist&description=devcontainer"
@@ -116,6 +129,7 @@ if [ "$GH" -eq 1 ]; then
       case "$tok" in ghp_*|github_pat_*|gho_*) ;; *) echo "warning: does not look like a GitHub token; trying anyway." ;; esac
       printf '%s' "$tok" | gh auth login --hostname "$GH_HOST" --with-token
       echo "✅ $(gh auth status --hostname "$GH_HOST" 2>&1 | grep -o 'account [^ ]*' | head -1)"
+      setup_git
       persist_tip
     fi
   fi

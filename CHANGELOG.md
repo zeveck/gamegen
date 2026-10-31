@@ -19,4 +19,4 @@ before `2026.10.20`.
 - One-line install: `/plugin install gg --marketplace zeveck/gamegen` installs
   gamegen with imagegen2, anim8gen, audiogen and nanogen, all listed in the
   gamegen marketplace. The skill shows as `/gg:gamegen`, or just `/gamegen`.
-- Dev container from github.com/zeveck/devcontainers.
+- Dev container from github.com/zeveck/devcontainer-plus.

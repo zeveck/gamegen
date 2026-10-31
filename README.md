@@ -123,7 +123,7 @@ python3 -m http.server 8000
 
 then open http://localhost:8000.
 
-Working in a [dev container](https://github.com/zeveck/devcontainers)? VS Code forwards the link to your computer (if it doesn't open, the Ports tab shows where it went). With `dc`, first run `dc forward 8000` in the project folder on your computer (add `--network` to try it on your phone over Wi-Fi).
+Working in a [dev container](https://github.com/zeveck/devcontainer-plus)? VS Code forwards the link to your computer (if it doesn't open, the Ports tab shows where it went). With `dc`, first run `dc forward 8000` in the project folder on your computer (add `--network` to try it on your phone over Wi-Fi).
 
 ## Install
 
@@ -143,7 +143,7 @@ Already installed imagegen2, anim8gen, audiogen or nanogen on their own? Remove 
 
 (and the same for any of the others you have).
 
-You'll also need [Node.js](https://nodejs.org/) and Python 3, which the art and sound plugins use. gamegen tests your game in a real browser with `playwright-cli`, which comes with the [zeveck dev container](https://github.com/zeveck/devcontainers); without it, gamegen tries Playwright, and if that's not possible either, it tells you the game wasn't play-tested in a browser.
+You'll also need [Node.js](https://nodejs.org/) and Python 3, which the art and sound plugins use. gamegen tests your game in a real browser with `playwright-cli`, which comes with the [devcontainer-plus](https://github.com/zeveck/devcontainer-plus) dev container; without it, gamegen tries Playwright, and if that's not possible either, it tells you the game wasn't play-tested in a browser.
 
 ### Your API keys
 
