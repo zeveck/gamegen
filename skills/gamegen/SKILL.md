@@ -214,7 +214,11 @@ have. Don't swap in code-drawn art unless they agree.
 
 ### 4. Start the progress file
 
-Create `design/STATUS.md` in the game folder: a "Requests" list starting
+Create `design/STATUS.md` in the game folder. Its first line is the game's
+name as a heading, `# Hoard Hopper`: a working name until the design settles
+it, then the real one, and the new one whenever a change renames the game.
+gamegen shows it above the prompt, so the person knows which game they're on.
+Then add a "Requests" list starting
 with the request exactly as typed (later `--change` and `--continue` notes are
 added to it, also exactly as typed), the settings you settled on, what's available, and a checklist of the phases
 below. Keep it current as you go, because it's what you (or a later

@@ -133,6 +133,8 @@ your-game/
 
 gamegen makes the game right where you run it if the folder is empty, or in a new folder named after the game if it isn't. It never overwrites your files.
 
+While you work on a game, its name shows above the prompt (🎮 Hoard Hopper), so you always know which one you're on. Click `[-]` beside it to fold it away.
+
 Web games save your progress, come with a link-preview image for sharing, and are ready to put online with `/gamegen --publish`. Once published, players can install your game as an app on their phone and play it offline.
 
 ### Playing it

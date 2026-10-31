@@ -1,6 +1,6 @@
 {
   "name": "gg",
-  "version": "2026.11.4",
+  "version": "2026.11.5",
   "description": "/gamegen: make a complete, playable game from a description: designed, reviewed, illustrated, animated, scored, built and play-tested.",
   "author": {
     "name": "zeveck"
@@ -22,5 +22,6 @@
     "anim8gen",
     "audiogen",
     "nanogen"
-  ]
+  ],
+  "types": "./types/index.d.ts"
 }

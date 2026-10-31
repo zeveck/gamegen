@@ -5,6 +5,14 @@ which are also valid semver. For a second release on the same day, use the next
 day's date rather than a `-1` suffix, because semver sorts `2026.10.20-1`
 before `2026.10.20`.
 
+## v2026.11.5
+
+- While you work on a game, its name shows above the prompt, so you always
+  know which game you're on. It's the game in the folder you're in, or the
+  one you changed most recently in the folders below it. Click `[-]` beside
+  it to fold it away.
+- `design/STATUS.md` starts with the game's name as a heading.
+
 ## v2026.11.4
 
 - Whenever gamegen needs to ask you something, not just when publishing, it
