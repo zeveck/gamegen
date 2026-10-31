@@ -1313,6 +1313,9 @@ function reportNoMatch(root) {
 const TEMPLATE_REPO = 'zeveck/devcontainer-plus';
 const RECORD = '.dcp.json';
 const WHATS_NEW = 'https://dcp.synapticnoise.com/whats-new/';
+// The files people customise, merged on update. Everything else is
+// devcontainer-plus's own program and is simply replaced.
+const CUSTOMISED = { 'setup.sh': 'the build steps', 'devcontainer.json': 'the container settings' };
 // Line endings don't count as a change: a Windows checkout has CRLF.
 const lf = (text) => text.replace(/\r\n/g, '\n');
 const fingerprint = (text) => createHash('sha256').update(lf(text)).digest('hex');
@@ -1463,6 +1466,8 @@ async function cmdUpdate(root, flags, rest) {
     const was = recorded[f.name];
     const item = { name: f.name, text: f.text, executable: f.executable, existing: mine };
     if (was && fingerprint(mine) === was) { plan.push({ ...item, action: 'update' }); continue; }
+    // devcontainer-plus's own files are simply updated: nobody edits them.
+    if (!CUSTOMISED[f.name]) { plan.push({ ...item, action: 'update' }); continue; }
     if (!was) { plan.push({ ...item, action: 'replace', backup: !gitHasIt(path) }); continue; }
     // You changed it. Merge with the template's changes if we know where it started.
     const base = record.version ? await template.base(f.name, record.version) : null;
@@ -1480,6 +1485,11 @@ async function cmdUpdate(root, flags, rest) {
     const path = join(target, name);
     if (names.has(name) || !existsSync(path)) continue;
     if (fingerprint(readFileSync(path, 'utf8')) === was) plan.push({ name, action: 'remove' });
+  }
+  // A .new beside one of devcontainer-plus's own files is from before they
+  // were simply replaced; it's obsolete.
+  for (const n of readdirSync(target)) {
+    if (n.endsWith('.new') && names.has(n.slice(0, -4)) && !CUSTOMISED[n.slice(0, -4)]) rmSync(join(target, n), { force: true });
   }
   const leftovers = readdirSync(target).filter((n) => n.endsWith('.new') && !plan.some((p) => p.action === 'keep' && `${p.name}.new` === n));
 
@@ -1500,13 +1510,12 @@ async function cmdUpdate(root, flags, rest) {
   const keeps = plan.filter((p) => p.action === 'keep');
   const replaced = plan.filter((p) => p.action === 'replace');
   for (const p of keeps) {
-    const why = p.note === 'you both changed the same lines' ? 'has changes of yours that overlap the update' : `has changes of yours, and ${p.note}`;
-    console.log(`${p.name} ${why}, so yours stays as it is and the new version is saved beside it as ${p.name}.new to compare.`);
+    const why = p.note === 'you both changed the same lines' ? 'overlap this update' : `can't be merged with this update (${p.note})`;
+    console.log(`Your changes to ${p.name} (${CUSTOMISED[p.name]}) ${why}. Yours is kept as it is; the new version is saved as ${p.name}.new if you want to compare.`);
   }
-  if (replaced.length) {
-    const backups = replaced.filter((p) => p.backup);
-    console.log('Some of its files differ from devcontainer-plus (an older copy, or changes of your own), so they\'ll be replaced. '
-      + (backups.length === replaced.length ? 'The old ones are kept beside them as .orig files.' : '`git diff .devcontainer` will show what changed.'));
+  for (const p of replaced) {
+    console.log(`${p.name} (${CUSTOMISED[p.name]}) is different here, so it'll be replaced. `
+      + (p.backup ? `Your copy is kept as ${p.name}.orig.` : `\`git diff .devcontainer/${p.name}\` will show what changed, so you can put back anything of yours.`));
   }
   console.log(`A newer devcontainer-plus is out. What's new: ${WHATS_NEW}`);
   if (!(await confirm('Update this project\'s dev container?', flags))) return 1;

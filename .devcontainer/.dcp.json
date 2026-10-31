@@ -1,11 +1,11 @@
 {
   "template": "zeveck/devcontainer-plus",
-  "version": "b2f6758b125ea187c7ab1d9ef97c7a9f69bbdb7e",
+  "version": "a194afcf48bd11bb48f13968ab7a13b93b82646b",
   "files": {
     "auth": "e9d845300eeac29bd5db7d9e9d4d9d280b52afe0a9ae87e66fd5182e00d9b4d1",
     "dc": "6ac8838843d9a8899099abbf625a8cddf495f5e9f2281f2edfeaf82fc36e4c94",
     "dc.cmd": "2e463fba40a7fc35f3369f359ce5aa5acafbce8d6e7696bb947a6fa052bbb072",
-    "dc.mjs": "8d95d524a7a13c620e5877b427bddea85ab5f88a669b644e4332fce90c8fb977",
+    "dc.mjs": "4a75c4679c3fceec1fd203e188be929c247860ecdb06a28b93358a5cd611a833",
     "dc.ps1": "3cae59c810001ec1d7a1d903a4a233f763afa440393324f5d09e477b65dcc003",
     "devcontainer.json": "94a9abd1bc6b4e9123a236fcd36509e0fad40d48c11437fcba84e0027f0e82ef",
     "on-create.sh": "71f01c5f9caf585bde5e0a4306d02398db8bbaab00e68daccf9dc8fc8c45182c",
