@@ -54,12 +54,15 @@ case "$cmd" in
   repo)
     full="${1:?repo needs owner/name}"
     # Only "Could not resolve" means free: any other failure (network, rate
-    # limit) must not pass for a free name.
+    # limit) must not pass for a free name. A name that answers with another
+    # repo's name is only a redirect left by a rename, and is free too.
     lookup() { # owner/name -> prints the details; returns 1 if free, 2 if unsure
       local out
-      if out="$(gh repo view "$1" --json visibility,description,pushedAt \
-        --jq '"\(.visibility|ascii_downcase) | \(.description // "") | \(.pushedAt[:10])"' 2>&1)"; then
-        printf '%s' "$out"; return 0
+      if out="$(gh repo view "$1" --json nameWithOwner,visibility,description,pushedAt \
+        --jq '"\(.nameWithOwner)\t\(.visibility|ascii_downcase) | \(.description // "") | \(.pushedAt[:10])"' 2>&1)"; then
+        local actual="${out%%$'\t'*}"
+        [ "${actual,,}" = "${1,,}" ] || return 1
+        printf '%s' "${out#*$'\t'}"; return 0
       fi
       case "$out" in *"Could not resolve to a Repository"*) return 1 ;; *) return 2 ;; esac
     }

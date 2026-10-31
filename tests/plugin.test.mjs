@@ -281,7 +281,8 @@ function publish(dir, args, { signedIn = true, cert = 'approved', env = {} } = {
 echo "$*" >> "$GH_LOG"
 case "$*" in
   "api user --jq .login") [ "$SIGNED_IN" = 1 ] && echo zeveck || exit 1 ;;
-  "repo view me/taken --json"*) echo "public | A frog game | 2026-04-25" ;;
+  "repo view me/taken --json"*) printf 'me/taken\tpublic | A frog game | 2026-04-25\n' ;;
+  "repo view me/renamed --json"*) printf 'me/renamed-old\tprivate | An old game | 2026-04-25\n' ;;
   "repo view me/offline"*) echo "error connecting to api.github.com" >&2; exit 1 ;;
   "repo view"*) echo "GraphQL: Could not resolve to a Repository with the name 'x'." >&2; exit 1 ;;
   *"--jq .html_url") echo "https://frog.example.com/" ;;
@@ -310,6 +311,8 @@ test('publish: a taken repo name says what is there and offers the next free one
   assert.equal(publish(dir, ['repo', 'me/free']).stdout, 'free: me/free\n');
   assert.equal(publish(dir, ['repo', 'me/taken']).stdout,
     'taken: me/taken (public | A frog game | 2026-04-25)\nfree: me/taken-2\n');
+  // A name left behind by a rename only redirects, so it's free.
+  assert.equal(publish(dir, ['repo', 'me/renamed']).stdout, 'free: me/renamed\n');
   // A failed lookup is never taken for a free name.
   const offline = publish(dir, ['repo', 'me/offline']);
   assert.equal(offline.status, 1);
