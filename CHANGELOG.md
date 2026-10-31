@@ -5,6 +5,12 @@ which are also valid semver. For a second release on the same day, use the next
 day's date rather than a `-1` suffix, because semver sorts `2026.10.20-1`
 before `2026.10.20`.
 
+## v2026.11.6
+
+- The game's name above the prompt leaves out the "status" label older games
+  have in their `design/STATUS.md` heading (`# BarbarAIn — status` shows as
+  BarbarAIn).
+
 ## v2026.11.5
 
 - While you work on a game, its name shows above the prompt, so you always

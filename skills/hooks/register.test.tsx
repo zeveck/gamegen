@@ -56,9 +56,14 @@ test('otherwise the most recently changed game below, by name or folder', async 
   expect(await band($)).toBe('🎮 frog')
 })
 
-test('an older STATUS.md heading loses its "Status:" label', async ($, on) => {
+test('an older STATUS.md heading loses its "status" label, before or after', async ($, on) => {
   disk(on, { '/proj/design/STATUS.md': '# Status: Tap Tester\n' }, {})
   expect(await band($)).toBe('🎮 Tap Tester')
+})
+
+test('"# BarbarAIn — status" shows as BarbarAIn', async ($, on) => {
+  disk(on, { '/proj/design/STATUS.md': '# BarbarAIn — status\n' }, {})
+  expect(await band($)).toBe('🎮 BarbarAIn')
 })
 
 test('no game, nothing of ours: the engine draws its own', async ($, on) => {

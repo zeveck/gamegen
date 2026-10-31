@@ -18,7 +18,10 @@ async function nameIn($: EngineInterface, dir: string): Promise<GameName | null>
   } catch {
     return null
   }
-  const heading = /^#[ \t]+(.+?)[ \t]*$/m.exec(text)?.[1]?.replace(/^Status:[ \t]*/i, '')
+  // Older games wrote "# Status: Name" or "# Name — status": keep just the name.
+  const heading = /^#[ \t]+(.+?)[ \t]*$/m.exec(text)?.[1]
+    ?.replace(/^status[ \t]*[:\u2014\u2013-][ \t]*/i, '')
+    .replace(/[ \t]*[:\u2014\u2013-][ \t]*status$/i, '')
   return heading || dir.split(/[\\/]/).filter(Boolean).pop() || null
 }
 
