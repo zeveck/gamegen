@@ -6,7 +6,7 @@ description: >-
   sound effects with imagegen2, nanogen, anim8gen and audiogen, builds it (a
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
-argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--publish [address]] [--site <address or none>] [--making-of] [--out <folder>]"
+argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--publish [address]] [--gallery <repo or none>] [--making-of] [--out <folder>]"
 allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(python3 -m http.server *), Bash(playwright-cli *)"
 ---
 
@@ -86,12 +86,12 @@ value) is the game description. Flags and defaults:
 | `--continue` | pick up an earlier run (after `--plan-only`, or one that was interrupted) | off |
 | `--change` | change a finished game: the words after it (other than other flags and their values) describe what to change | off |
 | `--publish` | put a finished web game online with GitHub Pages: optionally the address, such as `synapticnoise.com` (giving `<game>.synapticnoise.com`), a full address, or `github.io` | off |
-| `--site` | with `--publish`: the website that lists the person's games (an address or a repo), or `none` | the site at the publish domain, if it's theirs |
+| `--gallery` | with `--publish`: a GitHub repo for a gallery of the person's games, such as `zeveck/my-games`. The game is added to it, following its layout; if it doesn't exist yet, publishing offers to start it. `none` for no gallery | none |
 | `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
 | `--out` | folder for the game | see below |
 
-`--publish`, `--site` and `--making-of` can also be set as defaults in the
-nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_SITE`, `GAMEGEN_MAKING_OF=on`);
+`--publish`, `--gallery` and `--making-of` can also be set as defaults in the
+nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_MAKING_OF=on`);
 read them with `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" settings`, never
 by opening `.env` (it holds the keys). Flags win over these.
 
@@ -143,7 +143,7 @@ game isn't finished yet, suggest `--continue`. Then:
    with "Run `/gamegen --publish` to put this version online." Never publish
    without being asked.
 
-**Publishing.** `--publish` on its own (or with `--site`, `--out`) publishes
+**Publishing.** `--publish` on its own (or with `--gallery`, `--out`) publishes
 the finished game: follow `references/publish.md`, and do nothing else. With a
 game description, or "and publish it" in one, make the game first, then
 publish it at the end of Phase 8. With `--change`, make the change, then

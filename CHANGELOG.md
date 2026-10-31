@@ -5,6 +5,16 @@ which are also valid semver. For a second release on the same day, use the next
 day's date rather than a `-1` suffix, because semver sorts `2026.10.20-1`
 before `2026.10.20`.
 
+## v2026.11.1
+
+- `--site` is now `--gallery` (and `GAMEGEN_SITE` is `GAMEGEN_GALLERY`): a
+  GitHub repository showing all your games together. If it doesn't exist
+  yet, publishing offers to start it; each game is added the way the gallery
+  already shows the others. It's only used when you set it: publishing no
+  longer searches your repositories for a site.
+- Every publish ends with the game's link, title, description and picture,
+  for adding it to any other site by hand.
+
 ## v2026.10.31
 
 - **Publish a game:** `/gamegen --publish` puts a finished web game online with

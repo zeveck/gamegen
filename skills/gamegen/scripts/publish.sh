@@ -12,6 +12,8 @@
 #   publish.sh dns <host> <owner>          does <host> point at GitHub Pages yet?
 #   publish.sh pages <owner/name> [host]   turn on Pages (from the workflow), set
 #                                          the custom address, the repo's homepage
+#   publish.sh gallery-pages <owner/name>  turn on Pages for a new gallery,
+#                                          served straight from its main branch
 #   publish.sh https <owner/name>          wait for the certificate, then make
 #                                          HTTPS required (PUBLISH_WAIT seconds,
 #                                          default 540, under a 10-minute call)
@@ -31,7 +33,7 @@ case "$cmd" in
       [ "$dir" = "/" ] && break
       dir="$(dirname "$dir")"
     done
-    for name in GAMEGEN_DOMAIN GAMEGEN_SITE GAMEGEN_MAKING_OF; do
+    for name in GAMEGEN_DOMAIN GAMEGEN_GALLERY GAMEGEN_MAKING_OF; do
       value="${!name:-}"
       if [ -z "$value" ] && [ -n "$envfile" ]; then
         value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$name[[:space:]]*=" "$envfile" | tail -1 \
@@ -115,6 +117,16 @@ except OSError: pass" "$host")"
     echo "url: $url"
     ;;
 
+  gallery-pages)
+    full="${1:?gallery-pages needs owner/name}"
+    gh api -X POST "repos/$full/pages" -f 'source[branch]=main' -f 'source[path]=/' >/dev/null 2>&1 \
+      || die "pages: couldn't turn on GitHub Pages for $full"
+    url="$(gh api "repos/$full/pages" --jq .html_url 2>/dev/null)"
+    [ -n "$url" ] || die "pages: turned on, but GitHub didn't report the address"
+    gh repo edit "$full" --homepage "${url%/}" >/dev/null 2>&1 || true
+    echo "url: $url"
+    ;;
+
   https)
     full="${1:?https needs owner/name}"
     deadline=$(( $(date +%s) + ${PUBLISH_WAIT:-540} ))
@@ -135,5 +147,5 @@ except OSError: pass" "$host")"
     done
     ;;
 
-  *) die "usage: publish.sh settings | check | repo <owner/name> | dns <host> <owner> | pages <owner/name> [host] | https <owner/name>" ;;
+  *) die "usage: publish.sh settings | check | repo <owner/name> | dns <host> <owner> | pages <owner/name> [host] | gallery-pages <owner/name> | https <owner/name>" ;;
 esac

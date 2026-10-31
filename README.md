@@ -75,7 +75,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
 | `--change <what to change>` | Change something in a finished game, keeping everything else. | off |
 | `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |
-| `--site <address>` or `none` | With `--publish`: the website that lists your games, so the new one is added to it. | the site at your domain, if it's yours |
+| `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games, a page in a GitHub repository of yours. gamegen offers to start it the first time. | none |
 | `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
 
@@ -109,7 +109,7 @@ When you like it, put it online:
 
 gamegen makes a GitHub repository for it and publishes it at `https://<you>.github.io/<game>/`, free. You need a GitHub account, signed in here (`gh auth login`, or `auth` in the dev container). Before it changes anything, it shows you where the game will go and asks.
 
-Have your own domain? `/gamegen --publish example.com` puts it at `<game>.example.com`, and gamegen tells you the one DNS record to add. If example.com is your own site on GitHub Pages, the game is added to its list of games too (`--site` picks a different site).
+Have your own domain? `/gamegen --publish example.com` puts it at `<game>.example.com`, and gamegen tells you the one DNS record to add. When it's done, you get the game's link, title, description and picture, ready to add to your own site. Want all your games on one page? `--gallery you/my-games` adds each one to a gallery, and starts it for you the first time.
 
 Made a change? `/gamegen --publish` again updates the live game.
 
@@ -117,7 +117,7 @@ To use the same settings every time, put them in your `.env`:
 
 ```
 GAMEGEN_DOMAIN=example.com
-GAMEGEN_SITE=example.com
+GAMEGEN_GALLERY=you/my-games
 GAMEGEN_MAKING_OF=on
 ```
 

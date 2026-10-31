@@ -333,8 +333,24 @@ test('publish: turns on Pages at the custom address, then requires HTTPS', (t) =
 
 test('publish: settings come from the environment or the .env, and never the keys', (t) => {
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
-  writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_DOMAIN="example.com"  # mine\n# GAMEGEN_SITE=old.example.com\n');
+  writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_DOMAIN="example.com"  # mine\n# GAMEGEN_GALLERY=me/old-games\n');
   const deep = join(dir, 'frog'); mkdirSync(deep);
   const r = publish(deep, ['settings'], { env: { GAMEGEN_MAKING_OF: 'on' } });
-  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_SITE: not set\nGAMEGEN_MAKING_OF: on\n');
+  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_MAKING_OF: on\n');
+});
+
+test('publish: a new gallery is served straight from its main branch', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const r = publish(dir, ['gallery-pages', 'me/games']);
+  assert.equal(r.stdout, 'url: https://frog.example.com/\n');
+  assert.equal(r.calls[0], 'api -X POST repos/me/games/pages -f source[branch]=main -f source[path]=/');
+});
+
+test('the gallery template has the placeholders publish.md fills in', () => {
+  const page = read('skills/gamegen/templates/gallery.html');
+  const steps = read(`${REFS}/publish.md`);
+  for (const p of ['GALLERY_TITLE', 'GAME_URL', 'GAME_IMAGE', 'GAME_TITLE', 'GAME_DESCRIPTION']) {
+    assert.ok(page.includes(p), `template has ${p}`);
+    assert.ok(steps.includes(`\`${p}\``), `publish.md says how to fill in ${p}`);
+  }
 });

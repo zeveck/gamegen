@@ -18,7 +18,7 @@ GEMINI_API_KEY=
 ELEVENLABS_API_KEY=
 
 # Optional: your own defaults for publishing (/gamegen --publish). Remove the
-# # to use one. The --publish, --site and --making-of flags override these.
+# # to use one. The --publish, --gallery and --making-of flags override these.
 # GAMEGEN_DOMAIN=example.com     # games go to <game>.example.com (or github.io)
-# GAMEGEN_SITE=example.com       # the website that lists your games, or none
+# GAMEGEN_GALLERY=you/my-games   # a GitHub repo showing all your games together
 # GAMEGEN_MAKING_OF=on           # READMEs show the prompts and how it was made

@@ -37,7 +37,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--continue` | Build a saved design, or finish an interrupted game |
 | `--change <what>` | Change something in a finished game, keeping the rest |
 | `--publish [address]` | Put a finished game online, free, with GitHub Pages |
-| `--site <address>` or `none` | With `--publish`: the website that lists your games |
+| `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games |
 | `--making-of` | Show in the README how the game was made |
 | `--out <folder>` | Where to put the game |
 
@@ -189,20 +189,26 @@ nothing.
 Publishing again after a `--change` updates the live game. To use the same
 domain every time, put `GAMEGEN_DOMAIN=example.com` in your `.env`.
 
-## --site
+## --gallery
 
-**The website that lists your games**, so publishing adds the new one to it:
-an address or a GitHub repository. gamegen adds a card in the same style as
-the others, at the top unless the page is ordered some other way.
+**Show your published games together** on one page, a gallery kept in a
+GitHub repository of yours:
 
 ```
-/gamegen --publish example.com --site example.com
+/gamegen --publish --gallery you/my-games
 ```
 
-When you publish to your own domain and the site at that domain is one of
-your GitHub repositories, gamegen uses it without being told; `--site none`
-skips it. If the site isn't a repository of yours, you get the card to paste
-in. To set it once, put `GAMEGEN_SITE=example.com` in your `.env`.
+The first time, if `you/my-games` doesn't exist yet, gamegen offers to start
+it: a page with each game's picture, name, a line about it and a Play
+button, at `https://<you>.github.io/my-games/`. Each game you publish after
+that is added at the top. Change the page however you like; gamegen adds new
+games the way the page already shows the others. A games page you already
+have works too, if it's a GitHub repository you can push to.
+
+To use it every time, put `GAMEGEN_GALLERY=you/my-games` in your `.env`;
+`--gallery none` skips it for one game. Without either, there's no gallery.
+Either way, every publish ends with the game's link, title, description and
+picture, for adding it to any other site yourself.
 
 ## --making-of
 

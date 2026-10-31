@@ -1,8 +1,8 @@
 # Publishing a game
 
 `--publish` puts a finished web game online with GitHub Pages, at a free
-GitHub address or the person's own, and can add it to a website that lists
-their games. Run with `--publish` on a finished game, or at the end of Phase 8
+GitHub address or the person's own, and, if they ask for one, adds it to a
+gallery of their games. Run with `--publish` on a finished game, or at the end of Phase 8
 when the request asked for it ("…and publish it").
 
 The GitHub calls go through `scripts/publish.sh` (run it as
@@ -21,7 +21,8 @@ Change nothing until the person confirms in step 2.
 2. **Already published?** It's an update when the game folder is the root of
    a git repository whose `origin` is a GitHub repo the person can push to
    (`gh api repos/<owner>/<repo> --jq .permissions.push` says `true`) and that
-   has a Pages site (`gh api repos/<owner>/<repo>/pages` works). Then skip to
+   has a Pages site (`gh api repos/<owner>/<repo>/pages` works). Then work
+   out the address and the gallery (items 3 and 4 below) and follow
    "Updating a published game". With an `origin` they can push to but no
    Pages site, publish into that repo (it's already the game's own) and skip
    creating one. With an `origin` they can't push to, publish as a new repo
@@ -36,13 +37,23 @@ Change nothing until the person confirms in step 2.
    - A full host, like `pp3.synapticnoise.com`: exactly that.
    For a custom address, run `publish.sh dns <host> <account>` now, so the
    confirmation can say if DNS still needs setting up.
-4. **The listing site.** In order: `--site`; otherwise `GAMEGEN_SITE`;
-   otherwise, for a custom address, the site at the bare domain
-   (`synapticnoise.com`) if one of the person's repos serves it with GitHub
-   Pages (check `gh api repos/<account>/<repo>/pages --jq .cname` on their
-   repos whose name looks like the domain first, then the rest). `--site
-   none`, or nothing found, means no listing. A site that isn't one of their
-   repos gets a card to paste instead.
+4. **The gallery.** Only from `--gallery`, otherwise `GAMEGEN_GALLERY`; never
+   work it out or search for one. Nothing set, or `none`, means no gallery:
+   don't mention galleries at all. Otherwise it names a GitHub repo
+   (`zeveck/synapticnoise`):
+   - It exists and they can push to it
+     (`gh api repos/<repo> --jq .permissions.push`): clone it into
+     `.gamegen/gallery/` now (changing nothing yet) and find how it shows
+     the games and where a new one goes: at the top, unless they're clearly
+     in another order (alphabetical, oldest first). If it shows no games yet,
+     or it isn't clear how, plan to show the person what you'd add.
+   - It doesn't exist (`publish.sh repo` says it's free) and it's under
+     their own account: offer to start it, in the confirmation. Its address
+     will be `https://<account>.github.io/<name>/`, or
+     `https://<account>.github.io/` if it's named `<account>.github.io`.
+   - It exists but they can't push to it, it's under someone else's account,
+     or it isn't a repo name: say so plainly in the confirmation, and carry
+     on without it.
 5. **The repo name.** The game's folder name (kebab-case). `publish.sh repo
    <account>/<name>`: if it's taken, use the free name it suggests and say
    what's already there. If it says it couldn't check, try again; never
@@ -60,8 +71,8 @@ Change nothing until the person confirms in step 2.
 Show one line with everything, and ask. For example:
 
 > Publish Pomegranate Panic 3 as a new public repo, zeveck/pomegranate-panic-3,
-> at https://pomegranatepanic3.synapticnoise.com, and add it at the top of
-> synapticnoise.com? (yes/no)
+> at https://pomegranatepanic3.synapticnoise.com, and add it to the top of your
+> games gallery, zeveck/synapticnoise? (yes/no)
 
 Add what applies, briefly:
 
@@ -71,13 +82,16 @@ Add what applies, briefly:
   https://zeveck.github.io/barbarain-2/ and move once you add the record."
 - Inside a bigger repository: "It becomes its own repo, so my-project will
   ignore the barbarain folder."
-- The listing site isn't their repo: "I'll give you a card for
-  example.com" instead of "add it to example.com".
-- The card's place: at the top, unless the site's cards are clearly in
-  another order (alphabetical, oldest first), then where that order puts it.
+- A new gallery: "…and start your games gallery, zeveck/my-games, at
+  https://zeveck.github.io/my-games/?"
+- The gallery can't be used, saying why: "you can't push to
+  someone/their-games, so it won't be added there", or "other/games doesn't
+  exist and isn't yours to start, so…".
+- Where it goes in the gallery, as found in step 1.4. If it isn't clear,
+  say you'll show what you'd add before changing the gallery.
 
 A plain "no": say nothing was published, and how to change it
-(`/gamegen --publish <address>`, `--site none`). Anything else ("yes, but
+(`/gamegen --publish <address>`, `--gallery none`). Anything else ("yes, but
 call it…", "don't list it", "the DNS is fine, it's behind Cloudflare") is a
 correction: adjust, show the line again, and ask again.
 
@@ -126,26 +140,42 @@ correction: adjust, show the line again, and ask again.
    canonical link and preview image. GitHub can take a minute or two to
    update; try a few times before calling it broken.
 
-## 5. Add it to the listing site
+## 5. Add it to the gallery
 
-Clone the site's repo into `.gamegen/site/` and find the page that links the
-person's other games. Add a card for this game in exactly the same style as
-the others: the same HTML, its social card as the picture, the README's
-tagline or first sentence as the description, and a link to the address.
-Put it where the confirmation said. If the site has a `sitemap.xml`, add the
-game's address to it. Commit ("Add Pomegranate Panic 3"), push, and check the
-live site shows the new card (it can take a few minutes).
+**Starting a new gallery:** make it in `.gamegen/gallery/` from
+`templates/gallery.html`, saved as `index.html`: replace `GALLERY_TITLE`
+with "<their name>'s games" (`gh api user --jq '.name // .login'`), and fill
+in the example game with this one: `GAME_URL` is the game's address,
+`GAME_IMAGE` the full address of its `social-card.jpg` (watch for a doubled
+`/`), `GAME_TITLE` its name and `GAME_DESCRIPTION` the README's tagline or
+first sentence. Add a short `README.md` ("<Name>'s games, to play at
+<gallery address>"). Then `git init -b main`, commit, `gh repo create
+<repo> --public --description "<Name>'s games"`, push, and
+`publish.sh gallery-pages <repo>`. Check the gallery's address loads, then go
+on to step 6.
 
-If the site has no games on it yet, show the person the card and where it
-would go, and ask before pushing. If the site isn't one of their repos, give
-them the finished card to paste.
+**An existing gallery** (cloned in step 1.4): add this game the same way the
+gallery already shows the others, whether it's an HTML page, a Markdown
+list, a data file or anything else, and even if gamegen made it (the person
+may have changed it since). Match the existing entries exactly (what they
+show, in the same markup), using the game's address, title, the README's
+tagline or first sentence, and its social card if the entries have
+pictures. If it shows no games yet, or it isn't clear how, show the person
+what you'd add and where, and ask before pushing. Put it where the
+confirmation said. If the gallery has a `sitemap.xml`, add the game's
+address to it. Commit ("Add Pomegranate Panic 3"), push, and check the live
+gallery shows the new game (it can take a few minutes).
 
 ## 6. Report
 
 Short and happy: the game's address, first and on its own line; the repo; the
-listing site, if any; and anything still pending (DNS to add, HTTPS still
-switching on), with exactly what to do. Updating later is just
-`/gamegen --change …` and then `/gamegen --publish`.
+gallery, if any; and anything still pending (DNS to add, HTTPS still
+switching on), with exactly what to do, and that updating later is just
+`/gamegen --change …` and then `/gamegen --publish`. End with what they'd
+need to list it anywhere else by hand:
+
+> **To list it elsewhere:** link https://…, title "…", description "…",
+> picture https://…/social-card.jpg (1200×630).
 
 ## Updating a published game
 
@@ -158,6 +188,9 @@ github.io waiting for DNS that's now ready. Confirm in one line:
 
 or, when it moves: "Update Barbarain and move it from
 https://zeveck.github.io/barbarain-2/ to https://barbarain.synapticnoise.com?"
+Add the gallery when it changes ("…and add it to your games gallery,
+zeveck/synapticnoise", "…and start your games gallery…", or why it can't),
+as in step 2.
 
 Then:
 
@@ -168,6 +201,7 @@ Then:
 4. If it's on a custom address and HTTPS isn't required yet:
    `publish.sh https <owner>/<repo>` (step 4.4).
 5. Check the live page (step 4.5).
-6. If it moved, or the title, tagline or social card changed, update its card
-   on the listing site (step 5). If it was never listed and the site settings
-   now point at one, add it.
+6. If it moved, or the title, tagline or social card changed, update its entry
+   in the gallery (step 5). If it was never in one and a gallery is now set,
+   add it, or start it (step 5).
+7. Report as in step 6.
