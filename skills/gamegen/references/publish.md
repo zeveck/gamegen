@@ -75,33 +75,35 @@ Change nothing until the person confirms in step 2.
    root for this game moves into the game folder. Say all this in the
    confirmation.
 
-## 2. Confirm, in one line
+## 2. Confirm
 
-Ask one short question that says where it goes, and nothing else. For example:
+Tell the person what's about to happen in a few plain, concrete sentences,
+then ask. For example:
 
-> Publish BarbarAIn at https://barbarain.synapticnoise.com (new repo
-> zeveck/barbarain-2, since zeveck/barbarain is taken) and add it to the top
-> of your gallery? (yes/no)
+> BarbarAIn will go live at https://barbarain.synapticnoise.com.
+> zeveck/barbarain is your old private text adventure, so I'll make a new
+> public repo, zeveck/barbarain-2, with the game, its README (screenshots and
+> your prompts) and the design notes. Then I'll add BarbarAIn to the top of
+> synapticnoise.com, linking to the game. HTTPS can take a few minutes to
+> switch on after that. Go ahead?
 
-Keep it to that one sentence. Add a note only for something unusual, in a
-few words in brackets:
-
-- The repo name was taken: "(new repo zeveck/barbarain-2, since
-  zeveck/barbarain is taken)". Otherwise just "(new repo zeveck/barbarain)".
-- DNS isn't set up yet: "(at https://zeveck.github.io/barbarain/ until you
-  add its DNS record)".
-- Inside a bigger repository: "(as its own repo; my-project will skip the
-  folder)".
-- A new gallery: "and start your gallery, zeveck/my-games?".
-- The gallery can't be used: "(not added to someone/games: you can't push
-  to it)".
-- The gallery's spot: "to the top", or "just before Pomegranate Panic 2" for
-  a sequel. If it isn't clear how the gallery shows games, say you'll show
-  the change first. If the person asks for another place ("after Hoard
-  Hopper"), put it there.
-
-Don't explain settings (making-of, the domain) or say what's left out of the
-repo: those are already decided.
+- **Start with the address**, since that's what they care about most.
+- **Then what you'll do, in things they'd recognise:** the repo (and why, if
+  the name was taken, naming what's there: "your old private text
+  adventure"), what goes in it (the game, the README, and the design notes
+  with `--making-of`), and where it goes in the gallery ("the top of
+  synapticnoise.com", or "just before Pomegranate Panic 2" for a sequel).
+- **Anything that won't happen straight away or at all**, in the same voice:
+  DNS not set up yet ("It'll be at https://zeveck.github.io/barbarain-2/ for
+  now, and move to barbarain.synapticnoise.com once you add its DNS
+  record."), HTTPS still to come, a new gallery being started, a gallery
+  that can't be used and why, or the game becoming its own repo out of a
+  bigger one.
+- **Leave out** how settings were decided and what's kept out of the repo.
+- **End with a plain question** ("Go ahead?"), so a correction in their own
+  words is a natural answer. If they ask for another spot in the gallery
+  ("after Hoard Hopper"), use it. If it isn't clear how the gallery shows
+  games, say you'll show the change first.
 
 A plain "no": say nothing was published, and how to change it
 (`/gamegen --publish <address>`, `--gallery none`). Anything else ("yes, but
@@ -195,14 +197,19 @@ need to list it anywhere else by hand:
 Work out the address as in step 1.3, starting from where it is now (the
 Pages address, `gh api repos/<owner>/<repo>/pages --jq .html_url`). It
 changes only when `--publish` names a different one, or when it's on
-github.io waiting for DNS that's now ready. Confirm in one line:
+github.io waiting for DNS that's now ready. Confirm the same way as step 2,
+saying what's changed since it was last published (from the commits and the
+requests in `design/STATUS.md` since then):
 
-> Update Pomegranate Panic 3 at https://pomegranatepanic3.synapticnoise.com? (yes/no)
+> I'll update BarbarAIn at https://barbarain.synapticnoise.com with what's
+> changed since you last published: the boss fight at the end of the last
+> cave and the bolder title. Its README and screenshots will be refreshed
+> too, and its picture on synapticnoise.com updated to match. Go ahead?
 
-or, when it moves: "Update Barbarain and move it from
-https://zeveck.github.io/barbarain-2/ to https://barbarain.synapticnoise.com?"
-Add the gallery only when it changes ("…and add it to your gallery?"), as
-briefly as in step 2.
+When it moves, say so in the same sentence: "…and move it from
+https://zeveck.github.io/barbarain-2/ to https://barbarain.synapticnoise.com,
+now that its DNS is set up." Mention the gallery only when something there
+changes.
 
 Then:
 

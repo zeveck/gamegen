@@ -71,7 +71,11 @@ export const register: Register = on => {
     const name = await read($, game)
     if (!name || e.props.hasSurvey) return next(e)
 
-    const { Text } = $.ui.resolve(e)
-    return <Text dimColor>🎮 {name}</Text>
+    const { Box, Text } = $.ui.resolve(e)
+    return (
+      <Box marginTop={1}>
+        <Text dimColor>🎮 {name}</Text>
+      </Box>
+    )
   })
 }

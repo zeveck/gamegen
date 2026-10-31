@@ -4,6 +4,14 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.10.31.3
+
+- Publishing tells you what it's about to do in a few plain sentences before
+  asking: the address, the repo and what goes in it, the gallery spot, and
+  anything that comes later (DNS, HTTPS). An update says what's changed since
+  the game was last published.
+- A blank line above the game's name, so it stands apart from the chat.
+
 ## v2026.10.31.2
 
 Versions are now the release date, with `.2`, `.3` for later releases the
