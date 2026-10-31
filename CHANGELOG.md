@@ -5,6 +5,12 @@ which are also valid semver. For a second release on the same day, use the next
 day's date rather than a `-1` suffix, because semver sorts `2026.10.20-1`
 before `2026.10.20`.
 
+## v2026.11.3
+
+- Publishing asks its questions in plain words and waits for your reply,
+  instead of with a multiple-choice prompt, so you can answer with a
+  correction in your own words.
+
 ## v2026.11.2
 
 - A new game goes at the top of your gallery, newest first, or just before

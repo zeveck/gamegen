@@ -5,6 +5,11 @@ GitHub address or the person's own, and, if they ask for one, adds it to a
 gallery of their games. Run with `--publish` on a finished game, or at the end of Phase 8
 when the request asked for it ("…and publish it").
 
+Whenever this asks the person something, ask in plain words as the last line
+of your reply and end your turn to wait for their answer. Don't use a
+question tool or a multiple-choice prompt: their answer may be a correction
+in their own words.
+
 The GitHub calls go through `scripts/publish.sh` (run it as
 `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" <command>`). It prints plain
 `label: value` lines; turn them into plain words for the person.
