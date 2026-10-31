@@ -106,6 +106,68 @@ Save progress, best scores and settings to `localStorage` under a key named
 for the game, as a small JSON object with a version number. Wrap reads in
 `try`/`catch` and fall back to a fresh save if it's missing or broken.
 
+## Looking finished
+
+Players notice the words, the icons and the first two seconds before
+anything else. Build these in from the start; the play-test checks them (see
+playtest-guide.md).
+
+### Text that looks finished
+
+- **No lone last words.** `text-wrap: balance` on headings, labels, buttons
+  and captions, and `text-wrap: pretty` on running text. Keep names and
+  short phrases together with non-breaking spaces (`Sir&nbsp;Bramble`).
+- **Never cut a name off.** Where space is tight (a top bar, a map label, a
+  battle tag), shrink the text to fit, then let it go to two lines, and only
+  then cut it with "…". Test the longest name in the game at the smallest
+  size.
+- **Nothing spills out of its box.** Size boxes to their longest text at every
+  size, and test them with it.
+- **Build text from strings, never by turning objects into text.** A helper
+  that makes elements flattens its children all the way
+  (`children.flat(Infinity)`) and appends elements as elements; text goes in
+  with `textContent`. That's how `[object HTMLElement]` or `undefined` ends
+  up on screen.
+- **A screen that might scroll** on a short display: put the scrolling on an
+  inner box, and keep wide things (a logo, a title) sized to fit
+  (`max-width: 100%`, or scaled down) so the scrolling box can't clip them.
+- **One way of writing each name.** Items, characters and places are
+  spelled and capitalised the same everywhere; keep them in one list in the
+  code and use it.
+- **Text drawn on the canvas** gets the same care: wrap it with a helper
+  that measures the words (`measureText`) and never leaves one alone on the
+  last line, and shrinks a name to fit its space.
+
+### The first load
+
+The title should appear once, finished, and then stay still.
+
+- **Preload what the title needs**: its fonts (`<link rel="preload"
+  as="font" crossorigin>`, then `document.fonts.load(...)`) and its art.
+- **Keep the title hidden until they're ready**, with a failsafe (show it
+  anyway after about 3 seconds), then fade it in once. A plain background in
+  the game's colors meanwhile is fine; text on a blank screen isn't.
+- **Reserve space** for anything that appears later, so nothing shifts when
+  it does.
+- **Decide device-dependent words before showing them**: "Tap to begin" or
+  "Click to begin" (from `matchMedia('(pointer: coarse)')`) is settled before
+  the title appears, never swapped after.
+
+### Icons
+
+One set of matching icons, drawn as inline SVG in the text color
+(`fill: currentColor`), for mute, pause, settings, fullscreen and the rest.
+No emoji or symbol characters (🔊, ⚙, ⌨): they look different on every
+device, and some phones show them as empty boxes.
+
+### Pop-up messages
+
+Send every pop-up message (an item found, a level up, a hint) through one
+queue: messages of the same kind arriving together merge into one, the rest
+wait their turn or stack neatly below any tip instead of on top of it, and
+none ever covers the action (on a phone, in battle, keep them clear of the
+fighters).
+
 ## Install and offline
 
 - `manifest.webmanifest` with the name, short name, `display: fullscreen` (or
@@ -205,6 +267,8 @@ window.__game = {
   levels: () => /* number of levels */,
   goToLevel: (n) => { /* start level n fresh, as if just arrived */ },
   audioState: () => ({ context: audioCtx?.state, musicMuted, sfxMuted }),
+  // Only when menus are drawn on the canvas: what's pressable on screen now.
+  buttons: () => [{ label: 'Credits', x, y, w, h }],
 };
 ```
 

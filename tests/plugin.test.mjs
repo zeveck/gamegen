@@ -258,6 +258,18 @@ test('every reference file the skill names exists, and none is orphaned', () => 
   for (const f of files) assert.ok(all.includes(f), `${f} is referenced`);
 });
 
+test('every script is used by the skill, a reference file or another script', () => {
+  const dir = 'skills/gamegen/scripts';
+  const scripts = readdirSync(join(ROOT, dir));
+  const refs = readdirSync(join(ROOT, REFS)).map((f) => read(`${REFS}/${f}`));
+  for (const f of scripts) {
+    const others = scripts.filter((o) => o !== f).map((o) => read(`${dir}/${o}`));
+    assert.ok([skill, ...refs, ...others].some((text) => text.includes(f)), `${f} is used`);
+  }
+  // The first-load check runs without a permission prompt, like the others.
+  assert.match(skill.match(/^allowed-tools: (.*)$/m)[1], /scripts\/first-load\.sh \*/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {
@@ -375,4 +387,40 @@ test('the gallery template has the placeholders publish.md fills in', () => {
     assert.ok(page.includes(p), `template has ${p}`);
     assert.ok(steps.includes(`\`${p}\``), `publish.md says how to fill in ${p}`);
   }
+});
+
+// The text scanner, in a real browser when playwright-cli is here (it isn't
+// in CI). The test page has each problem once, beside text that's fine.
+const hasPlaywright = spawnSync('sh', ['-c', 'command -v playwright-cli']).status === 0;
+test('scan-text finds junk, lone words and cut-off text, and nothing else', { skip: !hasPlaywright && 'no playwright-cli' }, async (t) => {
+  const { createServer } = await import('node:http');
+  const { execFile } = await import('node:child_process');
+  const page = read('tests/fixtures/scan-text.html');
+  const server = createServer((req, res) => { res.setHeader('content-type', 'text/html'); res.end(page); });
+  await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
+  const dir = scratch();
+  mkdirSync(join(dir, '.playwright'));
+  writeFileSync(join(dir, '.playwright/cli.config.json'), JSON.stringify({
+    browser: { browserName: 'chromium', launchOptions: { headless: true, args: ['--no-sandbox'] } },
+    outputDir: '.playwright/output',
+  }));
+  const cli = (...args) => new Promise((ok, fail) => execFile('playwright-cli', ['-s=scan', ...args], { cwd: dir },
+    (err, stdout) => (err ? fail(err) : ok(stdout))));
+  t.after(async () => { await cli('close').catch(() => {}); server.close(); rmSync(dir, { recursive: true, force: true }); });
+  await cli('open', `http://127.0.0.1:${server.address().port}/`);
+  await cli('resize', '1280', '720');
+  const out = await cli('run-code', `async page => {
+    await page.addScriptTag({ path: ${JSON.stringify(join(ROOT, 'skills/gamegen/scripts/scan-text.js'))} });
+    return JSON.stringify(await page.evaluate(() => window.__scanText()));
+  }`);
+  const found = JSON.parse(JSON.parse(out.split('\n')[1]));
+  assert.deepEqual(found.map((f) => `${f.kind} ${f.where}${f.by ? ' by ' + f.by : ''}`).sort(), [
+    'clipped div.label by its own box',          // a label spilling out of its box
+    'clipped div.off by the screen edge',        // off the side of the screen
+    'clipped div.room by its own box',           // "The S…"
+    'clipped h1.logo by its own box',            // a logo in a box that scrolls
+    'clipped span.chip by div.box',              // cut off by a box around it
+    'junk div#credits',                          // [object HTMLElement]
+    'orphan p#t1.tag',                           // "seems." alone on its line
+  ]);
 });

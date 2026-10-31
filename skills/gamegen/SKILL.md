@@ -7,7 +7,7 @@ description: >-
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
 argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--publish [address]] [--gallery <repo or none>] [--making-of] [--out <folder>]"
-allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(python3 -m http.server *), Bash(playwright-cli *)"
+allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(python3 -m http.server *), Bash(playwright-cli *)"
 ---
 
 # /gamegen — make a game from a description
@@ -147,7 +147,8 @@ game isn't finished yet, suggest `--continue`. Then:
    round on the change.
 3. Make only the assets the change needs. Each change gets its own budget:
    `--budget` if given now, otherwise the default $20.
-4. Build it, play-test what changed, and replay every level's solution to make
+4. Build it, play-test what changed (with the text scanner on every screen
+   it touched, at every size), and replay every level's solution to make
    sure nothing else broke.
 5. Wrap up as usual: update the README and screenshots, start the game, and
    report with a fresh link and what changed. If the game is published, end
@@ -157,7 +158,7 @@ game isn't finished yet, suggest `--continue`. Then:
 **Publishing.** `--publish` on its own (or with `--gallery`, `--out`) publishes
 the finished game: follow `references/publish.md`, and do nothing else. With a
 game description, or "and publish it" in one, make the game first, then
-publish it at the end of Phase 8. With `--change`, make the change, then
+publish it at the end of Phase 9. With `--change`, make the change, then
 publish. A game that isn't finished can't be published yet: suggest
 `--continue`.
 
@@ -364,8 +365,12 @@ only the game's own files, never someone else's changes. Never push.
 Follow `references/playtest-guide.md`. Serve the game, open it at desktop and
 phone sizes (as the platform setting requires), and play it: every screen,
 every level, start to finish, with no errors in the console. Prove each level
-can be completed. Take screenshots of each screen and level into
-`design/screenshots/` and look at them.
+can be completed. Open everything every button opens, not just the main
+screens. Take screenshots of each screen and level into `design/screenshots/`,
+run the text scanner at each one, film the first load, and look at them all.
+
+Checking that it works isn't enough: it has to look finished too. Junk text
+on screen is a bug like any other.
 
 When something's broken, fix it and play again. If the same problem survives
 three fixes, cut or simplify that feature (it's on the cut list for a reason)
@@ -378,14 +383,31 @@ Dispatch two agents in parallel, with instructions from
 `references/review-roles.md`:
 
 - **Playtester:** plays the finished game at every targeted size and reviews
-  the screenshots for fun, clarity and polish.
+  the screenshots for fun, clarity and polish. Give it the polish checklist
+  from the Polish reviewer's role too.
 - **Bug hunter:** reads the code and pokes at the game for crashes, stuck
   states, phone problems, audio problems and lost saves.
 
 Fix what they find, then re-run the play-test for anything you changed. Run a
 second round only if the first found must-fix problems.
 
-## Phase 8 — Wrap up
+## Phase 8 — Polish pass
+
+Dispatch one **Polish reviewer** (its role is in `references/review-roles.md`):
+a fresh agent that didn't build the game. Serve the game as the play-test
+does, and give it the address, the targeted sizes and the play-test guide,
+but not your screenshots or anyone's opinions of them. It goes through every
+screen at every size against a concrete checklist: junk text, lone words,
+cut-off text, pop-ups covering things, names written differently, icons, and
+the first load. (For other targets, it checks what can be run here, and the
+screenshots, against the same checklist.)
+
+Fix everything it finds, then scan and screenshot those screens again at
+every size, and replay every level's solution if anything in play changed.
+A fix can break something else (making a box scroll can cut off a logo), so
+re-check the whole screen, not just the fixed spot.
+
+## Phase 9 — Wrap up
 
 1. **Make the social card and check the page's details** (web games): the
    1200x630 image link previews show, made from the game's own art and

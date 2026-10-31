@@ -2,7 +2,7 @@
 
 `--publish` puts a finished web game online with GitHub Pages, at a free
 GitHub address or the person's own, and, if they ask for one, adds it to a
-gallery of their games. Run with `--publish` on a finished game, or at the end of Phase 8
+gallery of their games. Run with `--publish` on a finished game, or at the end of Phase 9
 when the request asked for it ("…and publish it").
 
 Whenever this asks the person something, ask in plain words as the last line
@@ -71,7 +71,7 @@ Change nothing until the person confirms in step 2.
 6. **Inside a bigger repository?** If the game folder is part of a bigger git
    repository (not its root), it's published as its own repo: the game folder
    becomes its own repository, and the bigger one's `.gitignore` gets the
-   folder added. Any Pages workflow Phase 8 put at the bigger repository's
+   folder added. Any Pages workflow Phase 9 put at the bigger repository's
    root for this game moves into the game folder. Say all this in the
    confirmation.
 
@@ -165,6 +165,13 @@ correction: adjust, show the line again, and ask again.
 5. Load the address (`curl -sL`): it answers 200 and the page has the right
    canonical link and preview image. GitHub can take a minute or two to
    update; try a few times before calling it broken.
+6. **Look at the live game,** not just its HTML: open the address with
+   `playwright-cli` in fresh sessions at a desktop size and a phone size
+   (see playtest-guide.md), take a screenshot of each and look at them,
+   check the console for errors, run the text scanner, and open one or two
+   popups (credits, settings) and close them. Something that only breaks
+   online (a file name's case, a missing file, a path) shows up here. If
+   anything's wrong, fix it, push again and check again before reporting.
 
 ## 5. Add it to the gallery
 
@@ -231,7 +238,7 @@ Then:
 3. Push, and wait for that commit's deploy (step 4.3).
 4. If it's on a custom address and HTTPS isn't required yet:
    `publish.sh https <owner>/<repo>` (step 4.4).
-5. Check the live page (step 4.5).
+5. Check the live page and look at the live game (steps 4.5 and 4.6).
 6. If it moved, or the title, tagline or social card changed, update its entry
    in the gallery (step 5). If it was never in one and a gallery is now set,
    add it, or start it (step 5).

@@ -134,8 +134,10 @@ Work through the design's definition of done. At minimum:
 
 1. **No errors.** `playwright-cli -s=desktop console` after loading and after
    each screen; no errors, and no failed requests (`requests`).
-2. **Every screen.** Title, how to play, gameplay, pause, level complete, game
-   over, victory, settings. Each one looks right and can be left again.
+2. **Every screen, and everything they open.** Title, how to play, gameplay,
+   pause, level complete, game over, victory, settings, and everything every
+   button on them opens (see "Open every screen" below). Each one looks right
+   and can be left again.
 3. **Every level can be finished:** replay every recorded solution. Play the
    first level from the title screen with no help.
 4. **Losing works.** Lose a life and lose the game; retry; nothing gets stuck.
@@ -147,10 +149,44 @@ Work through the design's definition of done. At minimum:
    (`localstorage-list`).
 8. **Pausing.** Pausing, switching tabs and coming back, and resizing in the
    middle of a level all work.
-9. **Offline** (web games that install): in a fresh session, open the game
+9. **The first load** (see "The first load" below): the title appears once,
+   in its real fonts and art, and nothing jumps afterwards.
+10. **The words on screen** pass the text scanner at every screenshot (see
+    "Screenshots").
+11. **Offline** (web games that install): in a fresh session, open the game
    with `?sw=1`, reload once so the service worker takes over, then
    `network-state-set offline`, reload, and play. Close that session after,
    so the cached copy doesn't follow you into later tests.
+
+## Open every screen
+
+A screen nobody opened is a screen nobody checked. On the title, pause,
+game-over and end screens (and settings, and anything else with buttons),
+press every button that opens something: credits, help, settings, about,
+achievements, a map. Screenshot what it opens, scan its text, and close it
+again the way a player would. Read each screen's buttons from the page
+(`snapshot`, or `eval` over the visible `button` and `[role=button]`
+elements); for menus drawn on the canvas, the debug hook's `buttons()` lists
+them (see web-target.md). Do this at every size: a popup that fits a desktop
+can run off a phone held sideways.
+
+## The first load
+
+Screenshots are taken after the page has settled, so they can't show what a
+player sees while it loads: text in a stand-in font that then jumps, words
+on a blank screen before the art arrives, a button whose label changes.
+Film it instead, on a slowed connection, in a fresh session at each size
+(open the session, `resize`, then):
+
+```bash
+bash "${CLAUDE_SKILL_DIR}/scripts/first-load.sh" phone http://127.0.0.1:8123/ design/screenshots/first-load-phone.png
+```
+
+It saves a filmstrip of about 20 frames and prints when the fonts finished
+loading and when the picture changed. Look at the filmstrip. The title should
+appear once, in its real fonts and with its art, and then stay put: every
+change after it appears is a flicker or a jump to fix (see "The first load"
+in web-target.md). A fade-in as the title appears is fine.
 
 ## Screenshots
 
@@ -161,10 +197,44 @@ the design folder:
 playwright-cli -s=desktop screenshot --filename=design/screenshots/desktop-level-2.png
 ```
 
-Then look at them (Read each image), or have a review agent look at them and
-report back, to keep your own context free: cut-off text, controls covering
-the action, placeholder art, things too small to read on a phone. Copy the
-best few into `media/screenshots/` for the README.
+**Scan the text at every screenshot.** `scripts/scan-text.js` reads the words
+on screen the way a player sees them:
+
+```bash
+playwright-cli -s=desktop run-code "async page => {
+  await page.addScriptTag({ path: '${CLAUDE_SKILL_DIR}/scripts/scan-text.js' });
+  return await page.evaluate(() => window.__scanText());
+}"
+```
+
+It reports three kinds of problem, each with the text and the element:
+
+- `junk`: code or markup showing as text (`undefined`, `NaN`,
+  `[object HTMLElement]`, tags, `&amp;`, template braces). Always a bug: fix
+  it before going on.
+- `orphan`: a heading, button, caption or other short text whose last line
+  is one lone word.
+- `clipped`: text cut off by its own box (including a "…"), by a box around
+  it, or by the edge of the screen.
+
+Clear every `orphan` and `clipped` finding too: fix the cause (see "Text that
+looks finished" in web-target.md), then scan again. The scanner can't read
+text drawn on the canvas; check that in the screenshots.
+
+Then look at the screenshots (Read each image), or have a review agent look
+at them and report back, to keep your own context free: cut-off text,
+controls covering the action, pop-ups piling up, placeholder art, icons that
+don't match or show as empty boxes, things too small to read on a phone.
+Copy the best few into `media/screenshots/` for the README.
+
+## Never silence a check
+
+When a check flags something, fix the cause or make the check more precise.
+Never tell it to skip an element: the skip stays after the harmless thing it
+was added for changes, and hides the real problem that comes next. If an
+exception truly can't be avoided, write down why beside it, take a
+screenshot showing it looks right, and check it again whenever the CSS
+around it changes.
 
 ## When something's broken
 

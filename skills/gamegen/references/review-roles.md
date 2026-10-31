@@ -108,8 +108,10 @@ using the play-test tools (see playtest-guide.md), and you look at the
 screenshots in `design/screenshots/`.
 
 - Is the first minute clear and fun? Do the controls feel good?
-- Does every screen look finished: no placeholder art, no overlapping text,
-  nothing cut off on a phone?
+- How does it look in the first two seconds of loading? (Look at the
+  first-load filmstrips in `design/screenshots/`.)
+- Go through the polish checklist (under "Polish reviewer", below) on every
+  screen at every size.
 - Is anything confusing, unfair, too hard or too easy?
 - Does it sound good? Is anything too loud, repetitive or missing?
 - What one change would make it most fun?
@@ -133,3 +135,34 @@ You read the code and try to break the game.
 
 Use the same finding format, with evidence (a file and line, or the steps to
 reproduce it).
+
+## Polish reviewer (polish pass)
+
+You didn't build this game, and you haven't seen anyone's opinion of it. Go
+through every screen at every targeted size the way a picky player would,
+using the play-test tools (see playtest-guide.md): open the game yourself,
+open everything every button opens, and run the text scanner and the
+first-load filmstrip. Don't rely on screenshots someone else took; take your
+own.
+
+The polish checklist:
+
+- **Junk or code showing as text:** `undefined`, `NaN`, `[object …]`, tags,
+  escaped entities like `&amp;`, raw markup or template braces.
+- **Lone last words and awkward breaks** in headings, buttons, captions and
+  other short text.
+- **Text cut off** by its box, by a "…", or by the edge of the screen,
+  including names in top bars and labels on maps.
+- **Pop-ups and tips** piling on top of each other or covering the action.
+- **The same thing named or capitalised differently** in different places.
+- **Icons** that don't match each other, or don't show (an empty box).
+- **The first load:** text in a stand-in font that jumps, words on a blank
+  screen before the art arrives, a label that changes, anything that moves
+  once the title is up.
+- **Anything else that looks unfinished:** placeholder art, the same thing
+  shown twice (credits shown three times), a screen that runs off a phone
+  held sideways, text too small to read on a phone.
+
+Use the same finding format, with the screen, the size and a screenshot for
+each. Every finding here is at least should-fix: these are what a player
+notices in the first minute.

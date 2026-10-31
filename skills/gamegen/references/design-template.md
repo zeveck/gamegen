@@ -109,12 +109,16 @@ images and sounds that means.
 
 ## Definition of done
 
-A checklist the play-test verifies, for example:
+A checklist the play-test verifies, for example (always keep the line about
+every screen looking finished: it applies to every game):
 
 - [ ] Starts with no errors at every targeted size.
 - [ ] Every level can be completed, and the game can be won.
 - [ ] Losing and retrying works, and nothing gets stuck.
 - [ ] Every control works on every targeted platform.
+- [ ] Every screen looks finished at every targeted size: no cut-off text,
+      no junk or code showing, no lone words or awkward breaks, nothing
+      flickering or jumping as it loads.
 - [ ] Music and sound play (after the first tap or key), and mute works.
 - [ ] Progress is saved and restored.
 - [ ] (Web) Installs as an app and works offline.

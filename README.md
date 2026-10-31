@@ -208,9 +208,10 @@ gamegen does the planning, building and testing itself, and uses four companion 
 4. **Review.** Three review agents read the design independently: a **player** who wants it to be fun, a **builder** who looks for everything that could go wrong, and an **art and sound director** who makes sure it'll look and sound like one game. A fourth agent fixes the design based on what they found. This repeats for a couple of rounds.
 5. **Art, animation and sound.** It makes the main character first, so everything else can match it, then the rest: backgrounds, items, animations, music and sound effects. It looks at every image and redoes the ones that aren't right, and keeps track of the cost.
 6. **Build.** It builds the game in stages, playing each one: first the core idea with simple shapes (to make sure it's fun), then the art and sound, the levels, the menus and phone controls, and finally the polish.
-7. **Play-test.** It plays the game in a real browser at desktop and phone sizes: every screen and every level, start to finish, checking for errors, sound, saving and offline play.
+7. **Play-test.** It plays the game in a real browser at desktop and phone sizes: every screen and every level, start to finish, checking for errors, sound, saving and offline play. It opens everything every button opens, reads the words on every screen, and films the game loading to catch anything that flickers.
 8. **Final review.** A **playtester** and a **bug hunter** go over the finished game, and gamegen fixes what they find.
-9. **Wrap up.** It makes the link-preview image, writes your game's README, starts the game and gives you the link.
+9. **Polish pass.** A fresh reviewer who didn't build the game goes over every screen at every size with a checklist of what players notice first: stray code showing as text, a word left alone on a line, text that's cut off, messages covering the action, a title that flickers as it loads. gamegen fixes all of it.
+10. **Wrap up.** It makes the link-preview image, writes your game's README, starts the game and gives you the link.
 
 ## Costs
 

@@ -1,0 +1,30 @@
+<!doctype html>
+<!-- Test page for scripts/scan-text.js: each problem it should find once,
+     next to text that's fine and must not be reported. -->
+<html><head><meta charset="utf-8"><style>
+body{font:16px sans-serif;margin:0}
+.tag{width:320px}
+.good{width:320px;text-wrap:balance}
+.box{width:120px;overflow:hidden}
+.chip{display:inline-block;white-space:nowrap}
+.list{height:60px;overflow-y:auto;width:300px}
+.room{width:60px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scroller{width:200px;overflow-y:auto;height:80px}
+.logo{font-size:48px;white-space:nowrap}
+.label{width:50px;white-space:nowrap;border:1px solid}
+.off{position:absolute;left:-200px;top:400px;white-space:nowrap}
+</style></head><body>
+<p class="tag" id="t1">Nothing in the old kingdom is quite what it seems.</p>
+<p class="good">Nothing in the old kingdom is quite what it seems.</p>
+<div id="credits">[object HTMLElement][object HTMLElement]</div>
+<div hidden>undefined hidden junk</div>
+<div style="display:none">NaN hidden</div>
+<div class="room">The Sunken Hall</div>
+<div class="scroller"><h1 class="logo">BarbarAIn</h1></div>
+<div class="label">Forest gate</div>
+<div class="off">Off the left edge</div>
+<button>Play <b>now</b></button>
+<div class="box"><span class="chip">The Whispering Woods</span></div>
+<div class="list"><p>Lots of lines</p><p>in a list that</p><p>scrolls down</p><p>as it should</p></div>
+<p>Score: 1,200 &amp; rising, 3 lives left</p>
+</body></html>

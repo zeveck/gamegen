@@ -4,6 +4,29 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.10.31.7
+
+Games look finished, not just working (#1):
+
+- **A polish pass** before wrap-up: a fresh reviewer who didn't build the
+  game goes over every screen at every size with a checklist of what players
+  notice first: code showing as text, lone last words, cut-off text, pop-ups
+  covering the action, names written differently, icons, the first load.
+- **The play-test reads the words on screen**, at every screenshot, with a
+  new text scanner, and opens everything every button opens (credits,
+  settings, help), not just the main screens.
+- **It films the first load** on a slow connection, so a title that
+  flickers, changes font or jumps as it loads gets caught.
+- **Publishing looks at the live game**: screenshots at a desktop and a phone
+  size, the console, and a popup or two, not just the address answering.
+- Web games build in balanced line breaks, a title that waits for its fonts
+  and art and then fades in once, one set of matching SVG icons, a single
+  queue for pop-up messages, and names that shrink to fit before they're
+  cut off.
+- A check is never told to skip something: fix the cause instead.
+- Every game's definition of done now says every screen looks finished at
+  every size.
+
 ## v2026.10.31.6
 
 - Games credit the right person. The name comes from `GAMEGEN_CREDIT` in
