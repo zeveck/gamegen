@@ -4,6 +4,19 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.1.3
+
+Fixes from a bug review (#6):
+
+- On a Mac, publishing no longer reports a taken repository name as free (the
+  check used bash 4 syntax that macOS's bash 3.2 can't run).
+- The text scanner no longer crashes on text inside an SVG.
+- 3D play-tests really control time: the `step` hook now pauses the game's own
+  loop, so recorded solutions replay the same way every time.
+- Publishing uses one remote name (`github`) throughout, so a game whose
+  `origin` points elsewhere isn't published twice.
+- A 3D game's README credits meshgen in "How it was made".
+
 ## v2026.11.1.2
 
 - gamegen shows as **gamegen** in `/plugin` (it still installs as `gg`, and
