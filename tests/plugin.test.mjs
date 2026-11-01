@@ -375,6 +375,19 @@ test('the service worker template and the Pages workflow agree on placeholders',
   assert.match(web, /s\|\/\\\*__FILES__\\\*\/\|/, 'workflow fills the file list');
 });
 
+test('the shell scripts run on the bash that comes with macOS (3.2)', () => {
+  // Bash 4 features fail there: ${x,,} is a "bad substitution", which once
+  // made a taken repo name look free.
+  const BASH4 = /\$\{[#!]?[A-Za-z_][A-Za-z0-9_]*(\[[^\]]*\])?(,,?|\^\^?)|\b(declare|local|typeset) -[A-Za-z]*[An]|\b(mapfile|readarray|coproc)\b|&>>|;;&|\|&/;
+  const dir = 'skills/gamegen/scripts';
+  for (const f of readdirSync(join(ROOT, dir)).filter((f) => f.endsWith('.sh'))) {
+    read(`${dir}/${f}`).split('\n').forEach((line, i) => {
+      if (/^\s*#/.test(line)) return;
+      assert.doesNotMatch(line, BASH4, `${f}:${i + 1} needs bash 4: ${line.trim()}`);
+    });
+  }
+});
+
 test('the plugin folder carries the license', () => {
   assert.equal(read('skills/LICENSE'), read('LICENSE'));
 });

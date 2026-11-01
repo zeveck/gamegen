@@ -24,14 +24,16 @@ Change nothing until the person confirms in step 2.
 1. **Signed in?** `publish.sh check`. If it fails, tell them how to sign in
    (its message says), and that nothing was changed, then stop.
 2. **Already published?** It's an update when the game folder is the root of
-   a git repository whose `origin` is a GitHub repo the person can push to
+   a git repository whose `origin` (or `github`, a remote an earlier publish
+   added) is a GitHub repo the person can push to
    (`gh api repos/<owner>/<repo> --jq .permissions.push` says `true`) and that
    has a Pages site (`gh api repos/<owner>/<repo>/pages` works). Then work
    out the address and the gallery (items 3 and 4 below) and follow
    "Updating a published game". With an `origin` they can push to but no
    Pages site, publish into that repo (it's already the game's own) and skip
    creating one. With an `origin` they can't push to, publish as a new repo
-   and leave that `origin` alone (add the new one as `github`).
+   and leave that `origin` alone (add the new one as `github`, and push to
+   `github` from then on).
 3. **The address.** In order: the `--publish` value; otherwise
    `GAMEGEN_DOMAIN` (`publish.sh settings` reads it); otherwise the free
    GitHub address.
@@ -151,11 +153,12 @@ correction: adjust, show the line again, and ask again.
 1. Unless the repo already exists (step 1.2):
    `gh repo create <account>/<repo> --public --description "<tagline>"`
    (no `--push` yet: Pages must be on before the first push, or the first
-   deploy fails). Add it as `origin`.
+   deploy fails). Add it as `origin` (or as `github`, when step 1.2 left
+   another `origin` alone).
 2. `publish.sh pages <account>/<repo> [host]`, with the host only if its DNS
    is ready (or the person said it's fine). It prints the address.
-3. `git push -u origin main`, then wait for the deploy of that commit. Its run
-   can take a few seconds to appear, so look for it a few times:
+3. `git push -u origin main` (or `github`), then wait for the deploy of that
+   commit. Its run can take a few seconds to appear, so look for it a few times:
    `gh run list --workflow pages.yml --commit "$(git rev-parse HEAD)" --json databaseId --jq '.[0].databaseId'`,
    then `gh run watch <id> --exit-status`.
 4. For a custom address: `publish.sh https <account>/<repo>`, with the Bash

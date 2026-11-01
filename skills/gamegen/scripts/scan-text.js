@@ -38,8 +38,10 @@ window.__scanText = () => {
     const p = n.parentElement;
     if (!p || p.closest('script,style,noscript,template,[hidden]') || !shown(p)) continue;
     if (JUNK.test(t)) out.push({ kind: 'junk', text: short(t.trim(), 120), where: where(p) });
+    // The block it sits in: an HTML element (text in an SVG <text> belongs to
+    // the HTML box around the SVG, since SVG elements have no innerText).
     let b = p;
-    while (b.parentElement && ['inline', 'contents'].includes(getComputedStyle(b).display)) b = b.parentElement;
+    while (b.parentElement && (!(b instanceof HTMLElement) || ['inline', 'contents'].includes(getComputedStyle(b).display))) b = b.parentElement;
     blocks.add(b);
   }
 

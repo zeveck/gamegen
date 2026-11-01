@@ -54,6 +54,7 @@ animation, music and sound with these plugins, built it, and play-tested it:
 - [imagegen2](https://github.com/zeveck/imagegen2): <what it made>
 - [anim8gen](https://github.com/zeveck/anim8gen): <what it animated>
 - [audiogen](https://github.com/zeveck/audiogen): <the music and sounds>
+- [meshgen](https://github.com/zeveck/meshgen): <the 3D models and characters, in a 3D game>
 
 <Leave out any plugin that wasn't used. A picture of something each plugin
 made, beside its line, shows it off (as Hoard Hopper's README does).>
