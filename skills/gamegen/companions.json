@@ -1,0 +1,10 @@
+{
+  "_about": "The companion plugins gamegen uses. check-setup.sh reads this to warn (never block) when one is out of date. 'minimum' is the oldest version gamegen works with: raise it in the same change that starts relying on something newer, and say why in 'needs'. 'repo' and 'path' are where its plugin.json lives, as in .claude-plugin/marketplace.json.",
+  "companions": {
+    "imagegen2": { "repo": "zeveck/imagegen2", "path": "skills", "minimum": null, "needs": "" },
+    "nanogen": { "repo": "zeveck/nanogen", "path": "skills", "minimum": null, "needs": "" },
+    "anim8gen": { "repo": "zeveck/anim8gen", "path": ".codex/skills", "minimum": null, "needs": "" },
+    "audiogen": { "repo": "zeveck/audiogen", "path": "skills", "minimum": null, "needs": "" },
+    "meshgen": { "repo": "zeveck/meshgen", "path": "skills", "minimum": "2026.11.1", "needs": "3D games: --dir, --max-credits and credit reporting" }
+  }
+}

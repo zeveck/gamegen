@@ -203,6 +203,12 @@ Python with Pillow and `playwright-cli`:
   (`tier`). Write it in `design/STATUS.md`: only the free plan's audio needs a
   credit (see asset-guide.md), so later steps go by this, never a guess.
 
+It also prints an `update:` line for gamegen or any plugin it uses that's out
+of date, with the command that updates it. These never stop a run: mention
+them in your first update in plain words, with the command, and suggest
+turning on auto-update (`/plugin` → Marketplaces → gamegen → Enable
+auto-update). Then carry on.
+
 **Every key the game needs must pass before anything else happens.** If one is
 missing or refused, stop right there, before any design work or spending, and
 tell the person in plain words: which service, what the check said, and how

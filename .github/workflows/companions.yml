@@ -1,0 +1,31 @@
+name: companions
+
+# Every day, and on every change: do the latest companion plugins still have
+# what gamegen relies on? (tests/companions.test.mjs: free, no API keys.)
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - name: Get the latest companions
+        run: |
+          mkdir -p "$RUNNER_TEMP/companions"
+          node -e '
+            const m = require("./.claude-plugin/marketplace.json");
+            for (const p of m.plugins) if (p.source && p.source.url) console.log(p.name + " " + p.source.url);
+          ' | while read -r name url; do
+            git clone -q --depth 1 "$url" "$RUNNER_TEMP/companions/$name"
+          done
+      - name: Check what gamegen relies on
+        run: COMPANIONS_DIR="$RUNNER_TEMP/companions" node --test tests/companions.test.mjs

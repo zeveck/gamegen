@@ -22,7 +22,16 @@ audiogen plugins for art and sound, and meshgen for 3D games.
   anim8gen's imagegen2 dependency is declared on its entry here (anim8gen's
   own `plugin.json` declares none, so each marketplace can supply its own).
 - `skills/gamegen/scripts/check-setup.sh` tests the API keys with free requests
-  before a run spends anything.
+  before a run spends anything, and warns (never blocks) when a plugin is out
+  of date.
+- `skills/gamegen/companions.json` lists the companions, where they live, and
+  the oldest version of each that gamegen works with. When gamegen starts
+  relying on something new in a companion, raise its `minimum` (and say why
+  in `needs`) in the same change, and add the check to
+  `tests/companions.test.mjs`, which the companions workflow runs daily
+  against each companion's latest main. Don't use version requirements in
+  `plugin.json`'s `dependencies`: a companion that's behind would stop
+  gamegen from loading at all.
 
 ## Rules
 

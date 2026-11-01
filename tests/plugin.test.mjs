@@ -41,6 +41,9 @@ test('version is date-based CalVer and matches the first CHANGELOG heading', () 
 test('marketplace and plugin manifests point at the skill', () => {
   // The plugin's name is the prefix its skill shows under: /gg:gamegen.
   assert.equal(plugin.name, 'gg');
+  // /plugin shows "gamegen" instead (the marketplace entry's wins there).
+  assert.equal(plugin.displayName, 'gamegen');
+  assert.equal(market.plugins[0].displayName, 'gamegen');
   assert.equal(market.name, 'gamegen');
   assert.equal(market.plugins[0].name, 'gg');
   assert.equal(market.plugins[0].source, './skills');
@@ -75,6 +78,8 @@ test('anim8gen gets imagegen2 from this marketplace', () => {
 
 test('the README installs everything with one line', () => {
   assert.match(readme, /\/plugin install gg --marketplace zeveck\/gamegen/);
+  // Uninstalling takes the companions with it.
+  assert.match(readme, /claude plugin uninstall gg@gamegen --prune/);
   assert.doesNotMatch(readme, /\/plugin marketplace add/);
 });
 
@@ -129,7 +134,7 @@ test('SKILL.md\'s flag table has the options everything else documents', () => {
 // The setup check, run against a stand-in curl (no network): it answers with
 // STUB_CODE and writes STUB_BODY as the response body.
 const SCRIPT = join(ROOT, 'skills/gamegen/scripts/check-setup.sh');
-function runCheck(dir, { code = '401', body = '{}', args = [] } = {}) {
+function runCheck(dir, { code = '401', body = '{}', args = [], env = {} } = {}) {
   const bin = join(dir, '.stub-bin');
   mkdirSync(bin, { recursive: true });
   writeFileSync(join(bin, 'curl'), `#!/bin/sh
@@ -142,7 +147,7 @@ printf '%s' "$STUB_CODE"
   chmodSync(join(bin, 'curl'), 0o755);
   return spawnSync('bash', [SCRIPT, ...args], {
     cwd: dir, encoding: 'utf8',
-    env: { PATH: `${bin}:/usr/bin:/bin`, HOME: dir, STUB_CODE: code, STUB_BODY: body },
+    env: { PATH: `${bin}:/usr/bin:/bin`, HOME: dir, STUB_CODE: code, STUB_BODY: body, ...env },
   });
 }
 const scratch = () => mkdtempSync(join(tmpdir(), 'gamegen-check-'));
@@ -200,6 +205,55 @@ test('setup check: the Meshy key is only looked at for a 3D game', (t) => {
   assert.match(r.stdout, /meshy \(meshgen\): ok \(1,234 credits left\)/);
   assert.ok(!r.stdout.includes('msy-SECRET'));
   assert.match(runCheck(dir, { code: '401', args: ['--3d'] }).stdout, /meshy \(meshgen\): failed \(the key was refused/);
+});
+
+test('setup check: says which plugins are out of date, and never stops for it', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeEnv(dir);
+  // A stand-in claude that reports what's installed.
+  const installed = [
+    { id: 'gg@gamegen', version: '2026.11.1' },
+    { id: 'imagegen2@gamegen', version: '2026.10.11' },
+    { id: 'audiogen@gamegen', version: '2026.10.31.2' },
+    { id: 'meshgen@gamegen', version: '2026.10.30' },
+    { id: 'nanogen@nanogen', version: '2026.10.11' },
+  ];
+  mkdirSync(join(dir, '.stub-bin'), { recursive: true });
+  writeFileSync(join(dir, '.stub-bin/claude'), `#!/bin/sh\ncat <<'J'\n${JSON.stringify(installed)}\nJ\n`);
+  chmodSync(join(dir, '.stub-bin/claude'), 0o755);
+  // A stand-in for GitHub: the latest version of each.
+  const latest = { 'gamegen/main/skills': '2026.11.1', 'imagegen2/main/skills': '2026.10.11',
+    'audiogen/main/skills': '2026.11.1', 'meshgen/main/skills': '2026.11.1', 'nanogen/main/skills': '2026.10.11' };
+  for (const [where, version] of Object.entries(latest)) {
+    mkdirSync(join(dir, 'gh/zeveck', where, '.claude-plugin'), { recursive: true });
+    writeFileSync(join(dir, 'gh/zeveck', where, '.claude-plugin/plugin.json'), JSON.stringify({ version }));
+  }
+  const r = runCheck(dir, { code: '200', env: { GAMEGEN_LATEST_BASE: `file://${dir}/gh` } });
+  const updates = r.stdout.split('\n').filter((l) => l.startsWith('update:'));
+  assert.deepEqual(updates, [
+    'update: audiogen 2026.10.31.2 is installed; 2026.11.1 is out. Update: claude plugin update audiogen@gamegen, then restart Claude Code',
+    'update: meshgen 2026.10.30 is installed, and gamegen needs 2026.11.1 or newer (3D games: --dir, --max-credits and credit reporting). Update: claude plugin update meshgen@gamegen, then restart Claude Code',
+  ], r.stdout);
+  // Offline: the minimum is still checked (it's local), and nothing else is said.
+  const offline = runCheck(dir, { code: '200', env: { GAMEGEN_LATEST_BASE: `file://${dir}/nowhere` } });
+  assert.deepEqual(offline.stdout.split('\n').filter((l) => l.startsWith('update:')).map((l) => l.split(' ')[1]), ['meshgen']);
+  // Without the claude command there's nothing to compare, and no error.
+  rmSync(join(dir, '.stub-bin/claude'));
+  assert.doesNotMatch(runCheck(dir, { code: '200' }).stdout, /update:|Traceback/);
+});
+
+test('companions.json lists exactly the marketplace\'s companions, from the same places', () => {
+  const { companions } = json('skills/gamegen/companions.json');
+  assert.deepEqual(Object.keys(companions).sort(), [...COMPANIONS].sort());
+  for (const [name, c] of Object.entries(companions)) {
+    const src = market.plugins.find((p) => p.name === name).source;
+    assert.equal(`https://github.com/${c.repo}.git`, src.url, name);
+    assert.equal(c.path, src.path, name);
+    if (c.minimum) {
+      assert.match(c.minimum, /^\d{4}\.\d{1,2}\.\d{1,2}(\.\d+)?$/, `${name} minimum`);
+      assert.ok(c.needs, `${name} says why it needs ${c.minimum}`);
+    }
+  }
 });
 
 // prepare-env.sh, run in a scratch folder.

@@ -4,6 +4,17 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.1.2
+
+- gamegen shows as **gamegen** in `/plugin` (it still installs as `gg`, and
+  `/gamegen` works as before) (#4).
+- **Staying up to date** (#5): each run checks whether gamegen or any plugin
+  it uses is out of date, and says which command updates it. It never stops
+  a run for it, and stays quiet when offline. The README says how to turn on
+  auto-update, and how to uninstall everything in one go.
+- Behind the scenes, a daily check makes sure the latest versions of the art,
+  sound and 3D plugins still do everything gamegen relies on.
+
 ## v2026.11.1
 
 - **3D games, when you ask for one** (#3): `--3d`, or "3D" in your idea.

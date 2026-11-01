@@ -10,6 +10,11 @@
 # With --3d (a 3D game) it also checks MESHY_API_KEY, for meshgen; 2D games
 # never need it, so it isn't looked at otherwise.
 #
+# It also compares the installed gamegen and companion plugins with
+# companions.json and the latest versions on GitHub, and prints an "update:"
+# line for each one that's behind. Those are warnings only: they never change
+# the exit status, and they're skipped quietly when offline.
+#
 # Prints one line per check and exits 0 only when every check passes.
 set -u
 three_d=0
@@ -122,5 +127,59 @@ else fail "python3 + Pillow: Pillow missing (python3 -m pip install --user pillo
 # Play-testing in a real browser.
 if command -v playwright-cli >/dev/null 2>&1; then echo "playwright-cli: ok"
 else echo "playwright-cli: not installed (play-testing falls back to npx playwright)"; fi
+
+# Plugin versions: warnings only, never a reason to stop.
+if command -v claude >/dev/null 2>&1 && list="$(claude plugin list --json 2>/dev/null)"; then
+  PLUGIN_LIST="$list" python3 - "$(cd "$(dirname "$0")/.." && pwd)/companions.json" <<'PY' || true
+import concurrent.futures, json, os, sys, urllib.request
+
+installed = {p["id"].split("@")[0]: p for p in json.loads(os.environ["PLUGIN_LIST"]) if "@" in p.get("id", "")}
+spec = json.load(open(sys.argv[1]))["companions"]
+plugins = {"gg": {"repo": "zeveck/gamegen", "path": "skills", "minimum": None, "needs": "", "label": "gamegen"}}
+plugins.update(spec)
+base = os.environ.get("GAMEGEN_LATEST_BASE", "https://raw.githubusercontent.com")
+
+def parse(v):
+    try:
+        return tuple(int(x) for x in str(v).split("."))
+    except ValueError:
+        return None
+
+def older(a, b):
+    a, b = parse(a), parse(b)
+    if a is None or b is None:
+        return False
+    n = max(len(a), len(b))
+    return a + (0,) * (n - len(a)) < b + (0,) * (n - len(b))
+
+def latest(name):
+    p = plugins[name]
+    url = f"{base}/{p['repo']}/main/{p['path']}/.claude-plugin/plugin.json"
+    try:
+        with urllib.request.urlopen(url, timeout=5) as r:
+            return json.load(r).get("version")
+    except Exception:
+        return None  # offline, or GitHub didn't answer: say nothing
+
+names = [n for n in plugins if n in installed]
+with concurrent.futures.ThreadPoolExecutor(len(names) or 1) as pool:
+    newest = dict(zip(names, pool.map(latest, names)))
+
+behind = 0
+for name in names:
+    p, have = plugins[name], installed[name]
+    version, label = have.get("version"), plugins[name].get("label", name)
+    fix = f"claude plugin update {have['id']}, then restart Claude Code"
+    if p.get("minimum") and older(version, p["minimum"]):
+        print(f"update: {label} {version} is installed, and gamegen needs {p['minimum']} or newer"
+              f" ({p['needs']}). Update: {fix}")
+        behind += 1
+    elif newest.get(name) and older(version, newest[name]):
+        print(f"update: {label} {version} is installed; {newest[name]} is out. Update: {fix}")
+        behind += 1
+if names and not behind:
+    print("plugins: up to date" if any(newest.values()) else "plugins: installed (couldn't check for updates)")
+PY
+fi
 
 exit $status

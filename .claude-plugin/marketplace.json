@@ -7,6 +7,7 @@
   "plugins": [
     {
       "name": "gg",
+      "displayName": "gamegen",
       "source": "./skills",
       "description": "/gamegen: describe a game and get a finished, play-tested one: designed, reviewed, illustrated, animated, scored and built. Installs imagegen2, anim8gen, audiogen, nanogen and meshgen with it."
     },
