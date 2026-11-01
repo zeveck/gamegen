@@ -116,9 +116,7 @@ every screen looking finished: it applies to every game):
 - [ ] Every level can be completed, and the game can be won.
 - [ ] Losing and retrying works, and nothing gets stuck.
 - [ ] Every control works on every targeted platform.
-- [ ] Every screen looks finished at every targeted size: no cut-off text,
-      no junk or code showing, no lone words or awkward breaks, nothing
-      flickering or jumping as it loads.
+- [ ] Every screen looks finished at every targeted size, from the first load.
 - [ ] Music and sound play (after the first tap or key), and mute works.
 - [ ] Progress is saved and restored.
 - [ ] (Web) Installs as an app and works offline.

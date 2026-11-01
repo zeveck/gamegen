@@ -222,10 +222,10 @@ finished" in web-target.md), then scan again. The scanner can't read
 text drawn on the canvas; check that in the screenshots.
 
 Then look at the screenshots (Read each image), or have a review agent look
-at them and report back, to keep your own context free: cut-off text,
-controls covering the action, pop-ups piling up, placeholder art, icons that
-don't match or show as empty boxes, things too small to read on a phone.
-Copy the best few into `media/screenshots/` for the README.
+at them and report back, to keep your own context free, against the polish
+checklist in review-roles.md, plus controls covering the action and things
+too small to read on a phone. Copy the best few into `media/screenshots/`
+for the README.
 
 ## Never silence a check
 

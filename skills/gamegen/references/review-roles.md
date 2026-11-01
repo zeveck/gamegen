@@ -109,10 +109,6 @@ using the play-test tools (see playtest-guide.md), and you look at the
 screenshots in `design/screenshots/`.
 
 - Is the first minute clear and fun? Do the controls feel good?
-- How does it look in the first two seconds of loading? (Look at the
-  first-load filmstrips in `design/screenshots/`.)
-- Go through the polish checklist (under "Polish reviewer", below) on every
-  screen at every size.
 - Is anything confusing, unfair, too hard or too easy?
 - Does it sound good? Is anything too loud, repetitive or missing?
 - What one change would make it most fun?

@@ -122,8 +122,9 @@ git.
 Read every image after making it, and listen for problems you can detect
 (file size, duration) in every sound. An asset that doesn't match the design,
 the anchor or the rules above gets a better prompt and another try, at most
-twice. Then simplify it, swap in a code-drawn version, or cut it (check the
-cut list).
+twice. If two better prompts don't fix it, change approach: a simpler
+version, another tool, or drawn in code. Drop it only if nothing works, and
+say so.
 
 ## Budget
 

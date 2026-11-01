@@ -68,7 +68,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--platform desktop`, `mobile` or `both` | Where it'll be played. Phones get touch controls. | `both` |
 | `--style <description or link>` | The look and feel to aim for: a description, a game's name, or a link to a game, store page or screenshot. Use it more than once to mix influences. | gamegen picks a look that suits your idea |
 | `--target <web or an engine>` | What to build it in: `web`, or an engine such as `godot` or `pygame`. Engines are experimental: gamegen makes the project and all its art and sound, but it can only play-test what it can run, and editors like Unity and Unreal usually can't run here. | `web` |
-| `--scope small`, `medium` or `large` | How big a game: a polished 5-minute game, a 20-minute game with several levels, or more. | sized from your idea |
+| `--scope small`, `medium` or `large` | How big a game: one strong idea in a few minutes of play, several levels in twenty to thirty minutes, or a full game with a world or story to work through. | sized from your idea |
 | `--budget <dollars>` | The most to spend on generated art and audio. `0` makes a free game with everything drawn in code. | `20` |
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
 | `--plan-only` | Stop after the design, before spending anything, so you can read it and suggest changes. | off |

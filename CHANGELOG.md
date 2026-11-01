@@ -4,6 +4,20 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.1.6
+
+A leaner skill, aimed squarely at a fun, finished game (#9):
+
+- Game sizes are described by what they're like to play (a few minutes, half
+  an hour, an hour or more), not by counts of art and songs.
+- The polish checklist is written once, for the polish reviewer. The final
+  playtester sticks to what only a player can judge: fun, clarity, difficulty
+  and sound.
+- Art or sound that won't come out right gets a different approach (simpler,
+  another tool, or drawn in code) before it's ever dropped.
+- The rule about crediting you moved from the top of the skill to where
+  credits are written; it works the same.
+
 ## v2026.11.1.5
 
 - The playtester and polish reviewer now know where gamegen's folder is, so

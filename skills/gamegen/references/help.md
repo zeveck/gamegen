@@ -96,11 +96,12 @@ gamegen tells you what it couldn't test.
 the game from your idea, and says which size it picked and why, so you can
 change it.
 
-- `small`: one great idea, polished: a few levels or an arena, about 5
-  minutes of play. Quickest and cheapest.
-- `medium`: several levels or areas, each with a twist, about 20 minutes of
-  play.
-- `large`: more levels, enemies and ideas. Takes longer and costs more.
+- `small`: one strong idea, done really well; a few minutes of play.
+  Quickest and cheapest.
+- `medium`: several levels or areas, each with something new; about twenty
+  to thirty minutes.
+- `large`: a full game with a world or story to work through; an hour or
+  more. Takes longer and costs more.
 
 You can always grow a game later with `--change`.
 

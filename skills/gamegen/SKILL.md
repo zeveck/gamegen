@@ -49,15 +49,6 @@ levels and about 30 pieces of art."). A long run with no word feels broken,
 and it lets them stop you (Esc) if it's heading the wrong way. Talk about
 their game, not about phases, agents or files.
 
-**Never make up anything about the person.** When the game names who made
-it (credits, an author line, a copyright notice, an "about" screen, the
-README), use the name `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" credit`
-suggests (their `GAMEGEN_CREDIT`, GitHub name or git name), and if it says
-`not known`, leave the line out. No credit is better than a made-up one ("the
-player", "you", a guess). The same goes for any other personal detail: use
-only what they've told you. Nothing personal goes public without their say:
-publishing confirms the credit before anything goes online.
-
 The reference files in `references/` hold the detail for each phase. Read each
 one when you reach its phase, not all up front. Their commands start paths
 with the `CLAUDE_SKILL_DIR` placeholder, which only this file fills in: it
@@ -264,7 +255,7 @@ gamegen shows it above the prompt, so the person knows which game they're on.
 Then add a "Requests" list starting
 with the request exactly as typed (later `--change` and `--continue` notes are
 added to it, also exactly as typed), the settings you settled on, the credit
-(what `publish.sh credit` said, or "none"), what's available, and a checklist of the phases
+(what `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" credit` said, or "none"), what's available, and a checklist of the phases
 below. Keep it current as you go, because it's what you (or a later
 `--continue`) read to pick up after an interruption or a long gap: tick each
 phase off with one line on what happened, and within a phase note where you
@@ -302,12 +293,11 @@ do for the platform and style: a quick idea in a sentence is small; a long
 request with chapters, a cast and a story is large. Say which size and why
 in your first update, so they can correct it.
 
-- **small:** one core mechanic, one to three levels or an arena, about 10 to
-  20 assets, one song. A great 5-minute game.
-- **medium:** three to five levels or areas with a twist each, about 25 to 45
-  assets, a song per area. A great 20-minute game.
-- **large:** more levels, enemies and mechanics. Say in that first update that
-  it takes longer and costs more.
+- **small:** one strong idea, done really well; a few minutes of play.
+- **medium:** several levels or areas, each with something new; about twenty
+  to thirty minutes.
+- **large:** a full game with a world or story to work through; an hour or
+  more. Say in that first update that it takes longer and costs more.
 
 ## Phase 3 — Design review
 
@@ -358,7 +348,9 @@ Follow `references/asset-guide.md`. In short:
 3. **Look at every image you make** (Read it). Check it matches the design and
    the style anchor, has a clean transparent background where it needs one,
    has no stray text or watermark, and is the right size. Regenerate a bad one
-   up to twice with a better prompt, then simplify the asset instead.
+   up to twice with a better prompt. If that doesn't fix it, change
+   approach: a simpler version, another tool, or drawn in code. Drop it only
+   if nothing works, and say so.
 4. **Track spending** in `design/ASSETS.md`: every asset, its file, the tool,
    and its estimated cost. Warn at 80% of `--budget`. When the budget runs
    out, stop generating, use the cut list, and fill any gaps with code-drawn
@@ -417,8 +409,8 @@ Dispatch two agents in parallel, with instructions from
 `references/review-roles.md`:
 
 - **Playtester:** plays the finished game at every targeted size and reviews
-  the screenshots for fun, clarity and polish. Give it the polish checklist
-  from the Polish reviewer's role too, and the skill folder.
+  the screenshots for fun, clarity, difficulty and sound. Give it the skill
+  folder.
 - **Bug hunter:** reads the code and pokes at the game for crashes, stuck
   states, phone problems, audio problems and lost saves.
 
@@ -432,10 +424,8 @@ a fresh agent that didn't build the game. Serve the game as the play-test
 does, and give it the address, the targeted sizes, the play-test guide and
 the skill folder,
 but not your screenshots or anyone's opinions of them. It goes through every
-screen at every size against a concrete checklist: junk text, lone words,
-cut-off text, pop-ups covering things, names written differently, icons, and
-the first load. (For other targets, it checks what can be run here, and the
-screenshots, against the same checklist.)
+screen at every size against the polish checklist in its role. (For other
+targets, it checks what can be run here, and the screenshots.)
 
 Fix everything it finds, then scan and screenshot those screens again at
 every size, and replay every level's solution if anything in play changed.
@@ -452,6 +442,9 @@ fixed spot.
    game is, how to play on desktop and phone, screenshots, and how to run it.
    With `--making-of`, also how it was made: every request in
    `design/STATUS.md`, exactly as typed, and what gamegen and each plugin did.
+   Here and in the game's own credits, credit the person by the name
+   `publish.sh credit` gave (in `design/STATUS.md`), or leave the line out if
+   it gave none.
 3. **Add the GitHub Pages workflow** (web games) from
    `references/web-target.md`, so publishing is just a push and a switch. If
    the game folder is inside a git repository, put it at that repository's
