@@ -59,7 +59,10 @@ only what they've told you. Nothing personal goes public without their say:
 publishing confirms the credit before anything goes online.
 
 The reference files in `references/` hold the detail for each phase. Read each
-one when you reach its phase, not all up front.
+one when you reach its phase, not all up front. Their commands start paths
+with the `CLAUDE_SKILL_DIR` placeholder, which only this file fills in: it
+means this skill's folder, `${CLAUDE_SKILL_DIR}`. Use that real path when you
+run them, and give it to any agent you hand a reference file to.
 
 ## Preflight
 
@@ -415,7 +418,7 @@ Dispatch two agents in parallel, with instructions from
 
 - **Playtester:** plays the finished game at every targeted size and reviews
   the screenshots for fun, clarity and polish. Give it the polish checklist
-  from the Polish reviewer's role too.
+  from the Polish reviewer's role too, and the skill folder.
 - **Bug hunter:** reads the code and pokes at the game for crashes, stuck
   states, phone problems, audio problems and lost saves.
 
@@ -426,7 +429,8 @@ they found any must-fix problem, run a second round once it's fixed.
 
 Dispatch one **Polish reviewer** (its role is in `references/review-roles.md`):
 a fresh agent that didn't build the game. Serve the game as the play-test
-does, and give it the address, the targeted sizes and the play-test guide,
+does, and give it the address, the targeted sizes, the play-test guide and
+the skill folder,
 but not your screenshots or anyone's opinions of them. It goes through every
 screen at every size against a concrete checklist: junk text, lone words,
 cut-off text, pop-ups covering things, names written differently, icons, and

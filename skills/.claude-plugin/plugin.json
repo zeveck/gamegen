@@ -1,7 +1,7 @@
 {
   "name": "gg",
   "displayName": "gamegen",
-  "version": "2026.11.1.4",
+  "version": "2026.11.1.5",
   "description": "/gamegen: make a complete, playable game from a description: designed, reviewed, illustrated, animated, scored, built and play-tested.",
   "author": {
     "name": "zeveck"

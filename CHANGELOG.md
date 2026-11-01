@@ -4,6 +4,12 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.1.5
+
+- The playtester and polish reviewer now know where gamegen's folder is, so
+  they can run the text scanner and the first-load filmstrip instead of
+  getting "No such file" (#8).
+
 ## v2026.11.1.4
 
 Games come out the size you described, and nothing gets cut to finish

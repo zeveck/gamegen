@@ -340,6 +340,15 @@ test('every reference file the skill names exists, and none is orphaned', () => 
   for (const f of files) assert.ok(all.includes(f), `${f} is referenced`);
 });
 
+test('agents reading a reference file learn where the skill folder is', () => {
+  // Claude Code fills in the placeholder only in SKILL.md, so SKILL.md must
+  // say what it means in the reference files, as a path it fills in.
+  const refs = readdirSync(join(ROOT, REFS)).filter((f) => read(`${REFS}/${f}`).includes('${CLAUDE_SKILL_DIR}'));
+  assert.ok(refs.length, 'some reference file uses the placeholder');
+  assert.match(skill, /`CLAUDE_SKILL_DIR` placeholder[\s\S]{0,120}this skill's folder, `\$\{CLAUDE_SKILL_DIR\}`/);
+  assert.match(skill, /give it to any agent you hand a reference file to/);
+});
+
 test('every script is used by the skill, a reference file or another script', () => {
   const dir = 'skills/gamegen/scripts';
   const scripts = readdirSync(join(ROOT, dir));
