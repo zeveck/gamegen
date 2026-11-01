@@ -1,6 +1,6 @@
 {
   "template": "zeveck/devcontainer-plus",
-  "version": "a194afcf48bd11bb48f13968ab7a13b93b82646b",
+  "version": "6777fa88526619799725679437c361ecb1505975",
   "files": {
     "auth": "e9d845300eeac29bd5db7d9e9d4d9d280b52afe0a9ae87e66fd5182e00d9b4d1",
     "dc": "6ac8838843d9a8899099abbf625a8cddf495f5e9f2281f2edfeaf82fc36e4c94",
