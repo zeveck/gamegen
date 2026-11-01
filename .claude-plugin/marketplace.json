@@ -8,7 +8,7 @@
     {
       "name": "gg",
       "source": "./skills",
-      "description": "/gamegen: describe a game and get a finished, play-tested one: designed, reviewed, illustrated, animated, scored and built. Installs imagegen2, anim8gen, audiogen and nanogen with it."
+      "description": "/gamegen: describe a game and get a finished, play-tested one: designed, reviewed, illustrated, animated, scored and built. Installs imagegen2, anim8gen, audiogen, nanogen and meshgen with it."
     },
     {
       "name": "imagegen2",
@@ -30,6 +30,11 @@
       "name": "nanogen",
       "source": { "source": "git-subdir", "url": "https://github.com/zeveck/nanogen.git", "path": "skills" },
       "description": "Game art with Google Gemini (Nano Banana): backgrounds, scenery, tiles and items."
+    },
+    {
+      "name": "meshgen",
+      "source": { "source": "git-subdir", "url": "https://github.com/zeveck/meshgen.git", "path": "skills" },
+      "description": "3D game models and animated characters with Meshy, for 3D games."
     }
   ]
 }

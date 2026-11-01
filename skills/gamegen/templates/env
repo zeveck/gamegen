@@ -17,6 +17,10 @@ GEMINI_API_KEY=
 # Get a key at https://elevenlabs.io/app/developers/api-keys
 ELEVENLABS_API_KEY=
 
+# Optional, for 3D games only: Meshy, for 3D models and characters (meshgen).
+# Get a key at https://www.meshy.ai under Settings > API (it needs a paid plan).
+MESHY_API_KEY=
+
 # Optional: your own defaults for publishing (/gamegen --publish). Remove the
 # # to use one. The --publish, --gallery and --making-of flags override these.
 # GAMEGEN_DOMAIN=example.com     # games go to <game>.example.com (or github.io)

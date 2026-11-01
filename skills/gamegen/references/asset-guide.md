@@ -38,6 +38,7 @@ same way you do: load the skill (`imagegen2`, `nanogen`, `anim8gen`,
 | Background music | audiogen `music` | One track per area or mood |
 | Sound effects | audiogen `sfx` | One per action; `--loop` for ambience |
 | Voice lines (rarely needed) | audiogen `voice` | Short barks only |
+| 3D models and characters (3D games only) | meshgen | See 3d.md |
 | Text: titles, scores, menus, dialogue | code | Draw text in code with a bundled font, never inside generated images |
 
 If only one image tool has a key, use it for everything. Without

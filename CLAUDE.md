@@ -2,7 +2,7 @@
 
 gamegen is a Claude Code plugin: one skill, `/gamegen`, that designs, reviews,
 builds and play-tests a game, using the imagegen2, nanogen, anim8gen and
-audiogen plugins for art and sound.
+audiogen plugins for art and sound, and meshgen for 3D games.
 
 ## Layout
 
@@ -12,10 +12,12 @@ audiogen plugins for art and sound.
 - `skills/gamegen/SKILL.md` is the pipeline. Detail for each phase lives in
   `skills/gamegen/references/`, read by the skill when it reaches that phase.
   Keep SKILL.md readable end to end; move long detail into a reference file.
+- 3D is opt-in (`--3d`, or "3D" in the request). All 3D guidance lives in
+  `references/3d.md`, which only 3D games read; SKILL.md has just the gate.
 - The plugin is named `gg`, so its skill shows as `/gg:gamegen` (and plain
   `/gamegen`). The repository and marketplace are `gamegen`.
 - `.claude-plugin/marketplace.json` is the marketplace. It lists gamegen and
-  the four companion plugins (from their own repositories, via `git-subdir`),
+  the five companion plugins (from their own repositories, via `git-subdir`),
   so `/plugin install gg --marketplace zeveck/gamegen` installs everything.
   anim8gen's imagegen2 dependency is declared on its entry here (anim8gen's
   own `plugin.json` declares none, so each marketplace can supply its own).
@@ -36,4 +38,4 @@ audiogen plugins for art and sound.
 
 `node --test`, plus `claude plugin validate --strict skills` before a release.
 To try the plugin locally without installing it:
-`claude --plugin-dir skills` (with the four companion plugins installed).
+`claude --plugin-dir skills` (with the companion plugins installed).

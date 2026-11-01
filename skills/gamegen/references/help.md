@@ -39,6 +39,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--publish [address]` | Put a finished game online, free, with GitHub Pages |
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games |
 | `--making-of` | Show in the README how the game was made |
+| `--3d` | Make a 3D game |
 | `--out <folder>` | Where to put the game |
 
 `/gamegen help <option>` explains one, for example `/gamegen help style`.
@@ -227,6 +228,25 @@ with pictures. Publishing then includes the design notes too.
 
 Without it, the README is all about the game. To always have it, put
 `GAMEGEN_MAKING_OF=on` in your `.env`.
+
+## --3d
+
+**Make a 3D game**, with 3D characters and models made by meshgen (Meshy),
+instead of a 2D one:
+
+```
+/gamegen a knight exploring a ruined castle --3d
+```
+
+Saying "3D" in your idea works too ("a 3D platformer about a bouncing
+snail"). Without either, every game is 2D, even in Godot. If your idea
+sounds like 3D without saying so (first-person, Unreal, low-poly), gamegen
+asks you first, before it starts. 3D games need a
+Meshy key in your `.env` (`MESHY_API_KEY`, from meshy.ai under Settings >
+API, on a paid plan); gamegen checks it before starting, like the others.
+Characters are made from a picture first, then turned into 3D and animated
+(walking, running, jumping, attacking). 3D models cost more than pictures,
+so a 3D game fits fewer of them in the same budget.
 
 ## --out
 

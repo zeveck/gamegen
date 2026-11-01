@@ -9,9 +9,14 @@
 # - A .env outside the project (above its git repository, or in the home
 #   folder or above it, such as ~/.env) is left alone.
 #
+# With --3d, an existing .env also gets a MESHY_API_KEY placeholder (meshgen,
+# for 3D games); the template already has one.
+#
 # Never reads or prints key values. Prints what it did, ending with the path
 # of the .env to fill in.
 set -eu
+three_d=0
+[ "${1:-}" = "--3d" ] && three_d=1
 here="$(cd "$(dirname "$0")" && pwd)"
 template="$here/../templates/env"
 
@@ -63,6 +68,9 @@ else
   has OPENAI_API_KEY || add OPENAI_API_KEY "OpenAI, for characters, sprites and animations: https://platform.openai.com/api-keys"
   [ "$gemini_present" = 1 ] || add GEMINI_API_KEY "Google Gemini, for backgrounds, scenery and items: https://aistudio.google.com/apikey"
   has ELEVENLABS_API_KEY || add ELEVENLABS_API_KEY "ElevenLabs, for music and sound effects: https://elevenlabs.io/app/developers/api-keys"
+  if [ "$three_d" = 1 ]; then
+    has MESHY_API_KEY || add MESHY_API_KEY "Meshy, for 3D models and characters in 3D games (meshgen): meshy.ai, Settings > API (a paid plan)"
+  fi
   if [ -n "$added" ]; then echo "added placeholders for:$added"; else echo "no placeholders needed"; fi
 fi
 

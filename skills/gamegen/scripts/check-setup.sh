@@ -7,8 +7,13 @@
 # it. Key values are never printed, and they're passed to curl on standard
 # input so they don't appear in the process list either.
 #
+# With --3d (a 3D game) it also checks MESHY_API_KEY, for meshgen; 2D games
+# never need it, so it isn't looked at otherwise.
+#
 # Prints one line per check and exits 0 only when every check passes.
 set -u
+three_d=0
+[ "${1:-}" = "--3d" ] && three_d=1
 
 # The nearest .env, searching up from here.
 envfile=""
@@ -86,6 +91,23 @@ left = f", {limit - used:,} of {limit:,} credits left" if isinstance(used, int) 
 print(f"elevenlabs (audiogen): ok (tier: {tier}{left})")
 PY
   else verdict "elevenlabs (audiogen)" "$code"; fi
+fi
+
+# Meshy: meshgen, for 3D games only. The balance check is free and says how
+# many credits are left.
+if [ "$three_d" = 1 ]; then
+  k="$(key MESHY_API_KEY)"
+  if [ -z "$k" ]; then fail "meshy (meshgen): missing MESHY_API_KEY"
+  else
+    code="$(get https://api.meshy.ai/openapi/v1/balance "Authorization: Bearer $k" "$body")"
+    if [ "$code" = 200 ]; then
+      python3 - "$body" <<'PY' || echo "meshy (meshgen): ok"
+import json, sys
+b = json.load(open(sys.argv[1])).get("balance")
+print(f"meshy (meshgen): ok ({b:,} credits left)" if isinstance(b, int) else "meshy (meshgen): ok")
+PY
+    else verdict "meshy (meshgen)" "$code"; fi
+  fi
 fi
 
 # Node.js: the art and sound plugins' command-line tools.

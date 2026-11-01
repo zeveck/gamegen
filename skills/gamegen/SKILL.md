@@ -6,8 +6,8 @@ description: >-
   sound effects with imagegen2, nanogen, anim8gen and audiogen, builds it (a
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
-argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--publish [address]] [--gallery <repo or none>] [--making-of] [--out <folder>]"
-allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(python3 -m http.server *), Bash(playwright-cli *)"
+argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--publish [address]] [--gallery <repo or none>] [--making-of] [--3d] [--out <folder>]"
+allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(python3 -m http.server *), Bash(playwright-cli *)"
 ---
 
 # /gamegen — make a game from a description
@@ -25,7 +25,8 @@ something", "maybe", "perhaps") are invitations: use them or something better
 that serves the same purpose, and say which in the design.
 
 Work autonomously from start to finish. Don't stop to ask questions unless the
-request is genuinely unusable; make sensible choices, write them down in the
+request is genuinely unusable (or, right at the start, it may mean 3D: see
+"3D only when asked"); make sensible choices, write them down in the
 design, and keep going. When you do need to ask, ask in plain words as the
 last line of your reply and end your turn to wait for the answer; never use a
 question tool or a multiple-choice prompt.
@@ -99,6 +100,7 @@ value) is the game description. Flags and defaults:
 | `--publish` | put a finished web game online with GitHub Pages: optionally the address, such as `synapticnoise.com` (giving `<game>.synapticnoise.com`), a full address, or `github.io` | off |
 | `--gallery` | with `--publish`: a GitHub repo for a gallery of the person's games, such as `zeveck/my-games`. The game is added to it, following its layout; if it doesn't exist yet, publishing offers to start it. `none` for no gallery | none |
 | `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
+| `--3d` | make a 3D game, with 3D models and characters from meshgen | off: 2D |
 | `--out` | folder for the game | see below |
 
 `--publish`, `--gallery` and `--making-of` can also be set as defaults in the
@@ -110,6 +112,26 @@ The description can also carry these wishes in plain words ("for phones", "in
 the style of an old Game Boy game", "for Godot", "keep it tiny"). Honor them
 when no flag says otherwise. If a flag and the description disagree, the flag
 wins; note it in the design.
+
+**3D only when asked.** A game is 3D only with `--3d`, or when the request
+asks for 3D in so many words ("a 3D platformer", "in 3D"). A request that
+says 2D, or gives no sign either way, is 2D: that includes `--target godot`,
+top-down, isometric, 2.5D and pixel art.
+
+If the request looks like it means 3D without saying so, ask straight away,
+before the setup check or anything else: building the wrong kind of game
+wastes the whole run. Only these count as signs: `--target unreal` or
+`unity` with neither 2D nor 3D said; a first-person or third-person view, or
+a camera you steer around the world; "low-poly", "voxel" or "polygons"; a
+3D game as the style reference. Ask one short question and wait, for
+example: "Did you mean a 3D game? "First-person" sounds like it, but you
+didn't say. 3D games need a Meshy key and cost more for models. Say 3D or
+2D." Add their answer to the requests in `design/STATUS.md`, exactly as typed.
+
+For a 3D game, write `3D: yes` in the settings in `design/STATUS.md` (so
+`--continue` and `--change` know, and never ask again), and read
+`references/3d.md` now: it says what changes in each phase. Never read it
+for a 2D game. Turning a finished 2D game into 3D is a new game: suggest one.
 
 **Where the game goes.** With `--out`, use that folder. Otherwise, make the
 game right here only if this folder is essentially empty: nothing but `.git`,
@@ -170,7 +192,8 @@ Run the setup check from the folder `/gamegen` was run in:
 bash "${CLAUDE_SKILL_DIR}/scripts/check-setup.sh"
 ```
 
-It tests each API key with a free request (never printing it), using the
+For a 3D game, add `--3d`: it also checks `MESHY_API_KEY` (meshgen). It
+tests each API key with a free request (never printing it), using the
 environment or the nearest `.env` file in that folder or above it, and checks
 Python with Pillow and `playwright-cli`:
 
@@ -190,6 +213,8 @@ When keys are missing, first run
 ```bash
 bash "${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh"
 ```
+
+(with `--3d` for a 3D game, so the `.env` has a line for the Meshy key too).
 
 It creates a `.env` with a line for each key and where to get it (or adds
 lines for just the missing keys to an existing `.env`, leaving the rest
@@ -213,7 +238,7 @@ poses or code animation. If Pillow is missing, install it
 missing, play-testing uses the fallback in `references/playtest-guide.md`.
 
 Confirm the four plugins' skills (`imagegen2`, `nanogen`, `anim8gen`,
-`audiogen`) are available to you; they install with gamegen. When the game
+`audiogen`), and `meshgen` for a 3D game, are available to you; they install with gamegen. When the game
 goes in a new folder below the one with `.env`, run the generators from the
 folder that has the `.env`, with output paths pointing into the game folder.
 

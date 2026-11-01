@@ -77,6 +77,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games, a page in a GitHub repository of yours. gamegen offers to start it the first time. | none |
 | `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |
+| `--3d` | Make a 3D game, with 3D characters and models from meshgen. Saying "3D" in your idea works too; otherwise every game is 2D, and if your idea sounds like 3D without saying so, gamegen asks first. Needs a Meshy key. | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
 
 ### Change your game
@@ -163,9 +164,9 @@ In Claude Code:
 /plugin install gg --marketplace zeveck/gamegen
 ```
 
-That installs gamegen and the four plugins it uses for art and sound. Run `/reload-plugins` (or restart Claude Code), and `/gamegen` is ready.
+That installs gamegen and the five plugins it uses for art, sound and 3D models. Run `/reload-plugins` (or restart Claude Code), and `/gamegen` is ready.
 
-Already installed imagegen2, anim8gen, audiogen or nanogen on their own? Remove those first, so you don't end up with two copies of each:
+Already installed imagegen2, anim8gen, audiogen, nanogen or meshgen on their own? Remove those first, so you don't end up with two copies of each:
 
 ```
 /plugin uninstall imagegen2@imagegen2
@@ -183,7 +184,10 @@ The plugins make art and sound with online services, so they need your keys. You
 OPENAI_API_KEY=...       # imagegen2 and anim8gen
 GEMINI_API_KEY=...       # nanogen
 ELEVENLABS_API_KEY=...   # audiogen
+MESHY_API_KEY=...        # meshgen, only for 3D games
 ```
+
+The Meshy key is only needed for 3D games (`--3d`). Get it at [meshy.ai](https://www.meshy.ai) under Settings > API; Meshy's API needs a paid plan.
 
 Before it starts, gamegen tries each key with a free request. If one is missing or doesn't work, it stops right away, before spending anything, and tells you how to fix it. No `.env` yet? gamegen makes one for you, with links to where you get each key, and keeps it out of git: just paste your keys in and run your command again.
 
@@ -191,7 +195,7 @@ Don't have all three? Say what to do without one in your description: "no music"
 
 ## What it uses
 
-gamegen does the planning, building and testing itself, and uses four companion plugins for the art and sound:
+gamegen does the planning, building and testing itself, and uses companion plugins for the art, sound and 3D models:
 
 | Plugin | What it makes |
 |---|---|
@@ -199,6 +203,7 @@ gamegen does the planning, building and testing itself, and uses four companion 
 | [imagegen2](https://github.com/zeveck/imagegen2) | Characters and sprites with clean transparent edges, icons (OpenAI GPT Image) |
 | [anim8gen](https://github.com/zeveck/anim8gen) | Character animations: running, jumping, idling, attacking |
 | [audiogen](https://github.com/zeveck/audiogen) | Music and sound effects (ElevenLabs) |
+| [meshgen](https://github.com/zeveck/meshgen) | 3D models and animated 3D characters, for 3D games (Meshy) |
 
 ## How it works
 

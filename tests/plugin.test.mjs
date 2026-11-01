@@ -19,7 +19,7 @@ const skill = read('skills/gamegen/SKILL.md');
 const readme = read('README.md');
 const REFS = 'skills/gamegen/references';
 
-const COMPANIONS = ['imagegen2', 'anim8gen', 'audiogen', 'nanogen'];
+const COMPANIONS = ['imagegen2', 'anim8gen', 'audiogen', 'nanogen', 'meshgen'];
 // The options, as SKILL.md's flag table defines them.
 const FLAGS = [...skill.matchAll(/^\| `(--[a-z-]+)` \|/gm)].map((m) => m[1]);
 // Where each companion plugin lives, as the marketplace must point at it.
@@ -28,6 +28,7 @@ const SOURCES = {
   anim8gen: { url: 'https://github.com/zeveck/anim8gen.git', path: '.codex/skills' },
   audiogen: { url: 'https://github.com/zeveck/audiogen.git', path: 'skills' },
   nanogen: { url: 'https://github.com/zeveck/nanogen.git', path: 'skills' },
+  meshgen: { url: 'https://github.com/zeveck/meshgen.git', path: 'skills' },
 };
 
 test('version is date-based CalVer and matches the first CHANGELOG heading', () => {
@@ -49,8 +50,8 @@ test('marketplace and plugin manifests point at the skill', () => {
   assert.ok(!existsSync(join(ROOT, '.claude-plugin/plugin.json')));
 });
 
-test('depends on the four companion plugins, from this marketplace', () => {
-  // Plain names resolve in this marketplace, which lists all four, so one
+test('depends on the companion plugins, from this marketplace', () => {
+  // Plain names resolve in this marketplace, which lists them all, so one
   // install command gets everything.
   assert.deepEqual([...plugin.dependencies].sort(), [...COMPANIONS].sort());
 });
@@ -128,7 +129,7 @@ test('SKILL.md\'s flag table has the options everything else documents', () => {
 // The setup check, run against a stand-in curl (no network): it answers with
 // STUB_CODE and writes STUB_BODY as the response body.
 const SCRIPT = join(ROOT, 'skills/gamegen/scripts/check-setup.sh');
-function runCheck(dir, { code = '401', body = '{}' } = {}) {
+function runCheck(dir, { code = '401', body = '{}', args = [] } = {}) {
   const bin = join(dir, '.stub-bin');
   mkdirSync(bin, { recursive: true });
   writeFileSync(join(bin, 'curl'), `#!/bin/sh
@@ -139,7 +140,7 @@ cat > /dev/null
 printf '%s' "$STUB_CODE"
 `);
   chmodSync(join(bin, 'curl'), 0o755);
-  return spawnSync('bash', [SCRIPT], {
+  return spawnSync('bash', [SCRIPT, ...args], {
     cwd: dir, encoding: 'utf8',
     env: { PATH: `${bin}:/usr/bin:/bin`, HOME: dir, STUB_CODE: code, STUB_BODY: body },
   });
@@ -183,13 +184,31 @@ test('setup check: finds the .env in a folder above', (t) => {
   assert.match(r.stdout, /elevenlabs \(audiogen\): ok \(tier: free, 9,900 of 10,000 credits left\)/);
 });
 
+test('setup check: the Meshy key is only looked at for a 3D game', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeEnv(dir);
+  const ok = { code: '200', body: '{"balance":1234}' };
+  // A 2D game: no Meshy key, and it isn't mentioned.
+  // (Exit codes aren't checked: this stripped-down PATH has no node.)
+  const flat = runCheck(dir, ok);
+  assert.doesNotMatch(flat.stdout, /meshy/i);
+  // A 3D game needs it.
+  const missing = runCheck(dir, { ...ok, args: ['--3d'] });
+  assert.match(missing.stdout, /meshy \(meshgen\): missing MESHY_API_KEY/);
+  writeFileSync(join(dir, '.env'), 'MESHY_API_KEY=msy-SECRET\n', { flag: 'a' });
+  const r = runCheck(dir, { ...ok, args: ['--3d'] });
+  assert.match(r.stdout, /meshy \(meshgen\): ok \(1,234 credits left\)/);
+  assert.ok(!r.stdout.includes('msy-SECRET'));
+  assert.match(runCheck(dir, { code: '401', args: ['--3d'] }).stdout, /meshy \(meshgen\): failed \(the key was refused/);
+});
+
 // prepare-env.sh, run in a scratch folder.
 const PREPARE = join(ROOT, 'skills/gamegen/scripts/prepare-env.sh');
 // HOME is a separate empty folder unless a test says otherwise.
-function prepare(cwd, home) {
+function prepare(cwd, home, args = []) {
   const tmpHome = home ? null : scratch();
   try {
-    return spawnSync('bash', [PREPARE], { cwd, encoding: 'utf8', env: { PATH: '/usr/bin:/bin', HOME: home || tmpHome } });
+    return spawnSync('bash', [PREPARE, ...args], { cwd, encoding: 'utf8', env: { PATH: '/usr/bin:/bin', HOME: home || tmpHome } });
   } finally {
     if (tmpHome) rmSync(tmpHome, { recursive: true, force: true });
   }
@@ -225,6 +244,15 @@ test('prepare-env: adds only the missing keys to an existing .env, keeping the r
   assert.equal(readFileSync(join(dir, '.gitignore'), 'utf8'), 'node_modules\n.env\n');
   assert.ok(!r.stdout.includes('sk-keep-this'), 'never prints a key');
   assert.ok(!existsSync(join(sub, '.env')), 'no second .env');
+});
+
+test('prepare-env: adds a Meshy placeholder only for a 3D game', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=a\nGEMINI_API_KEY=b\nELEVENLABS_API_KEY=c\n');
+  prepare(dir);
+  assert.doesNotMatch(readFileSync(join(dir, '.env'), 'utf8'), /MESHY/);
+  prepare(dir, undefined, ['--3d']);
+  assert.match(readFileSync(join(dir, '.env'), 'utf8'), /^MESHY_API_KEY=$/m);
 });
 
 test('prepare-env: leaves a .env above the git repository alone', (t) => {
@@ -268,6 +296,20 @@ test('every script is used by the skill, a reference file or another script', ()
   }
   // The first-load check runs without a permission prompt, like the others.
   assert.match(skill.match(/^allowed-tools: (.*)$/m)[1], /scripts\/first-load\.sh \*/);
+});
+
+test('3D guidance stays in 3d.md, so 2D games never load it', () => {
+  // SKILL.md has only the gate: the flag, when a game is 3D, when to ask,
+  // and read 3d.md. (The gate has to be here: it runs before 3d.md is read.)
+  const lines = skill.split('\n').filter((l) => /3D|3d\.md|meshgen|MESHY|three\.js/.test(l));
+  assert.ok(lines.length <= 20, `SKILL.md has ${lines.length} lines about 3D:\n${lines.join('\n')}`);
+  assert.match(skill, /read\s+`references\/3d\.md`/);
+  assert.match(skill, /Never read it\s+for\s+a 2D game/);
+  // No other reference file a game reads carries 3D detail. (help.md is only
+  // shown for /gamegen help, so it can describe --3d for people.)
+  for (const f of readdirSync(join(ROOT, REFS)).filter((f) => !['3d.md', 'help.md'].includes(f))) {
+    assert.doesNotMatch(read(`${REFS}/${f}`), /three\.js|GLTFLoader|AnimationMixer|MESHY_API_KEY/, f);
+  }
 });
 
 test('the service worker template and the Pages workflow agree on placeholders', () => {

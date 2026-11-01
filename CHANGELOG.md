@@ -4,6 +4,20 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.1
+
+- **3D games, when you ask for one** (#3): `--3d`, or "3D" in your idea.
+  Characters start as a picture, then meshgen (a new companion plugin, using
+  Meshy) turns them into animated 3D models; props and weapons too. Web games
+  are built with three.js, bundled with the game; Godot games get the models
+  ready to use. Every other game stays 2D, and 2D games work exactly as
+  before.
+- If your idea sounds like 3D but doesn't say so (first-person, Unreal,
+  low-poly), gamegen asks you straight away, before starting, rather than
+  building the wrong kind of game.
+- 3D games need a Meshy key (`MESHY_API_KEY`); the setup check tests it for
+  free, only for 3D games.
+
 ## v2026.10.31.7
 
 Games look finished, not just working (#1):
