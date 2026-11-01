@@ -18,7 +18,7 @@ Two or three sentences: what you do, why it's fun, what makes it different.
 
 - Platform: desktop | mobile | both
 - Target: web (plain HTML and JavaScript, no build step) | <engine>
-- Scope: small | medium | large
+- Scope: small | medium | large (and why, if judged from the request)
 - Budget: $<n> for generated art and audio
 - Tools available: <which generators, which keys, play-test tools>
 - Credit: <the name from `publish.sh credit`, or none; never a stand-in>
@@ -99,7 +99,7 @@ For other targets: the project layout and how it will be tested.
 
 ## Cut list
 
-What to drop first if time, budget or difficulty demands it, in order. The
+What to drop first if the budget or a technical problem demands it, in order. The
 core loop is never on it.
 
 ## Budget estimate

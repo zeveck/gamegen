@@ -68,7 +68,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--platform desktop`, `mobile` or `both` | Where it'll be played. Phones get touch controls. | `both` |
 | `--style <description or link>` | The look and feel to aim for: a description, a game's name, or a link to a game, store page or screenshot. Use it more than once to mix influences. | gamegen picks a look that suits your idea |
 | `--target <web or an engine>` | What to build it in: `web`, or an engine such as `godot` or `pygame`. Engines are experimental: gamegen makes the project and all its art and sound, but it can only play-test what it can run, and editors like Unity and Unreal usually can't run here. | `web` |
-| `--scope small`, `medium` or `large` | How big a game: a polished 5-minute game, a 20-minute game with several levels, or more. | `medium` |
+| `--scope small`, `medium` or `large` | How big a game: a polished 5-minute game, a 20-minute game with several levels, or more. | sized from your idea |
 | `--budget <dollars>` | The most to spend on generated art and audio. `0` makes a free game with everything drawn in code. | `20` |
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
 | `--plan-only` | Stop after the design, before spending anything, so you can read it and suggest changes. | off |
@@ -237,7 +237,7 @@ gamegen also uses your Claude Code usage while it works, which for a whole game 
 - **Describe as much as you like.** A sentence works; a paragraph about the look, the mechanics and the feel works better. Bloom Hop's request below was a paragraph, and the game has every idea in it.
 - **Say what makes it fun.** "A platformer" is fine; "a platformer where you can only jump while the music is playing" is better.
 - **Name the feel you want.** A game, a film, an era ("like an old Game Boy game"), a mood ("cozy", "frantic").
-- **Start small.** `--scope small` games come out polished and quick to make. You can always add more with `--change`.
+- **Say how big, if you like.** gamegen sizes the game from your description and tells you what it picked; `--scope small` or `large` sets it. You can always add more with `--change`.
 - **Look at the design first** with `--plan-only` when you have strong opinions.
 - **Keep your keys in `.env`** and that file out of git.
 - **Style references inspire, they don't copy.** A link or a game's name sets the mood, look and feel; gamegen always makes original characters, art, music and names.

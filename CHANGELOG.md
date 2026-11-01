@@ -4,6 +4,22 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.1.4
+
+Games come out the size you described, and nothing gets cut to finish
+sooner (#7):
+
+- gamegen's top rule is now: "Racing to say 'done' but producing slop is a
+  fail. It's fine to take longer to get it right. Be careful."
+- Without `--scope`, the size comes from your request instead of always
+  medium, and the first update says which size and why, so you can change it.
+- Lines that let a run cut corners are gone: no dropping a feature after a
+  few failed fixes, no cutting to save time, and a second final review
+  whenever the first finds something that must be fixed.
+- The "looking finished" guidance is down to a few lines of principle, so it
+  fits every game; the polish pass, text scanner and first-load filmstrip
+  still check for those problems.
+
 ## v2026.11.1.3
 
 Fixes from a bug review (#6):

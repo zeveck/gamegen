@@ -62,7 +62,8 @@ expect things to go wrong. Find the places where they will.
 - **Testability.** Can the play-test prove every level is completable? Does
   the design include the debug hook needed to check it?
 - **Scope and budget.** Is it realistic for this scope and budget? Is the cut
-  list in the right order?
+  list in the right order? Suggest cuts only for what can't be built well
+  with these tools or this budget, never to save time.
 
 ## Art and sound director
 
@@ -147,21 +148,15 @@ own.
 
 The polish checklist:
 
-- **Junk or code showing as text:** `undefined`, `NaN`, `[object …]`, tags,
-  escaped entities like `&amp;`, raw markup or template braces.
-- **Lone last words and awkward breaks** in headings, buttons, captions and
-  other short text.
-- **Text cut off** by its box, by a "…", or by the edge of the screen,
-  including names in top bars and labels on maps.
-- **Pop-ups and tips** piling on top of each other or covering the action.
+- **Junk or code showing as text.**
+- **Lone last words and awkward breaks** in short text.
+- **Text cut off** or spilling out of its box.
+- **Pop-ups** covering each other or the action.
 - **The same thing named or capitalised differently** in different places.
-- **Icons** that don't match each other, or don't show (an empty box).
-- **The first load:** text in a stand-in font that jumps, words on a blank
-  screen before the art arrives, a label that changes, anything that moves
-  once the title is up.
-- **Anything else that looks unfinished:** placeholder art, the same thing
-  shown twice (credits shown three times), a screen that runs off a phone
-  held sideways, text too small to read on a phone.
+- **Icons** that don't match each other, or don't show.
+- **The first load:** anything that flickers, jumps or changes once the
+  title is up.
+- **Anything else that looks unfinished.**
 
 Use the same finding format, with the screen, the size and a screenshot for
 each. Every finding here is at least should-fix: these are what a player

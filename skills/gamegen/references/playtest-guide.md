@@ -185,7 +185,7 @@ bash "${CLAUDE_SKILL_DIR}/scripts/first-load.sh" phone http://127.0.0.1:8123/ de
 It saves a filmstrip of about 20 frames and prints when the fonts finished
 loading and when the picture changed. Look at the filmstrip. The title should
 appear once, in its real fonts and with its art, and then stay put: every
-change after it appears is a flicker or a jump to fix (see "The first load"
+change after it appears is a flicker or a jump to fix (see "Looking finished"
 in web-target.md). A fade-in as the title appears is fine.
 
 ## Screenshots
@@ -217,8 +217,8 @@ It reports three kinds of problem, each with the text and the element:
 - `clipped`: text cut off by its own box (including a "…"), by a box around
   it, or by the edge of the screen.
 
-Clear every `orphan` and `clipped` finding too: fix the cause (see "Text that
-looks finished" in web-target.md), then scan again. The scanner can't read
+Clear every `orphan` and `clipped` finding too: fix the cause (see "Looking
+finished" in web-target.md), then scan again. The scanner can't read
 text drawn on the canvas; check that in the screenshots.
 
 Then look at the screenshots (Read each image), or have a review agent look
@@ -238,10 +238,8 @@ around it changes.
 
 ## When something's broken
 
-Fix it, then play that part again. If the same problem survives three fixes,
-step back: simplify or cut the feature (check the cut list) and write down
-what changed. If the game as a whole can't be finished, stop and say so in the
-report, with what works and what doesn't.
+Fix it, then play that part again. If something truly can't be made to work,
+say so plainly in the report, with what works and what doesn't.
 
 ## Without playwright-cli
 

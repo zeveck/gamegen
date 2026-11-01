@@ -30,7 +30,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--platform desktop`, `mobile` or `both` | Where it'll be played (default: both) |
 | `--style <description or link>` | The look and feel to aim for |
 | `--target <web or an engine>` | What to build it in (default: web) |
-| `--scope small`, `medium` or `large` | How big a game (default: medium) |
+| `--scope small`, `medium` or `large` | How big a game (default: sized from your idea) |
 | `--budget <dollars>` | The most to spend on art and sound (default: 20) |
 | `--rounds <1 to 4>` | Rounds of design review (default: 2) |
 | `--plan-only` | Stop after the design, before spending anything |
@@ -92,7 +92,9 @@ gamegen tells you what it couldn't test.
 
 ## --scope
 
-**How big a game:** `small`, `medium` (the default) or `large`.
+**How big a game:** `small`, `medium` or `large`. Without it, gamegen sizes
+the game from your idea, and says which size it picked and why, so you can
+change it.
 
 - `small`: one great idea, polished: a few levels or an arena, about 5
   minutes of play. Quickest and cheapest.
@@ -100,8 +102,7 @@ gamegen tells you what it couldn't test.
   play.
 - `large`: more levels, enemies and ideas. Takes longer and costs more.
 
-Small games come out the most polished. You can always grow one later with
-`--change`.
+You can always grow a game later with `--change`.
 
 ## --budget
 

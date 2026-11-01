@@ -108,65 +108,19 @@ for the game, as a small JSON object with a version number. Wrap reads in
 
 ## Looking finished
 
-Players notice the words, the icons and the first two seconds before
-anything else. Build these in from the start; the play-test checks them (see
-playtest-guide.md).
+Players notice the words, the icons and the first seconds before anything
+else. Aim for:
 
-### Text that looks finished
+- **Text that looks finished:** no code or junk showing as text, no lone
+  last words in headings, buttons and captions (`text-wrap: balance` helps),
+  and nothing cut off or spilling out of its box at any size.
+- **A first load that appears once and stays still:** the title shows up
+  with its real fonts and art, and nothing jumps or changes after that.
+- **One consistent style of icons** that shows up on every device (emoji and
+  symbol characters often don't).
+- **Pop-up messages** that don't cover each other or the action.
 
-- **No lone last words.** `text-wrap: balance` on headings, labels, buttons
-  and captions, and `text-wrap: pretty` on running text. Keep names and
-  short phrases together with non-breaking spaces (`Sir&nbsp;Bramble`).
-- **Never cut a name off.** Where space is tight (a top bar, a map label, a
-  battle tag), shrink the text to fit, then let it go to two lines, and only
-  then cut it with "…". Test the longest name in the game at the smallest
-  size.
-- **Nothing spills out of its box.** Size boxes to their longest text at every
-  size, and test them with it.
-- **Build text from strings, never by turning objects into text.** A helper
-  that makes elements flattens its children all the way
-  (`children.flat(Infinity)`) and appends elements as elements; text goes in
-  with `textContent`. That's how `[object HTMLElement]` or `undefined` ends
-  up on screen.
-- **A screen that might scroll** on a short display: put the scrolling on an
-  inner box, and keep wide things (a logo, a title) sized to fit
-  (`max-width: 100%`, or scaled down) so the scrolling box can't clip them.
-- **One way of writing each name.** Items, characters and places are
-  spelled and capitalised the same everywhere; keep them in one list in the
-  code and use it.
-- **Text drawn on the canvas** gets the same care: wrap it with a helper
-  that measures the words (`measureText`) and never leaves one alone on the
-  last line, and shrinks a name to fit its space.
-
-### The first load
-
-The title should appear once, finished, and then stay still.
-
-- **Preload what the title needs**: its fonts (`<link rel="preload"
-  as="font" crossorigin>`, then `document.fonts.load(...)`) and its art.
-- **Keep the title hidden until they're ready**, with a failsafe (show it
-  anyway after about 3 seconds), then fade it in once. A plain background in
-  the game's colors meanwhile is fine; text on a blank screen isn't.
-- **Reserve space** for anything that appears later, so nothing shifts when
-  it does.
-- **Decide device-dependent words before showing them**: "Tap to begin" or
-  "Click to begin" (from `matchMedia('(pointer: coarse)')`) is settled before
-  the title appears, never swapped after.
-
-### Icons
-
-One set of matching icons, drawn as inline SVG in the text color
-(`fill: currentColor`), for mute, pause, settings, fullscreen and the rest.
-No emoji or symbol characters (🔊, ⚙, ⌨): they look different on every
-device, and some phones show them as empty boxes.
-
-### Pop-up messages
-
-Send every pop-up message (an item found, a level up, a hint) through one
-queue: messages of the same kind arriving together merge into one, the rest
-wait their turn or stack neatly below any tip instead of on top of it, and
-none ever covers the action (on a phone, in battle, keep them clear of the
-fighters).
+The play-test checks these (see playtest-guide.md).
 
 ## Install and offline
 

@@ -33,9 +33,8 @@ question tool or a multiple-choice prompt.
 
 Three rules beat everything else:
 
-1. **Fun and finished beats big.** A small game with one great mechanic,
-   tight controls and real polish is the goal. Cut scope before you cut
-   quality. Every design has a cut list; use it.
+1. **Racing to say "done" but producing slop is a fail.** It's fine to take
+   longer to get it right. Be careful.
 2. **Never call it done without playing it.** Every screen, every level, on
    every platform you're targeting, must be played (by the play-test tools in
    this skill) before you report success. If something can't be made to work,
@@ -91,7 +90,7 @@ value) is the game description. Flags and defaults:
 | `--platform` | `desktop`, `mobile`, `both` | `both` |
 | `--style` | a description, or a URL (a game, a store page, a screenshot, a video). Can be given more than once. | none: pick a look that suits the idea |
 | `--target` | `web`, or an engine or language such as `godot`, `unity`, `unreal`, `pygame`, `love2d` | `web` |
-| `--scope` | `small`, `medium`, `large` | `medium` |
+| `--scope` | `small`, `medium`, `large` | sized from the request |
 | `--budget` | dollars to spend on generated art and audio, such as `20` or `$20`. `0` means no generated assets: all the art is drawn in code | `20` |
 | `--rounds` | design review rounds, 1 to 4 | `2` |
 | `--plan-only` | stop after the reviewed design, before spending anything on assets | off |
@@ -295,14 +294,17 @@ and difficulty curve, screens, art and audio direction, the full asset list
 (which tool makes each asset), the tech plan, a cut list, a budget estimate,
 and the definition of done.
 
-Size it to `--scope`:
+Size it to `--scope`, or without it, to what the request describes, as you
+do for the platform and style: a quick idea in a sentence is small; a long
+request with chapters, a cast and a story is large. Say which size and why
+in your first update, so they can correct it.
 
 - **small:** one core mechanic, one to three levels or an arena, about 10 to
   20 assets, one song. A great 5-minute game.
 - **medium:** three to five levels or areas with a twist each, about 25 to 45
   assets, a song per area. A great 20-minute game.
-- **large:** more levels, enemies and mechanics. Warn in the report that it
-  takes longer and costs more, and still keep a cut list.
+- **large:** more levels, enemies and mechanics. Say in that first update that
+  it takes longer and costs more.
 
 ## Phase 3 — Design review
 
@@ -403,10 +405,8 @@ run the text scanner at each one, film the first load, and look at them all.
 Checking that it works isn't enough: it has to look finished too. Junk text
 on screen is a bug like any other.
 
-When something's broken, fix it and play again. If the same problem survives
-three fixes, cut or simplify that feature (it's on the cut list for a reason)
-and note it. If the game as a whole still can't be finished, stop and report
-honestly what works and what doesn't.
+When something's broken, fix it and play again. If something truly can't be
+made to work, say so plainly in the report.
 
 ## Phase 7 — Final review
 
@@ -419,8 +419,8 @@ Dispatch two agents in parallel, with instructions from
 - **Bug hunter:** reads the code and pokes at the game for crashes, stuck
   states, phone problems, audio problems and lost saves.
 
-Fix what they find, then re-run the play-test for anything you changed. Run a
-second round only if the first found must-fix problems.
+Fix what they find, then re-run the play-test for anything you changed. If
+they found any must-fix problem, run a second round once it's fixed.
 
 ## Phase 8 — Polish pass
 
@@ -435,8 +435,8 @@ screenshots, against the same checklist.)
 
 Fix everything it finds, then scan and screenshot those screens again at
 every size, and replay every level's solution if anything in play changed.
-A fix can break something else (making a box scroll can cut off a logo), so
-re-check the whole screen, not just the fixed spot.
+A fix can break something else, so re-check the whole screen, not just the
+fixed spot.
 
 ## Phase 9 — Wrap up
 
