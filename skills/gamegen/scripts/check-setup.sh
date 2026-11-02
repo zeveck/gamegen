@@ -135,7 +135,7 @@ import concurrent.futures, json, os, sys, urllib.request
 
 installed = {p["id"].split("@")[0]: p for p in json.loads(os.environ["PLUGIN_LIST"]) if "@" in p.get("id", "")}
 spec = json.load(open(sys.argv[1]))["companions"]
-plugins = {"gg": {"repo": "zeveck/gamegen", "path": "skills", "minimum": None, "needs": "", "label": "gamegen"}}
+plugins = {"gamegen": {"repo": "zeveck/gamegen", "path": "skills", "minimum": None, "needs": ""}}
 plugins.update(spec)
 base = os.environ.get("GAMEGEN_LATEST_BASE", "https://raw.githubusercontent.com")
 

@@ -39,13 +39,13 @@ test('version is date-based CalVer and matches the first CHANGELOG heading', () 
 });
 
 test('marketplace and plugin manifests point at the skill', () => {
-  // The plugin's name is the prefix its skill shows under: /gg:gamegen.
-  assert.equal(plugin.name, 'gg');
-  // /plugin shows "gamegen" instead (the marketplace entry's wins there).
-  assert.equal(plugin.displayName, 'gamegen');
-  assert.equal(market.plugins[0].displayName, 'gamegen');
+  // The plugin's name is the prefix its skill shows under: /gamegen:gamegen
+  // (and plain /gamegen). It was gg until v2026.11.2.2; the rename moves
+  // existing installs over.
+  assert.equal(plugin.name, 'gamegen');
+  assert.deepEqual(market.renames, { gg: 'gamegen' });
   assert.equal(market.name, 'gamegen');
-  assert.equal(market.plugins[0].name, 'gg');
+  assert.equal(market.plugins[0].name, 'gamegen');
   assert.equal(market.plugins[0].source, './skills');
   assert.equal(plugin.skills, './gamegen');
   assert.ok(existsSync(join(ROOT, 'skills/gamegen/SKILL.md')));
@@ -77,9 +77,9 @@ test('anim8gen gets imagegen2 from this marketplace', () => {
 });
 
 test('the README installs everything with one line', () => {
-  assert.match(readme, /\/plugin install gg --marketplace zeveck\/gamegen/);
+  assert.match(readme, /\/plugin install gamegen --marketplace zeveck\/gamegen/);
   // Uninstalling takes the companions with it.
-  assert.match(readme, /claude plugin uninstall gg@gamegen --prune/);
+  assert.match(readme, /claude plugin uninstall gamegen@gamegen --prune/);
   assert.doesNotMatch(readme, /\/plugin marketplace add/);
 });
 
@@ -212,7 +212,7 @@ test('setup check: says which plugins are out of date, and never stops for it', 
   writeEnv(dir);
   // A stand-in claude that reports what's installed.
   const installed = [
-    { id: 'gg@gamegen', version: '2026.11.1' },
+    { id: 'gamegen@gamegen', version: '2026.11.1' },
     { id: 'imagegen2@gamegen', version: '2026.10.11' },
     { id: 'audiogen@gamegen', version: '2026.10.31.2' },
     { id: 'meshgen@gamegen', version: '2026.10.30' },

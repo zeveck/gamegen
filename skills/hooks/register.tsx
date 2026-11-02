@@ -7,7 +7,7 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { GameName } from '../types'
 
-const game = atom({ plugin: 'gg', key: 'game' } as const, null as GameName | null)
+const game = atom({ plugin: 'gamegen', key: 'game' } as const, null as GameName | null)
 
 const STATUS = 'design/STATUS.md'
 

@@ -3,6 +3,6 @@ export type GameName = string
 
 declare module 'claude-code' {
   interface PluginState {
-    gg: { game: GameName | null }
+    gamegen: { game: GameName | null }
   }
 }

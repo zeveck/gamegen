@@ -3,11 +3,11 @@
   "owner": {
     "name": "zeveck"
   },
+  "renames": { "gg": "gamegen" },
   "description": "gamegen: make a complete, playable game from a description, with the art and sound tools it uses.",
   "plugins": [
     {
-      "name": "gg",
-      "displayName": "gamegen",
+      "name": "gamegen",
       "source": "./skills",
       "description": "/gamegen: describe a game and get a finished, play-tested one: designed, reviewed, illustrated, animated, scored and built. Installs imagegen2, anim8gen, audiogen, nanogen and meshgen with it."
     },

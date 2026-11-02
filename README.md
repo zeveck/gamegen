@@ -161,17 +161,19 @@ Working in a [dev container](https://github.com/zeveck/devcontainer-plus)? VS Co
 In Claude Code:
 
 ```
-/plugin install gg --marketplace zeveck/gamegen
+/plugin install gamegen --marketplace zeveck/gamegen
 ```
 
-That installs gamegen and the five plugins it uses for art, sound and 3D models. Run `/reload-plugins` (or restart Claude Code), and `/gamegen` is ready. (It's listed as gamegen in `/plugin`, and installs as `gg`.)
+That installs gamegen and the five plugins it uses for art, sound and 3D models. Run `/reload-plugins` (or restart Claude Code), and `/gamegen` is ready.
 
-**Keep it up to date.** Turn on auto-update for the gamegen marketplace, so gamegen and its plugins stay current: `/plugin` → Marketplaces → gamegen → Enable auto-update. Updating gamegen by itself (`claude plugin update gg@gamegen`) doesn't update the plugins it uses. Each time you make or change a game, gamegen checks, and if any of them is behind, it tells you the command that updates it.
+**Had it installed as `gg`?** gamegen's plugin used to be called `gg`. After updating the gamegen marketplace, run the install command above once to switch over; your settings and its plugins carry across.
+
+**Keep it up to date.** Turn on auto-update for the gamegen marketplace, so gamegen and its plugins stay current: `/plugin` → Marketplaces → gamegen → Enable auto-update. Updating gamegen by itself (`claude plugin update gamegen@gamegen`) doesn't update the plugins it uses. Each time you make or change a game, gamegen checks, and if any of them is behind, it tells you the command that updates it.
 
 **To remove it,** with the plugins it brought along:
 
 ```
-claude plugin uninstall gg@gamegen --prune
+claude plugin uninstall gamegen@gamegen --prune
 ```
 
 Already installed imagegen2, anim8gen, audiogen, nanogen or meshgen on their own? Remove those first, so you don't end up with two copies of each:

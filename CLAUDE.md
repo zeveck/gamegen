@@ -14,11 +14,13 @@ audiogen plugins for art and sound, and meshgen for 3D games.
   Keep SKILL.md readable end to end; move long detail into a reference file.
 - 3D is opt-in (`--3d`, or "3D" in the request). All 3D guidance lives in
   `references/3d.md`, which only 3D games read; SKILL.md has just the gate.
-- The plugin is named `gg`, so its skill shows as `/gg:gamegen` (and plain
-  `/gamegen`). The repository and marketplace are `gamegen`.
+- The plugin is named `gamegen`, so its skill shows as `/gamegen:gamegen` (and
+  plain `/gamegen`). It was `gg` until v2026.11.2.2; `renames` in
+  `marketplace.json` moves old installs over (keep it, and keep it
+  append-only).
 - `.claude-plugin/marketplace.json` is the marketplace. It lists gamegen and
   the five companion plugins (from their own repositories, via `git-subdir`),
-  so `/plugin install gg --marketplace zeveck/gamegen` installs everything.
+  so `/plugin install gamegen --marketplace zeveck/gamegen` installs everything.
   anim8gen's imagegen2 dependency is declared on its entry here (anim8gen's
   own `plugin.json` declares none, so each marketplace can supply its own).
 - `skills/gamegen/scripts/check-setup.sh` tests the API keys with free requests
