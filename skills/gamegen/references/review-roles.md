@@ -76,6 +76,9 @@ missing.
 - **Complete list.** Does the asset list cover every character, animation,
   background, tile, item, UI piece, icon and sound the design mentions?
   Anything listed that the design never uses?
+- **Looks finished.** Does it look as finished as the request deserves? Are
+  the big moments shown, do the characters who speak have faces, do the
+  characters who move have animations?
 - **Right tool, right size.** Is each asset going to the tool best at it (see
   asset-guide.md)? Are sizes and transparency right for how it's used?
 - **Audio.** Does the music fit each area and loop cleanly? Does every action

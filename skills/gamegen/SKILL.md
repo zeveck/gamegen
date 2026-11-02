@@ -34,7 +34,9 @@ question tool or a multiple-choice prompt.
 Three rules beat everything else:
 
 1. **Racing to say "done" but producing slop is a fail.** It's fine to take
-   longer to get it right. Be careful.
+   longer to get it right. Be careful. Make every asset that clearly improves
+   the game. The budget is a limit to stay within, not a target to stay well
+   under.
 2. **Never call it done without playing it.** Every screen, every level, on
    every platform you're targeting, must be played (by the play-test tools in
    this skill) before you report success. If something can't be made to work,
@@ -345,13 +347,16 @@ Follow `references/asset-guide.md`. In short:
 2. **Make the asset list, most important first,** with the right tool for each
    job, through the plugins' own skills and following their instructions.
    Characters that move get anim8gen animations.
-3. **Look at every image you make** (Read it). Check it matches the design and
+3. **Re-plan with real prices.** Once the style anchor and the first assets
+   show what things actually cost, look at the asset list again and add what
+   would make the game look and feel more finished.
+4. **Look at every image you make** (Read it). Check it matches the design and
    the style anchor, has a clean transparent background where it needs one,
    has no stray text or watermark, and is the right size. Regenerate a bad one
    up to twice with a better prompt. If that doesn't fix it, change
    approach: a simpler version, another tool, or drawn in code. Drop it only
    if nothing works, and say so.
-4. **Track spending** in `design/ASSETS.md`: every asset, its file, the tool,
+5. **Track spending** in `design/ASSETS.md`: every asset, its file, the tool,
    and its estimated cost. Warn at 80% of `--budget`. When the budget runs
    out, stop generating, use the cut list, and fill any gaps with code-drawn
    art.

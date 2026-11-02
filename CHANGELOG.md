@@ -4,6 +4,18 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.2
+
+Art that makes the game feel finished (#10):
+
+- gamegen makes every piece of art that clearly improves the game, and treats
+  the budget as a limit to stay within, not a target to stay well under.
+- Once the first art shows what things really cost, it looks at the art plan
+  again and adds what would make the game look more finished.
+- The design review asks whether the game looks as finished as the request
+  deserves: are the big moments shown, do the characters who speak have
+  faces, and do the characters who move have animations?
+
 ## v2026.11.1.6
 
 A leaner skill, aimed squarely at a fun, finished game (#9):
