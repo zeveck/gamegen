@@ -128,6 +128,10 @@ Generated levels: the generator itself checks each level is solvable before
 using it (for example, a search over the moves the player can make), and the
 play-test replays a few seeds.
 
+Prove the whole game can be finished, too: at least once, after the last
+fixes, play from New Game to the win screen in one run, with real input and
+no jumps. Other endings can start from a save made along the way.
+
 ## What to check
 
 Work through the design's definition of done. At minimum:

@@ -384,6 +384,10 @@ Build in milestones, and play each one (Phase 6's tools) before moving on:
 5. **Polish.** Screen shake, particles, little bounces, transitions and
    feedback sounds that make it feel alive (the design's "juice" list).
 
+When a game has a lot of content (chapters, worlds, level sets), settle it
+first in a shared bible (story, characters and voice, or rules and themes),
+then give each part to its own helper, who builds it and plays it through.
+
 Record a solution for each level as you build it (see
 `references/playtest-guide.md`): the proof that it can be finished.
 
@@ -398,7 +402,8 @@ only the game's own files, never someone else's changes. Never push.
 Follow `references/playtest-guide.md`. Serve the game, open it at desktop and
 phone sizes (as the platform setting requires), and play it: every screen,
 every level, start to finish, with no errors in the console. Prove each level
-can be completed. Open everything every button opens, not just the main
+can be completed, and once, after the last fixes, play the whole game from New
+Game to the win screen in one run. Open everything every button opens, not just the main
 screens. Take screenshots of each screen and level into `design/screenshots/`,
 run the text scanner at each one, film the first load, and look at them all.
 

@@ -4,6 +4,18 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.3
+
+- **The whole game gets played in one go.** Besides proving each level can be
+  finished, the play-test plays from New Game to the win screen in one run,
+  where problems that carry over between parts show up (#12).
+- **The final playtester checks depth:** is there as much to see, do and read
+  as this kind of game and your request call for, and where does it feel
+  thin?
+- **Big games are written by a team.** A game with a lot of content
+  (chapters, worlds, level sets) gets a shared bible first, then each part
+  goes to its own helper, who builds it and plays it through.
+
 ## v2026.11.2.2
 
 - gamegen's plugin is now called **gamegen** instead of `gg`, so it reads the

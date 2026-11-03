@@ -114,6 +114,10 @@ screenshots in `design/screenshots/`.
 - Is the first minute clear and fun? Do the controls feel good?
 - Is anything confusing, unfair, too hard or too easy?
 - Does it sound good? Is anything too loud, repetitive or missing?
+- **Depth.** Is there as much to see, do and read as this kind of game and
+  this request call for? A great arcade game needs very little; a story
+  adventure needs places, people and replies worth exploring. Where does it
+  feel thin?
 - What one change would make it most fun?
 
 Use the same finding format. Mark anything that stops a player from finishing
