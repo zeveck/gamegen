@@ -40,6 +40,8 @@ imagine playing it on each targeted platform.
   frustrated? Where will they be bored?
 - **Variety and reward.** Does each level add something? Is there a reason to
   keep going, and to come back?
+- **Depth.** Is the game planned with as much to see, do and read as this
+  kind of game and this request call for? Where will it feel thin?
 - **Feel.** Is the juice list enough to make it feel alive?
 - **Faithfulness.** Is this still the game the person asked for?
 

@@ -4,6 +4,12 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.3.3
+
+- The depth question is asked at design time too: the player reviewer checks
+  whether the game is planned with as much to see, do and read as your
+  request calls for, while a thin plan is still cheap to change (#13).
+
 ## v2026.11.3.2
 
 - 3D games with animals or monsters that need to really move (swimming,
