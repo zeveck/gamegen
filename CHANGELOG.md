@@ -4,6 +4,13 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.3.2
+
+- 3D games with animals or monsters that need to really move (swimming,
+  flying, hopping, walking) follow meshgen's new guide to animating them,
+  instead of simple bobbing and swaying (#11). This needs meshgen 2026.11.2
+  or newer; gamegen tells you if yours is older.
+
 ## v2026.11.3
 
 - **The whole game gets played in one go.** Besides proving each level can be

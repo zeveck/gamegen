@@ -5,6 +5,6 @@
     "nanogen": { "repo": "zeveck/nanogen", "path": "skills", "minimum": null, "needs": "" },
     "anim8gen": { "repo": "zeveck/anim8gen", "path": ".codex/skills", "minimum": null, "needs": "" },
     "audiogen": { "repo": "zeveck/audiogen", "path": "skills", "minimum": null, "needs": "" },
-    "meshgen": { "repo": "zeveck/meshgen", "path": "skills", "minimum": "2026.11.1", "needs": "3D games: --dir, --max-credits and credit reporting" }
+    "meshgen": { "repo": "zeveck/meshgen", "path": "skills", "minimum": "2026.11.2", "needs": "3D games: --dir, --max-credits, credit reporting, and animating.md for creatures" }
   }
 }

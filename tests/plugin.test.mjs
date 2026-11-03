@@ -232,7 +232,7 @@ test('setup check: says which plugins are out of date, and never stops for it', 
   const updates = r.stdout.split('\n').filter((l) => l.startsWith('update:'));
   assert.deepEqual(updates, [
     'update: audiogen 2026.10.31.2 is installed; 2026.11.1 is out. Update: claude plugin update audiogen@gamegen, then restart Claude Code',
-    'update: meshgen 2026.10.30 is installed, and gamegen needs 2026.11.1 or newer (3D games: --dir, --max-credits and credit reporting). Update: claude plugin update meshgen@gamegen, then restart Claude Code',
+    'update: meshgen 2026.10.30 is installed, and gamegen needs 2026.11.2 or newer (3D games: --dir, --max-credits, credit reporting, and animating.md for creatures). Update: claude plugin update meshgen@gamegen, then restart Claude Code',
   ], r.stdout);
   // Offline: the minimum is still checked (it's local), and nothing else is said.
   const offline = runCheck(dir, { code: '200', env: { GAMEGEN_LATEST_BASE: `file://${dir}/nowhere` } });

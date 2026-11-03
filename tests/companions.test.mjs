@@ -73,6 +73,8 @@ test('meshgen: the commands, flags and output 3D games use', { skip }, () => {
   assert.equal(typeof dry.credits, 'number');
   // Real runs report credits and warnings (not callable without a key).
   has(readFileSync(cli, 'utf8'), ['creditsUsed', 'creditsLeft', 'warnings'], 'meshgen');
+  // The guide 3D games follow to animate animals and monsters.
+  assert.ok(existsSync(join(DIR, 'meshgen/skills/meshgen/animating.md')), 'meshgen still ships animating.md');
   // The three.js copy 3D web games are built with.
   const vendor = join(DIR, 'meshgen/skills/meshgen/viewer/vendor');
   for (const f of ['three.module.js', 'three.core.js', 'LICENSE', 'addons/loaders/GLTFLoader.js', 'addons/utils/SkeletonUtils.js']) {
