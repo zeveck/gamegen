@@ -41,7 +41,7 @@ imagine playing it on each targeted platform.
 - **Variety and reward.** Does each level add something? Is there a reason to
   keep going, and to come back?
 - **Depth.** Is the game planned with as much to see, do and read as this
-  kind of game and this request call for? Where will it feel thin?
+  kind of game and this request call for, or will it feel thin anywhere?
 - **Feel.** Is the juice list enough to make it feel alive?
 - **Faithfulness.** Is this still the game the person asked for?
 
@@ -118,8 +118,8 @@ screenshots in `design/screenshots/`.
 - Does it sound good? Is anything too loud, repetitive or missing?
 - **Depth.** Is there as much to see, do and read as this kind of game and
   this request call for? A great arcade game needs very little; a story
-  adventure needs places, people and replies worth exploring. Where does it
-  feel thin?
+  adventure needs places, people and replies worth exploring. Does it feel
+  thin anywhere?
 - What one change would make it most fun?
 
 Use the same finding format. Mark anything that stops a player from finishing

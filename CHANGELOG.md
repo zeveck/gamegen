@@ -4,6 +4,12 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.3.4
+
+- The depth questions are asked neutrally ("does it feel thin anywhere?"
+  rather than "where does it feel thin?"), so reviewers don't go looking for
+  thinness that isn't there, and small games don't get padded (#14).
+
 ## v2026.11.3.3
 
 - The depth question is asked at design time too: the player reviewer checks
