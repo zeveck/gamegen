@@ -416,6 +416,8 @@ case "$*" in
   "repo view me/renamed --json"*) printf 'me/renamed-old\tprivate | An old game | 2026-04-25\n' ;;
   "repo view me/offline"*) echo "error connecting to api.github.com" >&2; exit 1 ;;
   "repo view"*) echo "GraphQL: Could not resolve to a Repository with the name 'x'." >&2; exit 1 ;;
+  "api -X POST repos/me/private/pages"*) echo "gh: Your current plan does not support GitHub Pages for this repository. (HTTP 422)" >&2; exit 1 ;;
+  "api -X PUT repos/me/private/pages"*) echo "gh: Not Found (HTTP 404)" >&2; exit 1 ;;
   *"--jq .html_url") echo "https://frog.example.com/" ;;
   *"https_certificate"*) echo "$CERT" ;;
 esac
@@ -461,6 +463,10 @@ test('publish: turns on Pages at the custom address, then requires HTTPS', (t) =
     'repo edit me/frog --homepage https://frog.example.com',
   ]);
   assert.equal(publish(dir, ['https', 'me/frog']).stdout, 'https: on\n');
+  // When GitHub refuses, it says why, in GitHub's words, not a guess.
+  const refused = publish(dir, ['pages', 'me/private']);
+  assert.equal(refused.status, 1);
+  assert.equal(refused.stdout, "pages: couldn't turn on GitHub Pages for me/private (GitHub said: Your current plan does not support GitHub Pages for this repository. (HTTP 422))\n");
   const waiting = publish(dir, ['https', 'me/frog'], { cert: 'authorization_pending' });
   assert.equal(waiting.status, 2);
   assert.match(waiting.stdout, /still waiting/);

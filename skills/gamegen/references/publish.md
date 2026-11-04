@@ -31,7 +31,10 @@ Change nothing until the person confirms in step 2.
    out the address and the gallery (items 3 and 4 below) and follow
    "Updating a published game". With an `origin` they can push to but no
    Pages site, publish into that repo (it's already the game's own) and skip
-   creating one. With an `origin` they can't push to, publish as a new repo
+   creating one. If that repo is private, it stays private: never make a repo
+   public unless they ask. GitHub's paid plans publish Pages from a private
+   repo (the game is public at its address; the repo and its README stay
+   private); if theirs can't, step 4.2 says so. With an `origin` they can't push to, publish as a new repo
    and leave that `origin` alone (add the new one as `github`, and push to
    `github` from then on).
 3. **The address.** In order: the `--publish` value; otherwise
@@ -112,6 +115,9 @@ then ask. For example:
   record."), HTTPS still to come, a new gallery being started, a gallery
   that can't be used and why, or the game becoming its own repo out of a
   bigger one.
+- **Publishing from a private repo they already have:** say it stays private,
+  and that the game itself will be public at its address. Don't say Pages
+  needs a public repo: paid GitHub plans don't.
 - **Leave out** how settings were decided and what's kept out of the repo.
 - **End with a plain question** ("Go ahead?"), so a correction in their own
   words is a natural answer. If they ask for another spot in the gallery
@@ -156,7 +162,11 @@ correction: adjust, show the line again, and ask again.
    deploy fails). Add it as `origin` (or as `github`, when step 1.2 left
    another `origin` alone).
 2. `publish.sh pages <account>/<repo> [host]`, with the host only if its DNS
-   is ready (or the person said it's fine). It prints the address.
+   is ready (or the person said it's fine). It prints the address. If it
+   fails, tell them GitHub's reason (it prints it) and that nothing is online
+   yet. If the plan can't publish Pages from a private repo, ask whether to
+   make that repo public or publish to a new public one; never decide for
+   them.
 3. `git push -u origin main` (or `github`), then wait for the deploy of that
    commit. Its run can take a few seconds to appear, so look for it a few times:
    `gh run list --workflow pages.yml --commit "$(git rev-parse HEAD)" --json databaseId --jq '.[0].databaseId'`,

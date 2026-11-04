@@ -132,10 +132,14 @@ except OSError: pass" "$host")"
 
   pages)
     full="${1:?pages needs owner/name}"; host="${2:-}"
-    # Create the Pages site, or switch an existing one to the workflow.
-    gh api -X POST "repos/$full/pages" -f build_type=workflow >/dev/null 2>&1 \
-      || gh api -X PUT "repos/$full/pages" -f build_type=workflow >/dev/null 2>&1 \
-      || die "pages: couldn't turn on GitHub Pages for $full"
+    # Create the Pages site, or switch an existing one to the workflow. If
+    # neither works, pass on GitHub's reason (such as a plan that can't publish
+    # Pages from a private repo), never a guess.
+    if ! err="$(gh api -X POST "repos/$full/pages" -f build_type=workflow 2>&1 >/dev/null)" \
+      && ! gh api -X PUT "repos/$full/pages" -f build_type=workflow >/dev/null 2>&1; then
+      reason="$(printf '%s' "$err" | head -1 | sed 's/^gh: //')"
+      die "pages: couldn't turn on GitHub Pages for $full${reason:+ (GitHub said: $reason)}"
+    fi
     if [ -n "$host" ]; then
       gh api -X PUT "repos/$full/pages" -f cname="$host" >/dev/null 2>&1 \
         || die "pages: couldn't set the address $host (is it used by another repo?)"
