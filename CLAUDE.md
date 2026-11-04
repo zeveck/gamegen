@@ -26,6 +26,12 @@ audiogen plugins for art and sound, and meshgen for 3D games.
 - `skills/gamegen/scripts/check-setup.sh` tests the API keys with free requests
   before a run spends anything, and warns (never blocks) when a plugin is out
   of date.
+- DNS providers: `GAMEGEN_DNS` (opt-in) names one, and
+  `scripts/dns-<provider>.sh` talks to it, with its own keys in `.env`. Each
+  provider script answers the same three commands (`access`, `lookup`,
+  `add-cname`; see `dns-godaddy.sh`), and `publish.sh dns-add` only ever adds
+  a record, never overwrites one. To add a provider: a new script, its keys
+  in `dns_provider` in `publish.sh`, the template, README and help, and tests.
 - `skills/gamegen/companions.json` lists the companions, where they live, and
   the oldest version of each that gamegen works with. When gamegen starts
   relying on something new in a companion, raise its `minimum` (and say why

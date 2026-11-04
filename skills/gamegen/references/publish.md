@@ -34,7 +34,7 @@ Change nothing until the person confirms in step 2.
    creating one. If that repo is private, it stays private: never make a repo
    public unless they ask. GitHub's paid plans publish Pages from a private
    repo (the game is public at its address; the repo and its README stay
-   private); if theirs can't, step 4.2 says so. With an `origin` they can't push to, publish as a new repo
+   private); if theirs can't, step 4.3 says so. With an `origin` they can't push to, publish as a new repo
    and leave that `origin` alone (add the new one as `github`, and push to
    `github` from then on).
 3. **The address.** In order: the `--publish` value; otherwise
@@ -46,7 +46,11 @@ Change nothing until the person confirms in step 2.
      (`Pomegranate Panic 3` gives `pomegranatepanic3`).
    - A full host, like `pp3.synapticnoise.com`: exactly that.
    For a custom address, run `publish.sh dns <host> <account>` now, so the
-   confirmation can say if DNS still needs setting up.
+   confirmation can say if DNS still needs setting up. If it's missing and
+   `GAMEGEN_DNS` is set (`publish.sh settings`), publishing can add the
+   record itself: run `publish.sh dns-provider <host>` (read-only) to check
+   the provider can manage it. Each provider has its own script
+   (`scripts/dns-godaddy.sh` for `GAMEGEN_DNS=godaddy`).
 4. **The gallery.** Only from `--gallery`, otherwise `GAMEGEN_GALLERY`; never
    work it out or search for one. Nothing set, or `none`, means no gallery:
    don't mention galleries at all. Otherwise it names a GitHub repo
@@ -109,6 +113,10 @@ then ask. For example:
   taking it ends the redirect, so old links reach the new game instead
   ("That name now just redirects to your renamed zeveck/barbarain-april26,
   so old links to it will reach the new game instead.").
+- **A DNS record gamegen will add** (when `dns-provider` said it can): say
+  so plainly ("…and I'll add its DNS record at GoDaddy, pointing it at
+  GitHub."). If the provider can't (no access, the name already has a
+  record), say that, and what to add by hand.
 - **Anything that won't happen straight away or at all**, in the same voice:
   DNS not set up yet ("It'll be at https://zeveck.github.io/barbarain-2/ for
   now, and move to barbarain.synapticnoise.com once you add its DNS
@@ -171,24 +179,30 @@ correction: adjust, show the line again, and ask again.
    (no `--push` yet: Pages must be on before the first push, or the first
    deploy fails). Add it as `origin` (or as `github`, when step 1.2 left
    another `origin` alone).
-2. `publish.sh pages <account>/<repo> [host]`, with the host only if its DNS
+2. If the confirmation said gamegen would add the DNS record:
+   `publish.sh dns-add <host> <account>`. It adds one CNAME and never
+   changes or overwrites another record. If it says the record was added or
+   is already there, the DNS counts as ready for the next step; if it fails,
+   say why (it prints the reason) and carry on with the free address, as
+   when DNS isn't ready.
+3. `publish.sh pages <account>/<repo> [host]`, with the host only if its DNS
    is ready (or the person said it's fine). It prints the address. If it
    fails, tell them GitHub's reason (it prints it) and that nothing is online
    yet. If the plan can't publish Pages from a private repo, ask whether to
    make that repo public or publish to a new public one; never decide for
    them.
-3. `git push -u origin main` (or `github`), then wait for the deploy of that
+4. `git push -u origin main` (or `github`), then wait for the deploy of that
    commit. Its run can take a few seconds to appear, so look for it a few times:
    `gh run list --workflow pages.yml --commit "$(git rev-parse HEAD)" --json databaseId --jq '.[0].databaseId'`,
    then `gh run watch <id> --exit-status`.
-4. For a custom address: `publish.sh https <account>/<repo>`, with the Bash
+5. For a custom address: `publish.sh https <account>/<repo>`, with the Bash
    tool's timeout set to 600000 (it waits up to 9 minutes for GitHub's
    certificate). If it's still waiting, carry on: the game already works at
    its address, and running `/gamegen --publish` later makes HTTPS required.
-5. Load the address (`curl -sL`): it answers 200 and the page has the right
+6. Load the address (`curl -sL`): it answers 200 and the page has the right
    canonical link and preview image. GitHub can take a minute or two to
    update; try a few times before calling it broken.
-6. **Look at the live game,** not just its HTML: open the address with
+7. **Look at the live game,** not just its HTML: open the address with
    `playwright-cli` in fresh sessions at a desktop size and a phone size
    (see playtest-guide.md), take a screenshot of each and look at them,
    check the console for errors, run the text scanner, check the title
@@ -258,11 +272,12 @@ Then:
 
 1. Get the repository ready as in step 3 (with the new address, if it moved),
    including the check before committing.
-2. If it moved: `publish.sh pages <owner>/<repo> <host>`.
-3. Push, and wait for that commit's deploy (step 4.3).
+2. If it moved: add its DNS record first if the confirmation said so
+   (step 4.2), then `publish.sh pages <owner>/<repo> <host>`.
+3. Push, and wait for that commit's deploy (step 4.4).
 4. If it's on a custom address and HTTPS isn't required yet:
-   `publish.sh https <owner>/<repo>` (step 4.4).
-5. Check the live page and look at the live game (steps 4.5 and 4.6).
+   `publish.sh https <owner>/<repo>` (step 4.5).
+5. Check the live page and look at the live game (steps 4.6 and 4.7).
 6. If it moved, or the title, tagline or social card changed, update its entry
    in the gallery (step 5). If it was never in one and a gallery is now set,
    add it, or start it (step 5).

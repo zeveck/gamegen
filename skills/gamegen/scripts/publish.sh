@@ -14,6 +14,12 @@
 #                                          there, and the next free name; a name
 #                                          left by a rename says where it redirects
 #   publish.sh dns <host> <owner>          does <host> point at GitHub Pages yet?
+#   publish.sh dns-provider [domain]       is GAMEGEN_DNS set up, and can its key
+#                                          manage <domain> (default:
+#                                          GAMEGEN_DOMAIN)? Read-only
+#   publish.sh dns-add <host> <owner>      add the CNAME <host> -> <owner>.github.io
+#                                          at the GAMEGEN_DNS provider, if <host>
+#                                          has no record yet (never overwrites)
 #   publish.sh pages <owner/name> [host]   turn on Pages (from the workflow), set
 #                                          the custom address, the repo's homepage
 #   publish.sh gallery-pages <owner/name>  turn on Pages for a new gallery,
@@ -46,10 +52,41 @@ setting() {
   printf '%s' "$value"
 }
 
+# The DNS provider named by GAMEGEN_DNS (opt-in): prints the path of its
+# script (dns-<provider>.sh), with its keys exported from .env, or exits with
+# a plain reason. Each provider's keys are its own settings.
+dns_provider() {
+  provider="$(setting GAMEGEN_DNS | tr '[:upper:]' '[:lower:]')"
+  [ -n "$provider" ] || die "dns provider: not set (GAMEGEN_DNS in .env; without it, publishing says which record to add)"
+  case "$provider" in *[!a-z0-9-]*) die "dns provider: '$provider' isn't one gamegen knows (supported: godaddy)" ;; esac
+  script="$(cd "$(dirname "$0")" && pwd)/dns-$provider.sh"
+  [ -f "$script" ] || die "dns provider: '$provider' isn't one gamegen knows (supported: godaddy)"
+  case "$provider" in
+    godaddy) GODADDY_API_KEY="$(setting GODADDY_API_KEY)"; GODADDY_API_SECRET="$(setting GODADDY_API_SECRET)"
+             export GODADDY_API_KEY GODADDY_API_SECRET ;;
+  esac
+}
+
+# The domain in the provider's account that <host> belongs to (the longest
+# match, so a.b.example.co.uk can work too), and <host>'s name within it.
+dns_zone() { # host -> sets domain and name, or exits
+  local rest="$1" rc out
+  while :; do
+    case "$rest" in *.*) ;; *) break ;; esac
+    if [ "$rest" != "$1" ]; then
+      out="$(bash "$script" access "$rest")"; rc=$?
+      if [ $rc = 0 ]; then domain="$rest"; name="${1%."$rest"}"; return 0; fi
+      [ $rc = 2 ] || die "$out"
+    fi
+    rest="${rest#*.}"
+  done
+  die "dns: $1 isn't under a domain in your $provider account (add its record by hand)"
+}
+
 cmd="${1:-}"; shift || true
 case "$cmd" in
   settings)
-    for name in GAMEGEN_DOMAIN GAMEGEN_GALLERY GAMEGEN_MAKING_OF GAMEGEN_CREDIT; do
+    for name in GAMEGEN_DOMAIN GAMEGEN_GALLERY GAMEGEN_MAKING_OF GAMEGEN_CREDIT GAMEGEN_DNS; do
       value="$(setting "$name")"
       echo "$name: ${value:-not set}"
     done
@@ -130,6 +167,32 @@ except OSError: pass" "$host")"
     echo "dns: ok"
     ;;
 
+  dns-provider)
+    dns_provider
+    domain="${1:-$(setting GAMEGEN_DOMAIN)}"
+    case "$domain" in ""|github.io) die "dns provider: $provider (give a domain to check, such as: dns-provider example.com)" ;; esac
+    # A full host (pp3.example.com) works too: it's checked against its domain.
+    dns_zone "x.$domain"
+    echo "dns provider: $provider (can manage $domain)"
+    ;;
+
+  dns-add)
+    host="${1:?dns-add needs a host}"; owner="${2:?dns-add needs the GitHub account}"
+    dns_provider
+    case "$host" in *.*.*) ;; *) die "dns: $host is a bare domain, which needs A records; add them by hand ($PAGES_IPS)" ;; esac
+    target="$owner.github.io"
+    dns_zone "$host"
+    records="$(bash "$script" lookup "$domain" "$name")" || { echo "$records"; exit 1; }
+    want="$(printf 'CNAME %s' "$target" | tr '[:upper:]' '[:lower:]')"
+    have="$(printf '%s\n' "$records" | sed 's/\.$//' | tr '[:upper:]' '[:lower:]' | sed '/^$/d')"
+    if [ "$have" = "$want" ]; then echo "dns: already there (CNAME $host -> $target)"; exit 0; fi
+    if [ -n "$have" ]; then
+      die "dns: $host already has a record ($(printf '%s' "$records" | tr '\n' ';' | sed 's/;$//; s/;/; /g')), so it was left alone"
+    fi
+    out="$(bash "$script" add-cname "$domain" "$name" "$target")" || die "$out"
+    echo "dns: added (CNAME $host -> $target at $provider); it can take a few minutes to reach everyone"
+    ;;
+
   pages)
     full="${1:?pages needs owner/name}"; host="${2:-}"
     # Create the Pages site, or switch an existing one to the workflow. If
@@ -183,5 +246,5 @@ except OSError: pass" "$host")"
     done
     ;;
 
-  *) die "usage: publish.sh settings | credit | check | repo <owner/name> | dns <host> <owner> | pages <owner/name> [host] | gallery-pages <owner/name> | https <owner/name>" ;;
+  *) die "usage: publish.sh settings | credit | check | repo <owner/name> | dns <host> <owner> | dns-provider [domain] | dns-add <host> <owner> | pages <owner/name> [host] | gallery-pages <owner/name> | https <owner/name>" ;;
 esac

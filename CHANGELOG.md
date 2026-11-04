@@ -4,6 +4,17 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.4.3
+
+- **Publishing can add each game's DNS record for you** on your own domain,
+  so a new game goes live at its address in one go. Turn it on with
+  `GAMEGEN_DNS=godaddy` and a GoDaddy API key and secret in `.env`
+  (`GODADDY_API_KEY`, `GODADDY_API_SECRET`). It only ever adds the one
+  record a game needs (never changing or removing another), and says so
+  before publishing. GoDaddy is the first supported; others can follow.
+- `publish.sh dns-provider` checks your key and account without changing
+  anything.
+
 ## v2026.11.4.2
 
 - Published games link back from their title screen: a small link to your

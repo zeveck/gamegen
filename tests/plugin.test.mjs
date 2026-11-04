@@ -477,7 +477,7 @@ test('publish: settings come from the environment or the .env, and never the key
   writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_DOMAIN="example.com"  # mine\n# GAMEGEN_GALLERY=me/old-games\n');
   const deep = join(dir, 'frog'); mkdirSync(deep);
   const r = publish(deep, ['settings'], { env: { GAMEGEN_MAKING_OF: 'on' } });
-  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\n');
+  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\nGAMEGEN_DNS: not set\n');
 });
 
 test('publish: the credit comes from the .env, then GitHub, then git, and is never made up', (t) => {
@@ -547,4 +547,100 @@ test('scan-text finds junk, lone words and cut-off text, and nothing else', { sk
     'junk div#credits',                          // [object HTMLElement]
     'orphan p#t1.tag',                           // "seems." alone on its line
   ]);
+});
+
+// DNS at a provider (GAMEGEN_DNS), run against a stand-in for GoDaddy's API:
+// a fake curl that keeps the account's records in a JSON file.
+function godaddy(dir, args, { records = {}, deny = false, env = {} } = {}) {
+  const bin = join(dir, '.stub-bin');
+  mkdirSync(bin, { recursive: true });
+  const state = join(dir, 'godaddy.json');
+  if (!existsSync(state)) writeFileSync(state, JSON.stringify({ 'synapticnoise.com': records }));
+  writeFileSync(join(bin, 'curl'), `#!${process.execPath}
+const fs = require('fs');
+const a = process.argv.slice(2);
+let method = 'GET', url = '', out = '', headers = '', body = '';
+for (let i = 0; i < a.length; i++) {
+  if (a[i] === '-X') method = a[++i];
+  else if (a[i] === '-o') out = a[++i];
+  else if (a[i] === '-H') headers = fs.readFileSync(a[++i].slice(1), 'utf8');
+  else if (a[i] === '--data-binary') body = fs.readFileSync(0, 'utf8');
+  else if (a[i] === '-w' || a[i] === '--max-time') i++;
+  else if (!a[i].startsWith('-')) url = a[i];
+}
+const st = JSON.parse(fs.readFileSync(${JSON.stringify(state)}, 'utf8'));
+fs.appendFileSync(${JSON.stringify(join(dir, 'calls.log'))}, method + ' ' + url.replace(/^https:\\/\\/api\\.godaddy\\.com/, '') + (body ? ' ' + body : '') + '\\n');
+const reply = (code, json) => { fs.writeFileSync(out, json === undefined ? '' : JSON.stringify(json)); process.stdout.write(String(code)); };
+if (!/Authorization: sso-key KEY123:SECRET456/.test(headers)) return reply(401, { code: 'UNABLE_TO_AUTHENTICATE', message: 'Unauthorized' });
+if (process.env.STUB_DENY) return reply(403, { code: 'ACCESS_DENIED', message: 'Authenticated user is not allowed access' });
+const m = url.match(/\\/v1\\/domains\\/([^/]+)(\\/records(?:\\/([A-Z]+)\\/([^/]+))?)?$/);
+if (!m || !st[m[1]]) return reply(404, { code: 'NOT_FOUND', message: 'Domain not found' });
+const zone = st[m[1]];
+if (!m[2]) return reply(200, { domain: m[1] });
+if (method === 'GET') return reply(200, (zone[m[4]] || []).filter((r) => r.type === m[3]).map((r) => ({ ...r, name: m[4] })));
+if (method === 'PATCH') { for (const r of JSON.parse(body)) (zone[r.name] = zone[r.name] || []).push({ type: r.type, data: r.data }); fs.writeFileSync(${JSON.stringify(state)}, JSON.stringify(st)); return reply(200); }
+reply(405, { code: 'METHOD_NOT_ALLOWED', message: 'not in the stand-in' });
+`);
+  chmodSync(join(bin, 'curl'), 0o755);
+  const r = spawnSync('bash', [PUBLISH, ...args], {
+    cwd: dir, encoding: 'utf8',
+    env: { PATH: `${bin}:/usr/bin:/bin`, HOME: dir, ...(deny ? { STUB_DENY: '1' } : {}), ...env },
+  });
+  const log = join(dir, 'calls.log');
+  return { ...r, calls: existsSync(log) ? readFileSync(log, 'utf8').trim().split('\n') : [],
+    zone: JSON.parse(readFileSync(state, 'utf8'))['synapticnoise.com'] };
+}
+const DNS_ENV = 'GAMEGEN_DNS=godaddy\nGODADDY_API_KEY=KEY123\nGODADDY_API_SECRET=SECRET456\nGAMEGEN_DOMAIN=synapticnoise.com\n';
+
+test('dns: nothing happens at a provider unless GAMEGEN_DNS opts in', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  // Keys alone aren't enough.
+  writeFileSync(join(dir, '.env'), 'GODADDY_API_KEY=KEY123\nGODADDY_API_SECRET=SECRET456\n');
+  const r = godaddy(dir, ['dns-add', 'newgame.synapticnoise.com', 'zeveck']);
+  assert.equal(r.status, 1);
+  assert.match(r.stdout, /^dns provider: not set/);
+  assert.deepEqual(r.calls, []);
+  // An unknown provider is named, not guessed at.
+  writeFileSync(join(dir, '.env'), 'GAMEGEN_DNS=namecheap\n');
+  assert.match(godaddy(dir, ['dns-provider', 'synapticnoise.com']).stdout, /'namecheap' isn't one gamegen knows \(supported: godaddy\)/);
+});
+
+test('dns: checks the key and account read-only, and never prints the key', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, '.env'), DNS_ENV);
+  const ok = godaddy(dir, ['dns-provider']);
+  assert.equal(ok.stdout, 'dns provider: godaddy (can manage synapticnoise.com)\n');
+  assert.ok(ok.calls.every((c) => c.startsWith('GET ')), ok.calls.join('\n'));
+  assert.ok(!/KEY123|SECRET456/.test(ok.stdout + ok.stderr));
+  // A full host is checked against its domain; a domain it doesn't own says so.
+  assert.equal(godaddy(dir, ['dns-provider', 'pp3.synapticnoise.com']).stdout, 'dns provider: godaddy (can manage synapticnoise.com)\n');
+  assert.match(godaddy(dir, ['dns-provider', 'example.org']).stdout, /isn't under a domain in your godaddy account/);
+  // GoDaddy's limits on who may use its API come through in its words.
+  const denied = godaddy(dir, ['dns-provider'], { deny: true });
+  assert.equal(denied.status, 1);
+  assert.match(denied.stdout, /can't use GoDaddy's DNS API \(Authenticated user is not allowed access\)/);
+  writeFileSync(join(dir, '.env'), DNS_ENV.replace('SECRET456', 'WRONG'));
+  assert.match(godaddy(dir, ['dns-provider']).stdout, /the key was refused/);
+});
+
+test('dns: adds just the one CNAME, and never overwrites a record', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, '.env'), DNS_ENV);
+  const records = { bubblenest: [{ type: 'CNAME', data: 'zeveck.github.io' }], mail: [{ type: 'A', data: '203.0.113.9' }] };
+  const r = godaddy(dir, ['dns-add', 'newgame.synapticnoise.com', 'zeveck'], { records });
+  assert.equal(r.stdout, 'dns: added (CNAME newgame.synapticnoise.com -> zeveck.github.io at godaddy); it can take a few minutes to reach everyone\n');
+  assert.deepEqual(r.zone.newgame, [{ type: 'CNAME', data: 'zeveck.github.io' }]);
+  assert.deepEqual(r.zone.bubblenest, records.bubblenest, 'other records untouched');
+  // Only an add (PATCH), never a replace (PUT).
+  assert.deepEqual(r.calls.filter((c) => !c.startsWith('GET ')),
+    ['PATCH /v1/domains/synapticnoise.com/records [{"type": "CNAME", "name": "newgame", "data": "zeveck.github.io", "ttl": 3600}]']);
+  // Running it again finds it already there.
+  assert.equal(godaddy(dir, ['dns-add', 'newgame.synapticnoise.com', 'zeveck']).stdout, 'dns: already there (CNAME newgame.synapticnoise.com -> zeveck.github.io)\n');
+  // A name that's already in use is left alone.
+  const taken = godaddy(dir, ['dns-add', 'mail.synapticnoise.com', 'zeveck']);
+  assert.equal(taken.status, 1);
+  assert.equal(taken.stdout, 'dns: mail.synapticnoise.com already has a record (A 203.0.113.9), so it was left alone\n');
+  assert.deepEqual(taken.zone.mail, records.mail);
+  // A bare domain needs A records: by hand.
+  assert.match(godaddy(dir, ['dns-add', 'synapticnoise.com', 'zeveck']).stdout, /bare domain, which needs A records/);
 });
