@@ -4,6 +4,14 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.4.2
+
+- Published games link back from their title screen: a small link to your
+  gallery in the lower-left corner (such as `synapticnoise.com`), and with
+  `--making-of`, a small GitHub link in the lower-right to the game's repo.
+  They stay out of the way on desktop and phones, show only on the title
+  screen, and tapping one never starts the game.
+
 ## v2026.11.4
 
 - Publishing from a private repo you already have keeps it private. gamegen

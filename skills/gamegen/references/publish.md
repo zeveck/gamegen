@@ -146,8 +146,18 @@ correction: adjust, show the line again, and ask again.
    absolute URLs of `social-card.jpg`, plus `robots.txt` and a one-page
    `sitemap.xml` in `game/` (see "Sharing and search" in web-target.md).
    In the README, the "Play" link points at the address.
-5. If the folder isn't in git yet: `git init -b main`.
-6. **Before every commit** (first publish or update), look at what's staged
+5. **Links on the title screen.** With a gallery, a small link in the
+   lower-left corner to the gallery, showing its address without `https://`
+   (`synapticnoise.com`). With `--making-of`, a small link in the
+   lower-right to the game's repo, labelled `GitHub` (title and label: "<Game>
+   on GitHub: how it was made"; opens in a new tab). Make them real links
+   over the game, on the title screen only, inside the safe areas, in the
+   game's font and a muted color: unobtrusive on desktop, smaller on phones,
+   and never over the title, its buttons or the touch controls. A tap on one
+   opens the link without starting the game. On an update, keep them, and
+   add whichever one is now due.
+6. If the folder isn't in git yet: `git init -b main`.
+7. **Before every commit** (first publish or update), look at what's staged
    (`git status`, `git diff --cached`) and search it for anything that looks
    like a key (`sk-`, `AIza`, `xi-api-key`, `ghp_`, `github_pat_`, long
    random strings next to `key` or `token`) or a private path. If anything
@@ -181,8 +191,9 @@ correction: adjust, show the line again, and ask again.
 6. **Look at the live game,** not just its HTML: open the address with
    `playwright-cli` in fresh sessions at a desktop size and a phone size
    (see playtest-guide.md), take a screenshot of each and look at them,
-   check the console for errors, run the text scanner, and open one or two
-   popups (credits, settings) and close them. Something that only breaks
+   check the console for errors, run the text scanner, check the title
+   screen's links lead to the right places, and open one or two popups
+   (credits, settings) and close them. Something that only breaks
    online (a file name's case, a missing file, a path) shows up here. If
    anything's wrong, fix it, push again and check again before reporting.
 

@@ -215,7 +215,8 @@ have works too, if it's a GitHub repository you can push to.
 
 To use it every time, put `GAMEGEN_GALLERY=you/my-games` in your `.env`;
 `--gallery none` skips it for one game. Without either, there's no gallery.
-Either way, every publish ends with the game's link, title, description and
+Each game's title screen also gets a small link to the gallery in its
+lower-left corner. Either way, every publish ends with the game's link, title, description and
 picture, for adding it to any other site yourself.
 
 ## --making-of
@@ -227,6 +228,9 @@ with pictures. Publishing then includes the design notes too.
 ```
 /gamegen a frog who hops between lily pads --making-of
 ```
+
+When the game is published, its title screen also gets a small GitHub link
+in the lower-right corner, to the repo where all this is.
 
 Without it, the README is all about the game. To always have it, put
 `GAMEGEN_MAKING_OF=on` in your `.env`.
