@@ -29,9 +29,8 @@ MESHY_API_KEY=
 # GAMEGEN_CREDIT=Your Name       # who games credit (else your GitHub or git name)
 
 # Optional: let publishing add each game's DNS record for your own domain.
-# Remove the # from all three to turn it on (GoDaddy is the one supported so
-# far). Make the key and secret at https://developer.godaddy.com/keys
-# (choose Production).
+# Remove the # from both lines to turn it on (GoDaddy is the one supported so
+# far). Make a personal access token at https://developer.godaddy.com with
+# two permissions: domains.domain:read and domains.dns:update.
 # GAMEGEN_DNS=godaddy
-# GODADDY_API_KEY=
-# GODADDY_API_SECRET=
+# GODADDY_API_TOKEN=

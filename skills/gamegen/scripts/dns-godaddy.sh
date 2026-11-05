@@ -12,22 +12,26 @@
 #                                                   change nothing else
 #
 # Exit 0 on success; otherwise exit 1 with one plain line saying why (exit 2
-# from access: the domain isn't in this account). The keys come from the
-# environment (publish.sh reads them from .env), never from the command line,
-# and are never printed: GODADDY_API_KEY and GODADDY_API_SECRET.
+# from access: the domain isn't in this account). The credentials come from
+# the environment (publish.sh reads them from .env), never from the command
+# line, and are never printed: GODADDY_API_TOKEN, a personal access token with
+# the domains.domain:read and domains.dns:update scopes (sent as a Bearer
+# token), or GoDaddy's older GODADDY_API_KEY and GODADDY_API_SECRET pair
+# (sso-key, which GoDaddy is phasing out for its domain API).
 set -u
 
 die() { echo "$1"; exit "${2:-1}"; }
 
 base="${GODADDY_API_BASE:-https://api.godaddy.com}"
-[ -n "${GODADDY_API_KEY:-}" ] && [ -n "${GODADDY_API_SECRET:-}" ] \
-  || die "godaddy: GODADDY_API_KEY and GODADDY_API_SECRET aren't both set in .env"
+if [ -n "${GODADDY_API_TOKEN:-}" ]; then auth="Bearer $GODADDY_API_TOKEN"
+elif [ -n "${GODADDY_API_KEY:-}" ] && [ -n "${GODADDY_API_SECRET:-}" ]; then auth="sso-key $GODADDY_API_KEY:$GODADDY_API_SECRET"
+else die "godaddy: GODADDY_API_TOKEN isn't set in .env (a personal access token from developer.godaddy.com)"; fi
 
 tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
-# The key goes to curl in a private file, so it isn't in the process list.
+# The credentials go to curl in a private file, so they aren't in the
+# process list.
 umask 077
-printf 'Authorization: sso-key %s:%s\nContent-Type: application/json\nAccept: application/json\n' \
-  "$GODADDY_API_KEY" "$GODADDY_API_SECRET" > "$tmp/headers"
+printf 'Authorization: %s\nContent-Type: application/json\nAccept: application/json\n' "$auth" > "$tmp/headers"
 
 # api METHOD PATH [BODY]: prints the HTTP status; the response is in $tmp/body.
 api() {
@@ -48,8 +52,8 @@ except Exception: print("")' "$tmp/body"
 
 refused() { # http-code -> exits with a plain reason
   case "$1" in
-    401) die "godaddy: the key was refused (check GODADDY_API_KEY and GODADDY_API_SECRET; production keys, not test keys)" ;;
-    403) die "godaddy: this account can't use GoDaddy's DNS API ($(reason)). GoDaddy limits it to some accounts; its API support can say why" ;;
+    401) die "godaddy: the token was refused, or has expired (check GODADDY_API_TOKEN in .env)" ;;
+    403) die "godaddy: not allowed ($(reason)). The token needs the domains.domain:read and domains.dns:update permissions, and GoDaddy limits its DNS API to some accounts; its API support can say why" ;;
     429) die "godaddy: too many requests just now; try again in a minute" ;;
     000) die "godaddy: couldn't reach api.godaddy.com" ;;
     *) die "godaddy: HTTP $1 ($(reason))" ;;

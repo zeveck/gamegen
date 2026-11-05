@@ -186,10 +186,10 @@ the domain (the game gets `<game>.example.com`) or the full address:
 
 For your own address, add a DNS record pointing it at `<you>.github.io`
 (gamegen checks, and tells you exactly what to add if it's missing). Or let
-gamegen add it: with `GAMEGEN_DNS=godaddy` and your GoDaddy API key and
-secret in `.env` (`GODADDY_API_KEY`, `GODADDY_API_SECRET`, from
-developer.godaddy.com/keys), it adds the one record each game needs and
-never touches any other. Before
+gamegen add it: with `GAMEGEN_DNS=godaddy` and a GoDaddy personal access
+token in `.env` (`GODADDY_API_TOKEN`, from developer.godaddy.com, with the
+`domains.domain:read` and `domains.dns:update` permissions), it adds the one
+record each game needs and never touches any other. Before
 changing anything, gamegen shows you where it'll go and asks; "no" changes
 nothing.
 

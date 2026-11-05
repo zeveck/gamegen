@@ -122,11 +122,10 @@ GAMEGEN_GALLERY=you/my-games
 GAMEGEN_MAKING_OF=on
 GAMEGEN_CREDIT=Your Name
 GAMEGEN_DNS=godaddy
-GODADDY_API_KEY=...
-GODADDY_API_SECRET=...
+GODADDY_API_TOKEN=...
 ```
 
-`GAMEGEN_DNS` lets publishing add each game's DNS record on your own domain for you, so a new game goes live at its address in one go. It's off unless you set it, and so far it works with GoDaddy: make a key and secret at [developer.godaddy.com/keys](https://developer.godaddy.com/keys) (Production) and add them as above. gamegen only ever adds the one record a game needs, never changes or removes another, and says so before publishing.
+`GAMEGEN_DNS` lets publishing add each game's DNS record on your own domain for you, so a new game goes live at its address in one go. It's off unless you set it, and so far it works with GoDaddy: make a personal access token at [developer.godaddy.com](https://developer.godaddy.com) with just two permissions, `domains.domain:read` and `domains.dns:update`, and add it as above. gamegen only ever adds the one record a game needs, never changes or removes another, and says so before publishing.
 
 `GAMEGEN_CREDIT` is the name your games' credits give for the idea. Without it, gamegen uses your GitHub name, or your git name, and if it can't find one it leaves the credit out rather than guess. Either way, it checks the name with you before the game goes online.
 

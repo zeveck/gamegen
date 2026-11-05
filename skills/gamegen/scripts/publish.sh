@@ -62,8 +62,9 @@ dns_provider() {
   script="$(cd "$(dirname "$0")" && pwd)/dns-$provider.sh"
   [ -f "$script" ] || die "dns provider: '$provider' isn't one gamegen knows (supported: godaddy)"
   case "$provider" in
-    godaddy) GODADDY_API_KEY="$(setting GODADDY_API_KEY)"; GODADDY_API_SECRET="$(setting GODADDY_API_SECRET)"
-             export GODADDY_API_KEY GODADDY_API_SECRET ;;
+    godaddy) GODADDY_API_TOKEN="$(setting GODADDY_API_TOKEN)"
+             GODADDY_API_KEY="$(setting GODADDY_API_KEY)"; GODADDY_API_SECRET="$(setting GODADDY_API_SECRET)"
+             export GODADDY_API_TOKEN GODADDY_API_KEY GODADDY_API_SECRET ;;
   esac
 }
 

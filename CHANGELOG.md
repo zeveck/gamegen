@@ -4,6 +4,13 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.5
+
+- Adding DNS records at GoDaddy uses a **personal access token**
+  (`GODADDY_API_TOKEN`), the kind GoDaddy now issues, with just two
+  permissions: `domains.domain:read` and `domains.dns:update`. GoDaddy's
+  older key and secret still work.
+
 ## v2026.11.4.3
 
 - **Publishing can add each game's DNS record for you** on your own domain,
