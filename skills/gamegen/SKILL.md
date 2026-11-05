@@ -6,7 +6,7 @@ description: >-
   sound effects with imagegen2, nanogen, anim8gen and audiogen, builds it (a
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
-argument-hint: "<description> [--platform desktop|mobile|both] [--style <description or URL>] [--target <web or an engine>] [--scope small|medium|large] [--budget <dollars>] [--rounds <n>] [--plan-only] [--continue] [--change <what to change>] [--publish [address]] [--gallery <repo or none>] [--making-of] [--3d] [--out <folder>]"
+argument-hint: "<your game idea> [--scope small|medium|large] [--3d] | --change <what> | --continue | --publish | help"
 allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(python3 -m http.server *), Bash(playwright-cli *)"
 ---
 
@@ -96,6 +96,7 @@ value) is the game description. Flags and defaults:
 | `--gallery` | with `--publish`: a GitHub repo for a gallery of the person's games, such as `zeveck/my-games`. The game is added to it, following its layout; if it doesn't exist yet, publishing offers to start it. `none` for no gallery | none |
 | `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
 | `--3d` | make a 3D game, with 3D models and characters from meshgen | off: 2D |
+| `--no-confirm` | with `--publish`: publish without stopping to ask first. The plan is still shown and the report says what was done; the safety stops in `references/publish.md` still stop | off: ask first |
 | `--out` | folder for the game | see below |
 
 `--publish`, `--gallery` and `--making-of` can also be set as defaults in the
@@ -177,7 +178,8 @@ the finished game: follow `references/publish.md`, and do nothing else. With a
 game description, or "and publish it" in one, make the game first, then
 publish it at the end of Phase 9. With `--change`, make the change, then
 publish. A game that isn't finished can't be published yet: suggest
-`--continue`.
+`--continue`. `--no-confirm` skips only publishing's "Go ahead?"; without
+`--publish` it does nothing.
 
 ### 3. Check everything works, before spending anything
 

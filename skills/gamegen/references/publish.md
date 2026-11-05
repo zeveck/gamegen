@@ -132,6 +132,14 @@ then ask. For example:
   ("after Hoard Hopper"), use it. If it isn't clear how the gallery shows
   games, say you'll show the change first.
 
+**With `--no-confirm`,** write the same few sentences as an update, then
+carry on without waiting. It skips only this question. These still stop
+and ask, whatever the flag says: something that looks like a key or a
+private path in what's about to be committed (step 3), making a private
+repo public (step 4.3), reusing a repo that isn't already this game's, and
+a gallery whose layout isn't clear (step 5). The credit is used as
+suggested; the report says which name went online.
+
 A plain "no": say nothing was published, and how to change it
 (`/gamegen --publish <address>`, `--gallery none`). Anything else ("yes, but
 call it…", "don't list it", "the DNS is fine, it's behind Cloudflare") is a

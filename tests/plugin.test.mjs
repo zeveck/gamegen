@@ -103,10 +103,14 @@ test('SKILL.md has the frontmatter Claude Code needs', () => {
   assert.match(fm[1], /^argument-hint: /m);
 });
 
-test('every flag is documented in the skill, its argument hint and the README', () => {
-  const hint = skill.match(/^argument-hint: (.*)$/m)[1];
+test('every flag is documented in the skill and the README; the hint stays short', () => {
+  // The argument hint shows only the common ones, short enough to read in
+  // full; /gamegen help lists them all.
+  const hint = skill.match(/^argument-hint: "(.*)"$/m)[1];
+  assert.ok(hint.length <= 110, `argument-hint is ${hint.length} characters`);
+  assert.match(hint, /\bhelp\b/, 'argument-hint points to help');
+  for (const [, flag] of hint.matchAll(/(--[a-z-]+)/g)) assert.ok(FLAGS.includes(flag), `argument-hint's ${flag} is a real flag`);
   for (const flag of FLAGS) {
-    assert.ok(hint.includes(flag), `argument-hint lists ${flag}`);
     assert.ok(skill.includes(`| \`${flag}\``), `SKILL.md flag table has ${flag}`);
     assert.ok(readme.includes(`\`${flag}`), `README documents ${flag}`);
   }

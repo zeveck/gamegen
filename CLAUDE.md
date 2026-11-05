@@ -45,8 +45,10 @@ audiogen plugins for art and sound, and meshgen for 3D games.
 
 - Versions are CalVer (`YYYY.M.D`). A release updates `plugin.json` and adds a
   `## vYYYY.M.D` heading at the top of CHANGELOG.md; the tests check they match.
-- Every flag must appear in SKILL.md's flag table, its `argument-hint`, and the
-  README options table; the tests check this too.
+- Every flag must appear in SKILL.md's flag table, the README options table,
+  and `help.md`; the tests check this too. The `argument-hint` lists only the
+  common ones and stays short (110 characters at most), so it can be read in
+  full.
 - User-facing text (README, the skill's report to the person) is friendly and
   plain, not technical.
 - Keep `skills/LICENSE` identical to `LICENSE`.

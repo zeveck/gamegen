@@ -4,6 +4,17 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.5.2
+
+- **`--no-confirm`**: with `--publish`, publish without stopping to ask "Go
+  ahead?" first, such as `/gamegen --change … --publish --no-confirm`.
+  gamegen still says what it's doing and reports what it did, and still
+  stops if anything looks wrong (something like a key about to go online, a
+  private repo that would need to be made public, a repo that isn't this
+  game's).
+- The hint shown after typing `/gamegen` is short enough to read: your game
+  idea, the common options, and `help` for the rest.
+
 ## v2026.11.5
 
 - Adding DNS records at GoDaddy uses a **personal access token**

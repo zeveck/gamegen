@@ -78,6 +78,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games, a page in a GitHub repository of yours. gamegen offers to start it the first time. | none |
 | `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |
 | `--3d` | Make a 3D game, with 3D characters and models from meshgen. Saying "3D" in your idea works too; otherwise every game is 2D, and if your idea sounds like 3D without saying so, gamegen asks first. Needs a Meshy key. | off |
+| `--no-confirm` | With `--publish`: publish without stopping to ask "Go ahead?" first. gamegen still says what it's doing, and still stops if anything looks wrong. | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
 
 ### Change your game

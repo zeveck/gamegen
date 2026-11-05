@@ -40,6 +40,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games |
 | `--making-of` | Show in the README how the game was made |
 | `--3d` | Make a 3D game |
+| `--no-confirm` | With `--publish`: publish without asking first |
 | `--out <folder>` | Where to put the game |
 
 `/gamegen help <option>` explains one, for example `/gamegen help style`.
@@ -257,6 +258,23 @@ API, on a paid plan); gamegen checks it before starting, like the others.
 Characters are made from a picture first, then turned into 3D and animated
 (walking, running, jumping, attacking). 3D models cost more than pictures,
 so a 3D game fits fewer of them in the same budget.
+
+## --no-confirm
+
+**Publish without stopping to ask**, with `--publish`. Normally, before
+anything goes online, gamegen tells you where it'll go and asks "Go ahead?".
+With `--no-confirm`, it still tells you, then just carries on:
+
+```
+/gamegen --change make the bettas glow at night --publish --no-confirm
+/gamegen --publish --no-confirm
+```
+
+It only skips that one question, for that one run. gamegen still stops if
+something looks wrong: anything like a key about to be published, a private
+repo that would need to be made public, or a repo that isn't this game's.
+With `--change`, the change goes live without you trying it first, so it's
+best for small changes.
 
 ## --out
 
