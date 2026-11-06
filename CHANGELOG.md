@@ -4,6 +4,14 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.6.3
+
+Fixes from a bug sweep:
+
+- Packaging works for game names with characters Windows doesn't allow in
+  file names, such as "Hades Rises: Part 2" (the app is named "Hades Rises
+  Part 2"), and checks for the `zip` command before building (#16).
+
 ## v2026.11.6.2
 
 - **Finish or remake a game you started**, by hand or with other tools,

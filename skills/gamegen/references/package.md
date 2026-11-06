@@ -61,7 +61,10 @@ bash "${CLAUDE_SKILL_DIR}/scripts/package.sh" build <windows|linux|both> "<Game 
   publisher); leave it out if there's none.
 - It downloads Electron the first time (a few hundred MB, once), and takes
   about a minute per platform. It prints where each build and its zip went:
-  `dist/windows/<Game name>/`, `dist/linux/<Game name>/`, `dist/*.zip`.
+  `dist/windows/<App>/`, `dist/linux/<App>/`, `dist/*.zip`. `<App>` is the
+  game's name, made safe for file names on every system (a name like "Hades
+  Rises: Part 2" gives "Hades Rises Part 2"); it prints it when it differs.
+  Use it for everything below that names a file or folder.
 - `dist/` is large and rebuilt every time: add it to the game's `.gitignore`
   (and never commit it or publish it).
 
@@ -94,7 +97,7 @@ Make these in `dist/steam/`:
    background). Plus at least five 1920x1080 screenshots of real play from
    the desktop build or the play-test. Look at every one.
 2. **Upload files** in `dist/steam/scripts/`: copy `templates/steam/*.vdf`
-   and fill in `GAME_TITLE`, `GAME_VERSION`, and, if `design/STATUS.md` has
+   and fill in `GAME_TITLE` (the app name, `<App>`), `GAME_VERSION`, and, if `design/STATUS.md` has
    them, `STEAM_APP_ID`, `STEAM_DEPOT_WINDOWS` and `STEAM_DEPOT_LINUX`
    (otherwise leave them for the person, and say where to find them). The
    upload never goes live on its own (`SetLive` stays empty).
@@ -110,7 +113,8 @@ Make these in `dist/steam/`:
      `design/STATUS.md` for next time;
    - the store page: images, text, price, the content survey, and the
      disclosure that the game was made with AI;
-   - the launch options: `<Game name>.exe` (Windows) and `<slug>` (Linux);
+   - the launch options: `<App>.exe` (Windows) and `<slug>` (Linux), exactly
+     as package.sh printed them;
    - Steam Cloud, if they want it (the guide has the folders);
    - uploading with SteamCMD to a private beta branch first, and trying it
      through Steam;

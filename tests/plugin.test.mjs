@@ -686,3 +686,32 @@ test('dns: adds just the one CNAME, and never overwrites a record', (t) => {
   // A bare domain needs A records: by hand.
   assert.match(godaddy(dir, ['dns-add', 'synapticnoise.com', 'zeveck']).stdout, /bare domain, which needs A records/);
 });
+
+// package.sh build, with a stand-in packager (no Electron download): it
+// writes the app folder the way the real one does, and turns a colon into a
+// dash, as the real one did with "Hades Rises: Part 2".
+test('package: a game name with a colon still builds, under a file-safe name', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  mkdirSync(join(dir, 'game')); writeFileSync(join(dir, 'game/index.html'), '<!doctype html><title>x</title>');
+  const tools = join(dir, '.gamegen/desktop-tools/node_modules');
+  mkdirSync(join(tools, '.bin'), { recursive: true }); mkdirSync(join(tools, 'resedit'));
+  writeFileSync(join(tools, '.bin/electron-packager'), `#!${process.execPath}
+const fs = require('fs'), path = require('path');
+const pos = process.argv.slice(2).filter((a) => !a.startsWith('--'));
+const opt = (k) => (process.argv.find((a) => a.startsWith('--' + k + '=')) || '').split('=').slice(1).join('=');
+const name = pos[1].replace(/:/g, '-');
+const out = path.join(opt('out'), name + '-' + opt('platform') + '-x64');
+fs.mkdirSync(out, { recursive: true });
+fs.writeFileSync(path.join(out, opt('executable-name') + (opt('platform') === 'win32' ? '.exe' : '')), 'app');
+fs.writeFileSync(path.join(out, 'productName.txt'), JSON.parse(fs.readFileSync(path.join(pos[0], 'package.json'))).productName);
+`);
+  chmodSync(join(tools, '.bin/electron-packager'), 0o755);
+  const r = spawnSync('bash', [join(ROOT, 'skills/gamegen/scripts/package.sh'), 'build', 'both', 'Hades Rises: Part 2', '1.0.0'], { cwd: dir, encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /^app name: Hades Rises Part 2 /m);
+  assert.match(r.stdout, /built: windows dist\/windows\/Hades Rises Part 2\/Hades Rises Part 2\.exe/);
+  assert.match(r.stdout, /built: linux dist\/linux\/Hades Rises Part 2\/hades-rises-part-2/);
+  for (const f of ['dist/hades-rises-part-2-windows.zip', 'dist/hades-rises-part-2-linux.zip']) assert.ok(existsSync(join(dir, f)), f);
+  // The saves folder is named after productName: safe on Windows too.
+  assert.equal(readFileSync(join(dir, 'dist/linux/Hades Rises Part 2/productName.txt'), 'utf8'), 'Hades Rises Part 2');
+});

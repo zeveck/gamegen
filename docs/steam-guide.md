@@ -67,7 +67,9 @@ a paid Apple Developer account, on a Mac.
 2. Under **SteamPipe → Depots**, add two depots: one for Windows and one
    for Linux (set each one's operating system). Each gets a **depot ID**.
 3. Under **Installation → General**, add two **launch options**:
-   - Windows: executable `<Game>.exe`;
+   - Windows: executable `<Game>.exe` (exactly as gamegen printed it: a name
+     with characters Windows doesn't allow in file names, such as a colon,
+     drops them);
    - Linux: executable `<game>` (the lowercase name `gamegen` printed, such
      as `bloom-hop`).
 4. Put the app and depot IDs in your game's `design/STATUS.md`, such as

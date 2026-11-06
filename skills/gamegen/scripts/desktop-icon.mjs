@@ -26,7 +26,7 @@ info.setFileVersion(a, b, c, 0, 1033);
 info.setProductVersion(a, b, c, 0, 1033);
 info.setStringValues({ lang: 1033, codepage: 1200 }, {
   ProductName: name, FileDescription: name, InternalName: name,
-  OriginalFilename: `${name}.exe`, FileVersion: version, ProductVersion: version,
+  OriginalFilename: path.basename(exePath), FileVersion: version, ProductVersion: version,
 });
 info.outputToResourceEntries(res.entries);
 res.outputResource(exe);

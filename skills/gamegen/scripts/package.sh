@@ -4,10 +4,12 @@
 # game/):
 #
 #   package.sh build <windows|linux|both> "<Game name>" [version] ["<author>"]
-#       Builds dist/windows/<Game name>/<Game name>.exe and/or
-#       dist/linux/<Game name>/<slug>, plus a zip of each in dist/. The game
-#       folder is copied in unchanged; templates/desktop/ is the app around it.
-#   package.sh test <dist/linux/<Game name>> <screenshot.png>
+#       Builds dist/windows/<App>/<App>.exe and/or dist/linux/<App>/<slug>,
+#       plus a zip of each in dist/. <App> is the game's name made safe for
+#       file names on every system (without \ / : * ? " < > |); it prints it
+#       when it differs. The game folder is copied in unchanged;
+#       templates/desktop/ is the app around it.
+#   package.sh test <dist/linux/<App>> <screenshot.png>
 #       Starts the Linux build on a virtual display, drives it like the
 #       play-test does, saves a screenshot and prints what it found (and any
 #       console errors). Needs Xvfb, and GTK 3 for Electron (libgtk-3-0).
@@ -32,6 +34,14 @@ case "$cmd" in
     case "$targets" in windows|linux) ;; both) targets="windows linux" ;; *) die "package: '$targets' isn't windows, linux or both" ;; esac
     [ -f game/index.html ] || die "package: no game/index.html here (run it from the game's project folder)"
     command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 || die "package: needs Node.js and npm"
+    command -v zip >/dev/null 2>&1 || die "package: needs the zip command (on Ubuntu or Debian: sudo apt-get install zip)"
+    # The name for folders, the .exe and the saves folder: the same on every
+    # system, so nothing Windows forbids (Electron also names its saves
+    # folder after it). The real name stays in the window and the .exe's
+    # description.
+    app="$(printf '%s' "$name" | sed -E 's#[][\\/:*?"<>|]+# #g; s/[[:space:]]+/ /g; s/^[ .]+//; s/[ .]+$//')"
+    [ -n "$app" ] || die "package: '$name' has nothing left to name the app with"
+    [ "$app" = "$name" ] || echo "app name: $app (the game's name, safe for file names)"
     slug="$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')"
     [ -n "$slug" ] || die "package: '$name' has no letters or digits to name the app with"
 
@@ -50,35 +60,35 @@ case "$cmd" in
     cp "$templates/main.js" "$templates/preload.js" "$stage/"
     cp -R game "$stage/game"
     node -e 'const [n, s, v, a, dir] = process.argv.slice(1); require("fs").writeFileSync(dir + "/package.json",
-      JSON.stringify({ name: s, productName: n, version: v, description: n, author: a, main: "main.js", private: true }, null, 2) + "\n")' \
-      "$name" "$slug" "$version" "$author" "$stage"
+      JSON.stringify({ name: s, productName: process.argv[6], version: v, description: n, author: a, main: "main.js", private: true }, null, 2) + "\n")' \
+      "$name" "$slug" "$version" "$author" "$stage" "$app"
 
     for target in $targets; do
-      case "$target" in windows) platform=win32; exe="$name" ;; linux) platform=linux; exe="$slug" ;; esac
-      "$tools/node_modules/.bin/electron-packager" "$stage" "$name" --platform="$platform" --arch=x64 \
+      case "$target" in windows) platform=win32; exe="$app" ;; linux) platform=linux; exe="$slug" ;; esac
+      "$tools/node_modules/.bin/electron-packager" "$stage" "$app" --platform="$platform" --arch=x64 \
         --electron-version="$ELECTRON_VERSION" --executable-name="$exe" --app-version="$version" \
         --asar --overwrite --quiet --out="$build" >"$build/$target.log" 2>&1 \
         || die "package: the $target build failed ($(tail -1 "$build/$target.log"))"
-      out="dist/$target/$name"
+      out="dist/$target/$app"
       rm -rf "$out"; mkdir -p "dist/$target"
-      mv "$build/$name-$platform-x64" "$out"
+      mv "$build/$app-$platform-x64" "$out" || die "package: the $target build isn't where the packager said ($build)"
 
       if [ "$target" = windows ]; then
         icon="game/icon-512.png"; [ -f "$icon" ] || icon="game/icon-192.png"
         if [ -f "$icon" ] && python3 -c "from PIL import Image
 Image.open('$icon').convert('RGBA').save('$build/icon.ico', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])" 2>/dev/null; then
-          node "$here/desktop-icon.mjs" "$tools/node_modules" "$out/$name.exe" "$build/icon.ico" "$name" "$version" \
+          node "$here/desktop-icon.mjs" "$tools/node_modules" "$out/$app.exe" "$build/icon.ico" "$name" "$version" \
             || echo "windows icon: couldn't be set (the game still runs, with Electron's icon)"
         else
           echo "windows icon: none (no game/icon-512.png, or no Pillow); it shows Electron's icon"
         fi
-        run="$out/$name.exe"
+        run="$out/$app.exe"
       else
         run="$out/$exe"
       fi
 
       zip="dist/$slug-$target.zip"; rm -f "$zip"
-      (cd "dist/$target" && zip -qry "../$slug-$target.zip" "$name") || die "package: couldn't zip the $target build"
+      (cd "dist/$target" && zip -qry "../$slug-$target.zip" "$app") || die "package: couldn't zip the $target build"
       echo "built: $target $run ($(du -sh "$out" | cut -f1); zip $zip)"
     done
     rm -rf "$build"
@@ -133,5 +143,5 @@ const { _electron } = require(pw);
 NODE
     ;;
 
-  *) die "usage: package.sh build <windows|linux|both> \"<Game name>\" [version] [\"<author>\"] | test <dist/linux/<Game name>> <screenshot.png>" ;;
+  *) die "usage: package.sh build <windows|linux|both> \"<Game name>\" [version] [\"<author>\"] | test <dist/linux/<App>> <screenshot.png>" ;;
 esac
