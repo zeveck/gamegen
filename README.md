@@ -79,6 +79,10 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |
 | `--3d` | Make a 3D game, with 3D characters and models from meshgen. Saying "3D" in your idea works too; otherwise every game is 2D, and if your idea sounds like 3D without saying so, gamegen asks first. Needs a Meshy key. | off |
 | `--no-confirm` | With `--publish`: publish without stopping to ask "Go ahead?" first. gamegen still says what it's doing, and still stops if anything looks wrong. | off |
+| `--finish <folder or repo>` | Finish a game you started some other way that stalled: in a copy that becomes its own repo, so your original stays as it is. gamegen shows its plan and asks first. | off |
+| `--remake <folder or repo>` | Make a game you started again, as a new game in a new repo, keeping your art, levels and ideas. | off |
+| `--in-place` | With `--finish`: work in your original project, on a new branch, instead of a copy. | off |
+| `--leeway little`, `some` or `lots` | With `--finish` or `--remake`: how freely gamegen may change your game. | picked from your game |
 | `--package [steam, windows or linux]` | Turn a finished game into apps for Windows and Linux that run without a browser, such as a Windows `.exe`. `steam` (the default) also makes the store images and upload files for Steam, plus a checklist of what's left to do in Steamworks; see the [Steam guide](https://gamegen.synapticnoise.com/steam-guide/). | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
 

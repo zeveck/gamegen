@@ -41,6 +41,10 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--making-of` | Show in the README how the game was made |
 | `--3d` | Make a 3D game |
 | `--no-confirm` | With `--publish`: publish without asking first |
+| `--finish <folder or repo>` | Finish a game you started (in a copy; your original stays as it is) |
+| `--remake <folder or repo>` | Make a game you started again, keeping your art and ideas |
+| `--in-place` | With `--finish`: work in your original project, on a new branch |
+| `--leeway little\|some\|lots` | With `--finish` or `--remake`: how freely to change it |
 | `--package [steam\|windows\|linux]` | Make Windows and Linux apps of a game, ready for Steam |
 | `--out <folder>` | Where to put the game |
 
@@ -276,6 +280,57 @@ something looks wrong: anything like a key about to be published, a private
 repo that would need to be made public, or a repo that isn't this game's.
 With `--change`, the change goes live without you trying it first, so it's
 best for small changes.
+
+## --finish
+
+**Finish a game you started**, by hand or with other tools, that stalled
+along the way. gamegen plays it, looks through its code, art and notes, and
+makes it whole: the missing levels, art, sound, menus, phone controls and
+polish, matching what you made.
+
+```
+/gamegen --finish ../snakez
+/gamegen --finish github.com/you/old-game --leeway little
+```
+
+It works on **a copy**: a new folder next to yours, with all its history,
+that becomes its own repo. Your original stays exactly as it is. Before it
+changes or makes anything, gamegen shows you its plan (what it'll keep,
+change and add) and asks. Say what matters in your own words too: "keep my
+art exactly", "the giant frog swarm is on purpose".
+
+## --remake
+
+**Make a game you started again**, as a new game, keeping your art, levels
+and ideas, when the old version is easier to rebuild than to finish:
+
+```
+/gamegen --remake ../bettarpg --leeway lots it should be an RPG with a town you swim around, not a text adventure
+```
+
+It goes in a new folder and a new repo; your original stays exactly as it
+is. As with `--finish`, gamegen shows its plan and asks before starting.
+
+## --in-place
+
+**With `--finish`: work in your original project** instead of a copy, on a
+new branch called `gamegen-finish`, so your main version is untouched until
+you merge it. It needs the project to be in git, with nothing unsaved.
+
+```
+/gamegen --finish ../snakez --in-place
+```
+
+## --leeway
+
+**With `--finish` or `--remake`: how freely gamegen may change your game.**
+
+- `little`: keep what's there and make it whole (the same mechanics, art and
+  feel), and match your style for anything new.
+- `some`: keep the core idea and the best parts, and rework the rest.
+- `lots`: treat it as a sketch, and build what it was reaching for.
+
+Without it, gamegen picks one from what it finds and tells you which.
 
 ## --package
 

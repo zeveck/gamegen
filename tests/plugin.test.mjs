@@ -401,6 +401,19 @@ test('packaging: the desktop app and Steam templates are complete', () => {
   assert.match(steps, /gamegen\.synapticnoise\.com\/steam-guide\//);
 });
 
+test('finishing or remaking never changes the person\'s original', () => {
+  const ref = read(`${REFS}/finish-or-remake.md`);
+  assert.match(ref, /\*\*Never touch the original\*\* outside that branch/);
+  // A copy can't push back to the original's remote.
+  assert.match(ref, /git remote rename origin original/);
+  // In place means a branch, only on a clean git repo; otherwise it refuses.
+  assert.match(ref, /git switch -c gamegen-finish/);
+  assert.match(ref, /no uncommitted changes/);
+  // Where it goes comes from the flags, never from wording.
+  assert.match(ref, /never guessed from\s+wording/);
+  assert.match(skill, /references\/finish-or-remake\.md/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

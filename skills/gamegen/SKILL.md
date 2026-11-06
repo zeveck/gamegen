@@ -97,6 +97,10 @@ value) is the game description. Flags and defaults:
 | `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
 | `--3d` | make a 3D game, with 3D models and characters from meshgen | off: 2D |
 | `--no-confirm` | with `--publish`: publish without stopping to ask first. The plan is still shown and the report says what was done; the safety stops in `references/publish.md` still stop | off: ask first |
+| `--finish` | a folder or GitHub repo of a game the person started: finish it, in a copy that becomes its own repo (the original is untouched) | off |
+| `--remake` | a folder or GitHub repo of a game the person started: make it again as a new game in a new repo, keeping their assets and ideas | off |
+| `--in-place` | with `--finish`: finish the original project itself, on a new branch, instead of a copy | off: a copy |
+| `--leeway` | with `--finish` or `--remake`: `little`, `some` or `lots` freedom to change the original | chosen from the original |
 | `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game; `steam` adds the store images and upload files | off (`steam` when given alone) |
 | `--out` | folder for the game | see below |
 
@@ -181,6 +185,13 @@ publish it at the end of Phase 9. With `--change`, make the change, then
 publish. A game that isn't finished can't be published yet: suggest
 `--continue`. `--no-confirm` skips only publishing's "Go ahead?"; without
 `--publish` it does nothing.
+
+**Finishing or remaking a game the person started.** `--finish` or
+`--remake` (with `--in-place`, `--leeway`) takes a project they began some
+other way and makes it whole without losing what they put in: follow
+`references/finish-or-remake.md`. It decides where their work ends up, so
+it's never guessed from wording, and their original is never changed
+(except on a new branch, with `--in-place`).
 
 **Packaging.** `--package` on its own (with `steam`, `windows` or `linux`)
 turns the finished game into desktop apps: follow `references/package.md`,

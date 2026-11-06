@@ -4,6 +4,18 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.6.2
+
+- **Finish or remake a game you started**, by hand or with other tools,
+  without losing what you put in. `--finish <folder or repo>` makes it whole
+  in a copy that becomes its own repo; `--finish … --in-place` works in your
+  original project on a new branch; `--remake <folder or repo>` makes it
+  again as a new game in a new repo, keeping your art, levels and ideas.
+  Your original is never changed. `--leeway little|some|lots` says how
+  freely gamegen may change it, and your own words ("keep my art exactly",
+  "the frog swarm is on purpose") beat that. gamegen plays the game, looks
+  through everything, and shows you its plan before it starts.
+
 ## v2026.11.6
 
 - **`--package`** turns a finished game into apps that run without a
