@@ -31,6 +31,16 @@ design, and keep going. When you do need to ask, ask in plain words as the
 last line of your reply and end your turn to wait for the answer; never use a
 question tool or a multiple-choice prompt.
 
+**`--no-confirm`** means: don't stop for approvals the person would give
+anyway (publishing's "Go ahead?", the plan for `--finish` and `--remake`):
+say what you're doing and carry on. A "did you mean…?" question isn't an
+approval: with `--no-confirm`, take the cautious choice (2D, when it might
+be 3D) and say so in the first update. Safety stops always stop, flag or
+not: anything that looks like a key or private path about to go online,
+making a private repo public, using a repo or folder that isn't this
+game's, overwriting the person's files, and a merge that isn't a plain
+fast-forward.
+
 Three rules beat everything else:
 
 1. **Racing to say "done" but producing slop is a fail.** It's fine to take
@@ -96,7 +106,7 @@ value) is the game description. Flags and defaults:
 | `--gallery` | with `--publish`: a GitHub repo for a gallery of the person's games, such as `zeveck/my-games`. The game is added to it, following its layout; if it doesn't exist yet, publishing offers to start it. `none` for no gallery | none |
 | `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
 | `--3d` | make a 3D game, with 3D models and characters from meshgen | off: 2D |
-| `--no-confirm` | with `--publish`: publish without stopping to ask first. The plan is still shown and the report says what was done; the safety stops in `references/publish.md` still stop | off: ask first |
+| `--no-confirm` | don't stop for approvals: publishing's "Go ahead?" and the plan for `--finish` and `--remake`. The plan is still shown and the report says what was done; safety stops still stop (see below) | off: ask first |
 | `--finish` | a folder or GitHub repo of a game the person started: finish it, in a copy that becomes its own repo (the original is untouched) | off |
 | `--remake` | a folder or GitHub repo of a game the person started: make it again as a new game in a new repo, keeping their assets and ideas | off |
 | `--in-place` | with `--finish`: finish the original project itself, on a new branch, instead of a copy | off: a copy |
@@ -119,7 +129,8 @@ asks for 3D in so many words ("a 3D platformer", "in 3D"). A request that
 says 2D, or gives no sign either way, is 2D: that includes `--target godot`,
 top-down, isometric, 2.5D and pixel art.
 
-If the request looks like it means 3D without saying so, ask straight away,
+If the request looks like it means 3D without saying so (with `--no-confirm`,
+make it 2D and say so instead), ask straight away,
 before the setup check or anything else: building the wrong kind of game
 wastes the whole run. Only these count as signs: `--target unreal` or
 `unity` with neither 2D nor 3D said; a first-person or third-person view, or
@@ -183,8 +194,7 @@ the finished game: follow `references/publish.md`, and do nothing else. With a
 game description, or "and publish it" in one, make the game first, then
 publish it at the end of Phase 9. With `--change`, make the change, then
 publish. A game that isn't finished can't be published yet: suggest
-`--continue`. `--no-confirm` skips only publishing's "Go ahead?"; without
-`--publish` it does nothing.
+`--continue`.
 
 **Finishing or remaking a game the person started.** `--finish` or
 `--remake` (with `--in-place`, `--leeway`) takes a project they began some

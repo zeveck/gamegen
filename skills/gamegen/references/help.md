@@ -40,7 +40,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games |
 | `--making-of` | Show in the README how the game was made |
 | `--3d` | Make a 3D game |
-| `--no-confirm` | With `--publish`: publish without asking first |
+| `--no-confirm` | Don't stop to ask for approvals (publishing, a finish or remake plan) |
 | `--finish <folder or repo>` | Finish a game you started (in a copy; your original stays as it is) |
 | `--remake <folder or repo>` | Make a game you started again, keeping your art and ideas |
 | `--in-place` | With `--finish`: work in your original project, on a new branch |
@@ -266,20 +266,23 @@ so a 3D game fits fewer of them in the same budget.
 
 ## --no-confirm
 
-**Publish without stopping to ask**, with `--publish`. Normally, before
-anything goes online, gamegen tells you where it'll go and asks "Go ahead?".
-With `--no-confirm`, it still tells you, then just carries on:
+**Don't stop to ask for approvals** you'd give anyway. Normally gamegen
+asks "Go ahead?" before publishing, and shows its plan before finishing or
+remaking a game you started. With `--no-confirm`, it still tells you what
+it's doing, then just carries on:
 
 ```
 /gamegen --change make the bettas glow at night --publish --no-confirm
-/gamegen --publish --no-confirm
+/gamegen --finish ../snakez --no-confirm
 ```
 
-It only skips that one question, for that one run. gamegen still stops if
+It's for that one run. If something's unclear (say, whether you meant a 3D
+game), it makes the cautious choice and tells you. It still stops if
 something looks wrong: anything like a key about to be published, a private
-repo that would need to be made public, or a repo that isn't this game's.
-With `--change`, the change goes live without you trying it first, so it's
-best for small changes.
+repo that would need to be made public, a repo that isn't this game's, or
+anything that would overwrite your files. With `--change … --publish`, the
+change goes live without you trying it first, so it's best for small
+changes.
 
 ## --finish
 

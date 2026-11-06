@@ -133,8 +133,8 @@ then ask. For example:
   games, say you'll show the change first.
 
 **With `--no-confirm`,** write the same few sentences as an update, then
-carry on without waiting. It skips only this question. These still stop
-and ask, whatever the flag says: something that looks like a key or a
+carry on without waiting. These still stop and ask, whatever the flag says
+(see SKILL.md): something that looks like a key or a
 private path in what's about to be committed (step 3), making a private
 repo public (step 4.3), reusing a repo that isn't already this game's, and
 a gallery whose layout isn't clear (step 5). The credit is used as
