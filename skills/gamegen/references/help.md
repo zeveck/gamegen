@@ -339,10 +339,12 @@ Without it, gamegen picks one from what it finds and tells you which.
 
 **Make desktop apps of a finished game**, that run without a browser:
 
+- `--package windows`: a Windows app (a folder with an .exe, and a zip).
+- `--package linux`: a Linux app (it runs on Steam Deck too).
+- `--package steam`: both, plus what Steam needs (the default).
+
 ```
-/gamegen --package windows      a Windows app (a folder with an .exe, and a zip)
-/gamegen --package linux        a Linux app (it runs on Steam Deck too)
-/gamegen --package steam        both, plus what Steam needs (the default)
+/gamegen --package windows
 ```
 
 The game is the same as on the web, with a Quit button and full screen

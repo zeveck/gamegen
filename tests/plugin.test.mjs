@@ -363,6 +363,7 @@ test('every script is used by the skill, a reference file or another script', ()
   }
   // The first-load check runs without a permission prompt, like the others.
   assert.match(skill.match(/^allowed-tools: (.*)$/m)[1], /scripts\/first-load\.sh \*/);
+  assert.match(skill.match(/^allowed-tools: (.*)$/m)[1], /scripts\/package\.sh \*/);
 });
 
 test('3D guidance stays in 3d.md, so 2D games never load it', () => {

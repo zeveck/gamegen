@@ -24,6 +24,8 @@ Fixes from a bug sweep:
 - A game started in its own layout is offered a move into `game/` in the
   plan; without it, publishing and packaging say what's needed and stop
   (#20).
+- `--package` runs without stopping for permission to run its build, and
+  the help's examples can be pasted as they are (#21).
 
 ## v2026.11.6.2
 
