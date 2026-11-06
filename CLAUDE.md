@@ -32,6 +32,14 @@ audiogen plugins for art and sound, and meshgen for 3D games.
   `add-cname`; see `dns-godaddy.sh`), and `publish.sh dns-add` only ever adds
   a record, never overwrites one. To add a provider: a new script, its keys
   in `dns_provider` in `publish.sh`, the template, README and help, and tests.
+- `--package` (references/package.md): `scripts/package.sh` wraps an
+  unchanged copy of `game/` in the Electron app in `templates/desktop/` for
+  Windows and Linux; `templates/steam/` has the SteamPipe upload files. The
+  Electron version is pinned in `package.sh`: raise it on purpose, and
+  re-test a packaged 2D and 3D game (`package.sh test`).
+- `docs/` is the site at gamegen.synapticnoise.com (GitHub Pages, from
+  `main`'s `/docs`): the home page and the Steam guide (`docs/steam-guide.md`).
+  Everything in `docs/` is public.
 - `skills/gamegen/companions.json` lists the companions, where they live, and
   the oldest version of each that gamegen works with. When gamegen starts
   relying on something new in a companion, raise its `minimum` (and say why

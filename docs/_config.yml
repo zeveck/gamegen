@@ -1,0 +1,5 @@
+# GitHub Pages site for gamegen (served at gamegen.synapticnoise.com from
+# this folder). Only the pages here are published; nothing else in the repo.
+title: gamegen
+description: Make a complete, playable game from a description.
+theme: jekyll-theme-minimal

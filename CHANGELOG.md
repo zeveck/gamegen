@@ -4,6 +4,19 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.6
+
+- **`--package`** turns a finished game into apps that run without a
+  browser: `--package windows` (a folder with an `.exe`, and a zip),
+  `--package linux` (it runs on Steam Deck too), or `--package steam` (the
+  default), which also makes the store images, the store text, the files
+  for uploading builds, and a checklist of what's left to do in
+  Steamworks. The game gets a Quit button, full screen and controller
+  support; everything else plays as on the web.
+- **A guide to putting your game on Steam**, at
+  https://gamegen.synapticnoise.com/steam-guide/ (and in `docs/` here):
+  Steamworks, the store page, uploading, Valve's reviews and releasing.
+
 ## v2026.11.5.2
 
 - **`--no-confirm`**: with `--publish`, publish without stopping to ask "Go

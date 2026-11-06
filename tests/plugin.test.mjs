@@ -379,6 +379,28 @@ test('3D guidance stays in 3d.md, so 2D games never load it', () => {
   }
 });
 
+test('packaging: the desktop app and Steam templates are complete', () => {
+  const pack = read('skills/gamegen/scripts/package.sh');
+  for (const f of ['main.js', 'preload.js']) {
+    assert.ok(existsSync(join(ROOT, 'skills/gamegen/templates/desktop', f)), f);
+    assert.ok(pack.includes(f), `package.sh copies ${f}`);
+    assert.equal(spawnSync(process.execPath, ['--check', join(ROOT, 'skills/gamegen/templates/desktop', f)]).status, 0, `${f} parses`);
+  }
+  // The app serves only the game's own folder, and never uploads straight to live.
+  const main = read('skills/gamegen/templates/desktop/main.js');
+  assert.match(main, /startsWith\(GAME \+ path\.sep\)/);
+  const app = read('skills/gamegen/templates/steam/app_build.vdf');
+  assert.match(app, /"SetLive" ""/);
+  const steps = read(`${REFS}/package.md`);
+  for (const p of ['GAME_TITLE', 'GAME_VERSION', 'STEAM_APP_ID', 'STEAM_DEPOT_WINDOWS', 'STEAM_DEPOT_LINUX']) {
+    assert.ok(read('skills/gamegen/templates/steam/app_build.vdf').includes(p) || read('skills/gamegen/templates/steam/depot_windows.vdf').includes(p), `templates use ${p}`);
+    assert.ok(steps.includes(`\`${p}\``), `package.md says how to fill in ${p}`);
+  }
+  // The guide the checklist links to is in the repo.
+  assert.ok(existsSync(join(ROOT, 'docs/steam-guide.md')));
+  assert.match(steps, /gamegen\.synapticnoise\.com\/steam-guide\//);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

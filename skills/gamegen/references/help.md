@@ -41,6 +41,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--making-of` | Show in the README how the game was made |
 | `--3d` | Make a 3D game |
 | `--no-confirm` | With `--publish`: publish without asking first |
+| `--package [steam\|windows\|linux]` | Make Windows and Linux apps of a game, ready for Steam |
 | `--out <folder>` | Where to put the game |
 
 `/gamegen help <option>` explains one, for example `/gamegen help style`.
@@ -275,6 +276,27 @@ something looks wrong: anything like a key about to be published, a private
 repo that would need to be made public, or a repo that isn't this game's.
 With `--change`, the change goes live without you trying it first, so it's
 best for small changes.
+
+## --package
+
+**Make desktop apps of a finished game**, that run without a browser:
+
+```
+/gamegen --package windows      a Windows app (a folder with an .exe, and a zip)
+/gamegen --package linux        a Linux app (it runs on Steam Deck too)
+/gamegen --package steam        both, plus what Steam needs (the default)
+```
+
+The game is the same as on the web, with a Quit button and full screen
+added, and controller support for Steam. For Steam, gamegen also makes the
+store images (capsules, library art, screenshots), the store text, and the
+files for uploading builds, and lists what's left for you in Steamworks: the
+account and its $100 fee per game, the store page, and Valve's review. The
+Steam guide at https://gamegen.synapticnoise.com/steam-guide/ walks through
+it. Mac apps aren't made yet: they need a Mac and a paid Apple account to
+sign them.
+
+After a change, run it again for a new build: `/gamegen --change … --package`.
 
 ## --out
 

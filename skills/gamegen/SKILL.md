@@ -97,6 +97,7 @@ value) is the game description. Flags and defaults:
 | `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
 | `--3d` | make a 3D game, with 3D models and characters from meshgen | off: 2D |
 | `--no-confirm` | with `--publish`: publish without stopping to ask first. The plan is still shown and the report says what was done; the safety stops in `references/publish.md` still stop | off: ask first |
+| `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game; `steam` adds the store images and upload files | off (`steam` when given alone) |
 | `--out` | folder for the game | see below |
 
 `--publish`, `--gallery` and `--making-of` can also be set as defaults in the
@@ -180,6 +181,12 @@ publish it at the end of Phase 9. With `--change`, make the change, then
 publish. A game that isn't finished can't be published yet: suggest
 `--continue`. `--no-confirm` skips only publishing's "Go ahead?"; without
 `--publish` it does nothing.
+
+**Packaging.** `--package` on its own (with `steam`, `windows` or `linux`)
+turns the finished game into desktop apps: follow `references/package.md`,
+and do nothing else. With a game description or `--change`, make the game
+or the change first, then package (after publishing, if `--publish` is
+there too).
 
 ### 3. Check everything works, before spending anything
 

@@ -1,0 +1,10 @@
+"DepotBuild"
+{
+	"DepotID" "STEAM_DEPOT_WINDOWS"
+	"FileMapping"
+	{
+		"LocalPath" "windows/GAME_TITLE/*"
+		"DepotPath" "."
+		"Recursive" "1"
+	}
+}

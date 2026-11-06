@@ -1,0 +1,15 @@
+"AppBuild"
+{
+	"AppID" "STEAM_APP_ID"
+	"Desc" "GAME_TITLE GAME_VERSION"
+	"BuildOutput" "../output/"
+	"ContentRoot" "../../"
+	// Left empty on purpose: an upload never goes live by itself. Choose the
+	// build for a branch (start with a private beta branch) in Steamworks.
+	"SetLive" ""
+	"Depots"
+	{
+		"STEAM_DEPOT_WINDOWS" "depot_windows.vdf"
+		"STEAM_DEPOT_LINUX" "depot_linux.vdf"
+	}
+}
