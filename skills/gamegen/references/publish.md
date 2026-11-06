@@ -19,7 +19,22 @@ web games and stop.
 
 ## 1. Check, and work out where it goes
 
-Change nothing until the person confirms in step 2.
+Change nothing until the person confirms in step 2. First, two things that
+stop publishing before anything else:
+
+- **The game must be in `game/`.** Publishing serves only that folder (it's
+  what keeps `design/`, notes and everything else offline). If the project
+  has no `game/` folder (a game finished in its own layout), say so and
+  stop, with the command that moves it: `/gamegen --change move the game
+  into game/`.
+- **The branch.** Publishing pushes `main`, and the site deploys from it. If
+  the project is on another branch (such as `gamegen-finish`, after
+  `--finish --in-place`), plan to bring `main` up to it first, and say so
+  in the confirmation ("You're on `gamegen-finish`: I'll move `main` up to
+  it, then publish."). Only a plain fast-forward
+  (`git switch main && git merge --ff-only <branch>`); if `main` has moved
+  on since, so they'd need a real merge, say so and stop, whatever
+  `--no-confirm` says.
 
 1. **Signed in?** `publish.sh check`. If it fails, tell them how to sign in
    (its message says), and that nothing was changed, then stop.

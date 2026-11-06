@@ -411,6 +411,15 @@ test('finishing or remaking never changes the person\'s original', () => {
   assert.match(ref, /no uncommitted changes/);
   // Where it goes comes from the flags, never from wording.
   assert.match(ref, /never guessed from\s+wording/);
+  // Nothing is made until the plan is approved, and a copy brings the work
+  // that was never committed (but never secrets).
+  assert.match(ref, /Nothing is created \(no copy, branch, folder or\s+records\) until the person approves the plan/);
+  assert.match(ref, /git status --porcelain --ignored/);
+  assert.match(ref, /never secrets \(`\.env`, keys\)/);
+  // Publishing from a branch only ever fast-forwards main, and needs game/.
+  const pub = read(`${REFS}/publish.md`);
+  assert.match(pub, /git merge --ff-only <branch>/);
+  assert.match(pub, /\*\*The game must be in `game\/`\.\*\*/);
   assert.match(skill, /references\/finish-or-remake\.md/);
 });
 

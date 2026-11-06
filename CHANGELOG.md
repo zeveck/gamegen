@@ -11,6 +11,19 @@ Fixes from a bug sweep:
 - Packaging works for game names with characters Windows doesn't allow in
   file names, such as "Hades Rises: Part 2" (the app is named "Hades Rises
   Part 2"), and checks for the `zip` command before building (#16).
+- `--finish` copies everything that's part of the game, including work you
+  never committed and ignored files such as big audio (never secrets,
+  dependencies or build output), and creates nothing until you approve its
+  plan (#17).
+- `--no-confirm` now means "don't stop for approvals I'd give anyway": the
+  publish "Go ahead?" and the plan for `--finish` and `--remake`. Unclear
+  questions get the cautious choice, said in the first update, and safety
+  stops still stop (#18).
+- Publishing from a branch (such as after `--finish --in-place`) offers to
+  move `main` up to it first, and only ever as a plain fast-forward (#19).
+- A game started in its own layout is offered a move into `game/` in the
+  plan; without it, publishing and packaging say what's needed and stop
+  (#20).
 
 ## v2026.11.6.2
 

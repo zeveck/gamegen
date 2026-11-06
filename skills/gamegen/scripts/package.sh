@@ -32,7 +32,7 @@ case "$cmd" in
   build)
     targets="${1:?build needs windows, linux or both}"; name="${2:?build needs the game name}"; version="${3:-1.0.0}"; author="${4:-$name}"
     case "$targets" in windows|linux) ;; both) targets="windows linux" ;; *) die "package: '$targets' isn't windows, linux or both" ;; esac
-    [ -f game/index.html ] || die "package: no game/index.html here (run it from the game's project folder)"
+    [ -f game/index.html ] || die "package: no game/index.html here (run it from the game's project folder; a game kept in its own layout moves there with: /gamegen --change move the game into game/)"
     command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1 || die "package: needs Node.js and npm"
     command -v zip >/dev/null 2>&1 || die "package: needs the zip command (on Ubuntu or Debian: sudo apt-get install zip)"
     # The name for folders, the .exe and the saves folder: the same on every
