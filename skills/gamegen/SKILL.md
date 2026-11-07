@@ -99,6 +99,7 @@ value) is the game description. Flags and defaults:
 | `--scope` | `small`, `medium`, `large` | sized from the request |
 | `--budget` | dollars to spend on generated art and audio, such as `20` or `$20`. `0` means no generated assets: all the art is drawn in code | `20` |
 | `--rounds` | design review rounds, 1 to 4 | `2` |
+| `--share-design` | `doc`, `page` or `both`: after the design review, share the brief and design on claude.ai (a Claude Doc people can comment on, or an artifact page) for others to read and comment on; later runs read the comments and keep it up to date | off (`doc` when given alone) |
 | `--plan-only` | stop after the reviewed design, before spending anything on assets | off |
 | `--continue` | pick up an earlier run (after `--plan-only`, or one that was interrupted) | off |
 | `--change` | change a finished game: the words after it (other than other flags and their values) describe what to change | off |
@@ -165,7 +166,9 @@ which in your first update (they can pick another with `--out`).
 **Continuing.** With `--continue`, read the game's `design/STATUS.md` and
 design, and resume at the first unfinished phase. A description given with
 `--continue` is a note on what to change; add it to the requests list in
-`design/STATUS.md` and apply it to the design before resuming. On a finished game, treat it as `--change`.
+`design/STATUS.md` and apply it to the design before resuming. If the design
+was shared, read its comments first (see `references/share-design.md`); with
+`--share-design` on a game whose design is done, share it first. On a finished game, treat it as `--change`.
 
 **Changing a finished game.** `--change <what to change>` (or `--continue`
 with notes, on a finished game) means: keep everything they didn't mention,
@@ -356,6 +359,10 @@ Then re-read the final design yourself as the person who asked for the game:
 does it still feel like what they described? Go through the brief's "what
 they asked for" checklist: each item is in the design, or (for a loose idea)
 the design says what serves its purpose instead.
+
+**With `--share-design`**, share the design now: follow
+`references/share-design.md`. If the design was shared before (its link is
+in `design/STATUS.md`), keep that copy up to date instead.
 
 **With `--plan-only`, stop here.** Report the game in a few friendly lines
 (the pitch, how it plays, the look and sound, the estimated cost) and tell

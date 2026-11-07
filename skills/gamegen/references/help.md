@@ -33,6 +33,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--scope small`, `medium` or `large` | How big a game (default: sized from your idea) |
 | `--budget <dollars>` | The most to spend on art and sound (default: 20) |
 | `--rounds <1 to 4>` | Rounds of design review (default: 2) |
+| `--share-design [doc\|page\|both]` | Share the design so others can read it and comment |
 | `--plan-only` | Stop after the design, before spending anything |
 | `--continue` | Build a saved design, or finish an interrupted game |
 | `--change <what>` | Change something in a finished game, keeping the rest |
@@ -141,6 +142,26 @@ then build it with `--continue`, adding any changes you want:
 /gamegen a haunted lighthouse puzzle game --plan-only
 /gamegen --continue make it spookier and add a ghost who helps you
 ```
+
+## --share-design
+
+**Share the design so other people can read it and comment**, before
+anything is made. Once the design has been reviewed, gamegen puts it on
+claude.ai and gives you the link:
+
+- `--share-design doc`: a Claude Doc, a document people can comment on
+  part by part (the default).
+- `--share-design page`: a web page, laid out to read.
+- `--share-design both`: one of each, so you can see which you prefer.
+
+```
+/gamegen a rabbit adventure across storybook worlds --plan-only --share-design both
+```
+
+The link is private to you until you share it from claude.ai. When you
+continue (`/gamegen --continue`), gamegen reads the comments first, uses
+what fits (it tells you which it took and which it didn't), and keeps the
+shared design up to date. Your own words always win over a reviewer's.
 
 ## --continue
 

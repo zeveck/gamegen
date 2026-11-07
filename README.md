@@ -71,6 +71,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--scope small`, `medium` or `large` | How big a game: one strong idea in a few minutes of play, several levels in twenty to thirty minutes, or a full game with a world or story to work through. | sized from your idea |
 | `--budget <dollars>` | The most to spend on generated art and audio. `0` makes a free game with everything drawn in code. | `20` |
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
+| `--share-design [doc, page or both]` | Share the reviewed design on claude.ai, so others can weigh in before anything is made: a Claude Doc people can comment on (the default), a web page, or both to compare. Later runs read the comments and keep it up to date. | off |
 | `--plan-only` | Stop after the design, before spending anything, so you can read it and suggest changes. | off |
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
 | `--change <what to change>` | Change something in a finished game, keeping everything else. | off |
