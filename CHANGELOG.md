@@ -4,14 +4,6 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
-## v2026.11.7
-
-- **`--share-design [doc|page|both]`** shares the reviewed design on
-  claude.ai, so others can weigh in before anything is made: a Claude Doc
-  people can comment on (the default), a web page, or both to compare. With `--plan-only` it's ready to share as soon
-  as the design is done. When you continue, gamegen reads the comments,
-  uses what fits (and says which), and keeps the shared design current.
-
 ## v2026.11.6.3
 
 Fixes from a bug sweep:
