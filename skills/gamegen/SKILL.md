@@ -94,26 +94,26 @@ value) is the game description. Flags and defaults:
 | Flag | Values | Default |
 |---|---|---|
 | `--platform` | `desktop`, `mobile`, `both` | `both` |
-| `--style` | a description, or a URL (a game, a store page, a screenshot, a video). Can be given more than once. | none: pick a look that suits the idea |
-| `--target` | `web`, or an engine or language such as `godot`, `unity`, `unreal`, `pygame`, `love2d` | `web` |
+| `--style` | a description, or a URL (a game, store page, screenshot, video); repeatable | a look that suits the idea |
+| `--target` | `web`, or an engine or language (`godot`, `unity`, `unreal`, `pygame`, `love2d`…) | `web` |
 | `--scope` | `small`, `medium`, `large` | sized from the request |
-| `--budget` | dollars to spend on generated art and audio, such as `20` or `$20`. `0` means no generated assets: all the art is drawn in code | `20` |
+| `--budget` | dollars for generated art and audio (`20`, `$20`); `0`: all art drawn in code | `20` |
 | `--rounds` | design review rounds, 1 to 4 | `2` |
-| `--share-design` | `page`, `doc` or `both`: after the design review, share the brief and design on claude.ai (an artifact page, or a Claude Doc people can comment on), with a few mock pictures, for others to read and comment on; later runs read the comments and keep it up to date | off (`page` when given alone) |
-| `--mockups` | with `--share-design`: dollars to spend on mock pictures of the main characters and places, out of `--budget`. `0` for none | `5` |
-| `--plan-only` | stop after the reviewed design, before spending anything on assets (except `--share-design`'s mock pictures) | off |
-| `--continue` | pick up an earlier run (after `--plan-only`, or one that was interrupted) | off |
-| `--change` | change a finished game: the words after it (other than other flags and their values) describe what to change | off |
-| `--publish` | put a finished web game online with GitHub Pages: optionally the address, such as `synapticnoise.com` (giving `<game>.synapticnoise.com`), a full address, or `github.io` | off |
-| `--gallery` | with `--publish`: a GitHub repo for a gallery of the person's games, such as `zeveck/my-games`. The game is added to it, following its layout; if it doesn't exist yet, publishing offers to start it. `none` for no gallery | none |
-| `--making-of` | the README also shows how the game was made: every request, and what gamegen and each plugin did. Publishing then includes `design/` | off |
-| `--3d` | make a 3D game, with 3D models and characters from meshgen | off: 2D |
-| `--no-confirm` | don't stop for approvals: publishing's "Go ahead?" and the plan for `--finish` and `--remake`. The plan is still shown and the report says what was done; safety stops still stop (see below) | off: ask first |
-| `--finish` | a folder or GitHub repo of a game the person started: finish it, in a copy that becomes its own repo (the original is untouched) | off |
-| `--remake` | a folder or GitHub repo of a game the person started: make it again as a new game in a new repo, keeping their assets and ideas | off |
-| `--in-place` | with `--finish`: finish the original project itself, on a new branch, instead of a copy | off: a copy |
-| `--leeway` | with `--finish` or `--remake`: `little`, `some` or `lots` freedom to change the original | chosen from the original |
-| `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game; `steam` adds the store images and upload files | off (`steam` when given alone) |
+| `--plan-only` | stop after the reviewed design, before spending (except `--share-design`'s mock pictures) | off |
+| `--share-design` | `page`, `doc` or `both`: share the reviewed design for comments (`references/share-design.md`) | off (`page` alone) |
+| `--mockups` | with `--share-design`: dollars for mock pictures, out of `--budget`; `0` for none | `5` |
+| `--continue` | pick up an unfinished game (`references/change.md`) | off |
+| `--change` | change a finished game: the words after it say what (`references/change.md`) | off |
+| `--3d` | a 3D game, with models from meshgen | off: 2D |
+| `--publish` | put a finished web game online: optionally the address (`example.com`, a full host, or `github.io`) (`references/publish.md`) | off |
+| `--gallery` | with `--publish`: the GitHub repo of a gallery of their games, or `none` | none |
+| `--making-of` | the README also tells how the game was made; publishing includes `design/` | off |
+| `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game (`references/package.md`) | off (`steam` alone) |
+| `--finish` | a folder or repo of a game they started: finish it, in a copy (`references/finish-or-remake.md`) | off |
+| `--remake` | a folder or repo of a game they started: make it again, keeping their assets and ideas | off |
+| `--in-place` | with `--finish`: work in the original, on a new branch | off: a copy |
+| `--leeway` | with `--finish`/`--remake`: `little`, `some` or `lots` freedom to change it | chosen from the original |
+| `--no-confirm` | don't stop for approvals (see below); safety stops still stop | off: ask first |
 | `--out` | folder for the game | see below |
 
 `--publish`, `--gallery` and `--making-of` can also be set as defaults in the
@@ -164,34 +164,10 @@ if given. Otherwise the current folder, if it holds a game (a
 one, use it; if there are several, use the one changed most recently and say
 which in your first update (they can pick another with `--out`).
 
-**Continuing.** With `--continue`, read the game's `design/STATUS.md` and
-design, and resume at the first unfinished phase. A description given with
-`--continue` is a note on what to change; add it to the requests list in
-`design/STATUS.md` and apply it to the design before resuming. If the design
-was shared, read its comments first (see `references/share-design.md`); with
-`--share-design` on a game whose design is done, share it first. On a finished game, treat it as `--change`.
-
-**Changing a finished game.** `--change <what to change>` (or `--continue`
-with notes, on a finished game) means: keep everything they didn't mention,
-and change what they asked for, whether it's small (the font, the title, one
-character's look) or big (a new level, a double jump, a boss). If there's no game, say so and suggest starting one; if the
-game isn't finished yet, suggest `--continue`. Then:
-
-1. Add the change request, exactly as typed, to the requests list in
-   `design/STATUS.md`. Update the design with the change, and follow it through: a new title also
-   means the title screen, logo, app name and icon labels, social card and
-   README; new art matches the style anchor and style line.
-2. For anything that changes how the game plays, run one short design review
-   round on the change.
-3. Make only the assets the change needs. Each change gets its own budget:
-   `--budget` if given now, otherwise the default $20.
-4. Build it, play-test what changed (with the text scanner on every screen
-   it touched, at every size), and replay every level's solution to make
-   sure nothing else broke.
-5. Wrap up as usual: update the README and screenshots, start the game, and
-   report with a fresh link and what changed. If the game is published, end
-   with "Run `/gamegen --publish` to put this version online." Never publish
-   without being asked.
+**Continuing and changing.** `--continue` picks up an unfinished game;
+`--change <what>` changes a finished one, keeping everything not mentioned
+(`--continue` with notes on a finished game counts as a change). Follow
+`references/change.md`.
 
 **Publishing.** `--publish` on its own (or with `--gallery`, `--out`) publishes
 the finished game: follow `references/publish.md`, and do nothing else. With a
@@ -215,72 +191,33 @@ there too).
 
 ### 3. Check everything works, before spending anything
 
-Run the setup check from the folder `/gamegen` was run in:
+Run the setup check from the folder `/gamegen` was run in (with `--3d` for a
+3D game, which also checks the Meshy key):
 
 ```bash
 bash "${CLAUDE_SKILL_DIR}/scripts/check-setup.sh"
 ```
 
-For a 3D game, add `--3d`: it also checks `MESHY_API_KEY` (meshgen). It
-tests each API key with a free request (never printing it), using the
-environment or the nearest `.env` file in that folder or above it, and checks
-Python with Pillow and `playwright-cli`:
-
-- `OPENAI_API_KEY`: imagegen2, and anim8gen (which draws with imagegen2)
-- `GEMINI_API_KEY` or `GOOGLE_API_KEY`: nanogen
-- `ELEVENLABS_API_KEY`: audiogen. The check also reports the account's plan
-  (`tier`). Write it in `design/STATUS.md`: only the free plan's audio needs a
-  credit (see asset-guide.md), so later steps go by this, never a guess.
-
-It also prints an `update:` line for gamegen or any plugin it uses that's out
-of date, with the command that updates it. These never stop a run: mention
-them in your first update in plain words, with the command, and suggest
-turning on auto-update (`/plugin` → Marketplaces → gamegen → Enable
-auto-update). Then carry on.
-
 **Every key the game needs must pass before anything else happens.** If one is
 missing or refused, stop right there, before any design work or spending, and
 tell the person in plain words: which service, what the check said, and how
-to fix it. Don't quietly fall back to something worse.
+to fix it (`references/setup.md` covers making a `.env` for their keys, and
+when a key isn't needed). Don't quietly fall back to something worse.
 
-When keys are missing, first run
+Write the ElevenLabs plan it reports (`tier`) in `design/STATUS.md`: only
+the free plan's audio needs a credit (see asset-guide.md), so later steps go
+by this, never a guess. It also prints an `update:` line for gamegen or any
+plugin that's out of date, with the command that updates it. These never
+stop a run: mention them in your first update in plain words, with the
+command, and suggest turning on auto-update (`/plugin` → Marketplaces →
+gamegen → Enable auto-update). Then carry on.
 
-```bash
-bash "${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh"
-```
-
-(with `--3d` for a 3D game, so the `.env` has a line for the Meshy key too).
-
-It creates a `.env` with a line for each key and where to get it (or adds
-lines for just the missing keys to an existing `.env`, leaving the rest
-alone), and lists `.env` in the `.gitignore` beside it so keys never get
-committed. Then tell them, for example: "I've made a `.env` file in this
-folder for your keys, with links to where you get each one. Paste them in,
-save, and run your `/gamegen` command again." When a key is refused, say it
-looks wrong or expired, and where to get a new one (the links are in that
-file).
-
-A key isn't needed only when the person has said so:
-
-- `--budget 0`, or a request like "draw the art in code": no image keys.
-- "No music", "no sound", "silent": no ElevenLabs key. ("Make the sounds in
-  code" means effects synthesized with Web Audio.)
-- "Only use OpenAI" (or Gemini) for the art: that one image key.
-
-Without `OPENAI_API_KEY` there's no anim8gen, so characters get a few drawn
-poses or code animation. If Pillow is missing, install it
-(`python3 -m pip install --user pillow`) and say so. If `playwright-cli` is
-missing, play-testing uses the fallback in `references/playtest-guide.md`.
-
-Confirm the four plugins' skills (`imagegen2`, `nanogen`, `anim8gen`,
-`audiogen`), and `meshgen` for a 3D game, are available to you; they install with gamegen. When the game
-goes in a new folder below the one with `.env`, run the generators from the
-folder that has the `.env`, with output paths pointing into the game folder.
-
-Later, if a generator fails partway through for a reason a retry won't fix
-(the key stops working, credits run out), stop generating and tell the person
-what happened and how to fix it, then pick up with `--continue` once they
-have. Don't swap in code-drawn art unless they agree.
+The art and sound plugins (`imagegen2`, `nanogen`, `anim8gen`, `audiogen`,
+and `meshgen` for 3D) install with gamegen; run them from the folder with the
+`.env`, with output paths into the game folder. If one fails partway for a
+reason a retry won't fix (a key stops working, credits run out), stop
+generating and tell the person how to fix it; they pick up with `--continue`.
+Don't swap in code-drawn art unless they agree.
 
 ### 4. Start the progress file
 
