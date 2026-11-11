@@ -71,7 +71,9 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--scope small`, `medium` or `large` | How big a game: one strong idea in a few minutes of play, several levels in twenty to thirty minutes, or a full game with a world or story to work through. | sized from your idea |
 | `--budget <dollars>` | The most to spend on generated art and audio. `0` makes a free game with everything drawn in code. | `20` |
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
-| `--plan-only` | Stop after the design, before spending anything, so you can read it and suggest changes. | off |
+| `--share-design [page, doc or both]` | Share the reviewed design on claude.ai, with a few mock pictures of the main characters and places, so others can weigh in before the real work starts: a web page (the default), a Claude Doc people can comment on, or both to compare. Later runs read the comments and keep it up to date. | off |
+| `--mockups <dollars>` | With `--share-design`: how much to spend on the mock pictures, out of your budget. `0` for none. | `5` |
+| `--plan-only` | Stop after the design, before spending anything (apart from `--share-design`'s mock pictures), so you can read it and suggest changes. | off |
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
 | `--change <what to change>` | Change something in a finished game, keeping everything else. | off |
 | `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |

@@ -33,6 +33,8 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--scope small`, `medium` or `large` | How big a game (default: sized from your idea) |
 | `--budget <dollars>` | The most to spend on art and sound (default: 20) |
 | `--rounds <1 to 4>` | Rounds of design review (default: 2) |
+| `--share-design [page\|doc\|both]` | Share the design, with mock pictures, so others can weigh in |
+| `--mockups <dollars>` | With `--share-design`: how much to spend on mock pictures (default: 5) |
 | `--plan-only` | Stop after the design, before spending anything |
 | `--continue` | Build a saved design, or finish an interrupted game |
 | `--change <what>` | Change something in a finished game, keeping the rest |
@@ -140,6 +142,42 @@ then build it with `--continue`, adding any changes you want:
 ```
 /gamegen a haunted lighthouse puzzle game --plan-only
 /gamegen --continue make it spookier and add a ghost who helps you
+```
+
+## --share-design
+
+**Share the design so other people can see it and weigh in**, before the
+real work starts. Once the design has been reviewed, gamegen makes a few
+mock pictures of the main characters and places, puts the design and the
+pictures on claude.ai, and gives you the link:
+
+- `--share-design page`: a web page, laid out to read (the default).
+- `--share-design doc`: a Claude Doc, a document people can comment on
+  part by part.
+- `--share-design both`: one of each, so you can see which you prefer.
+
+The shared design shows how big the game is and what's hardest, but leaves
+out prices.
+
+```
+/gamegen a rabbit adventure across storybook worlds --plan-only --share-design both
+```
+
+The link is private to you until you share it from claude.ai. When you
+continue (`/gamegen --continue`), gamegen reads the comments first, uses
+what fits (it tells you which it took and which it didn't), and keeps the
+shared design up to date. Your own words always win over a reviewer's.
+
+## --mockups
+
+**How much to spend on mock pictures** for `--share-design`, in dollars:
+pictures of the main characters and a key place or two, so reviewers can
+react to the look. The default is $5, out of your `--budget`; the best one
+often becomes the start of the game's art, so it's rarely wasted. `0` shares
+the design without pictures.
+
+```
+/gamegen a rabbit adventure across storybook worlds --plan-only --share-design --mockups 10
 ```
 
 ## --continue

@@ -4,6 +4,20 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.11
+
+- **`--share-design [page|doc|both]`** shares the reviewed design on
+  claude.ai, so others can weigh in before the real work starts: a web page
+  (the default), a Claude Doc people can comment on, or both to compare.
+  It shows how big the game is and what's hardest, without prices. With
+  `--plan-only` it's ready as soon as the design is done. When you
+  continue, gamegen reads the comments, uses what fits (and says which),
+  and keeps the shared design current.
+- **`--mockups <dollars>`** (default $5) makes a few mock pictures of the
+  main characters and places for the shared design, so reviewers can react
+  to the look too. They come out of the game's budget, and the best often
+  becomes the start of its art.
+
 ## v2026.11.6.3
 
 Fixes from a bug sweep:
