@@ -424,6 +424,16 @@ test('finishing or remaking never changes the person\'s original', () => {
   assert.match(skill, /references\/finish-or-remake\.md/);
 });
 
+test('estimates are forecasts; only --budget limits spending', () => {
+  const template = read(`${REFS}/design-template.md`);
+  assert.match(template, /## Effort and cost estimate\s+A forecast, not a promise/);
+  assert.match(template, /\*\*Effort:\*\*/);
+  assert.match(read(`${REFS}/asset-guide.md`), /`--budget` is the only limit/);
+  assert.match(skill, /going past it is never a reason to hold back/);
+  // A shared design shows effort, not prices.
+  assert.match(read(`${REFS}/share-design.md`), /\*\*Leave out\s+prices and dollar figures\*\*/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

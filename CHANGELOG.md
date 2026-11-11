@@ -17,6 +17,11 @@ so on (`v2026.10.20.2`).
   main characters and places for the shared design, so reviewers can react
   to the look too. They come out of the game's budget, and the best often
   becomes the start of its art.
+- **Estimates are forecasts, not promises.** The design now has an "effort
+  and cost estimate" (how big the game is and its hardest parts, and roughly
+  what it'll cost), and the reviews, play-test and polish pass make new art
+  or sound whenever it clearly helps, even past the estimate. Only
+  `--budget` limits spending.
 
 ## v2026.11.6.3
 

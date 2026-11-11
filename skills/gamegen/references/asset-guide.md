@@ -146,6 +146,11 @@ with a running total. These are estimates, so round up:
   them to imagegen2's history. Count its tries in the run's `candidates.jsonl`
   (under `.anim8gen/runs/`) and estimate them like imagegen2 images.
 
+The design's effort and cost estimate is a forecast, not a promise: when the
+game turns out to need more (a review, the polish pass or the play-test
+finds a missing portrait, scene or effect), make it, as long as `--budget`
+allows. `--budget` is the only limit.
+
 Spend in order:
 
 - The style anchor and the must-have assets first; nice-to-haves last.

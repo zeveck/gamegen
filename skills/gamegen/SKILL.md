@@ -321,7 +321,8 @@ against.
 Write `design/GAME_DESIGN.md` from `references/design-template.md`. It covers
 the pitch, the core loop, controls for every targeted platform, the structure
 and difficulty curve, screens, art and audio direction, the full asset list
-(which tool makes each asset), the tech plan, a cut list, a budget estimate,
+(which tool makes each asset), the tech plan, a cut list, an effort and cost
+estimate (a forecast, not a promise),
 and the definition of done.
 
 Size it to `--scope`, or without it, to what the request describes, as you
@@ -464,6 +465,12 @@ Dispatch two agents in parallel, with instructions from
 
 Fix what they find, then re-run the play-test for anything you changed. If
 they found any must-fix problem, run a second round once it's fixed.
+
+From here to the end (and in the play-test before it), make new art or sound
+whenever it clearly improves the game: a missing portrait, a scene the
+story needs, an effect a moment lacks. The design's estimate is a forecast,
+not a limit: going past it is never a reason to hold back. Only `--budget`
+is (see asset-guide.md).
 
 ## Phase 8 — Polish pass
 

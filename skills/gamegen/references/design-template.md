@@ -102,10 +102,15 @@ For other targets: the project layout and how it will be tested.
 What to drop first if the budget or a technical problem demands it, in order. The
 core loop is never on it.
 
-## Budget estimate
+## Effort and cost estimate
 
-Roughly how much of the budget each kind of asset will use, and how many
-images and sounds that means.
+A forecast, not a promise: the only spending limit is `--budget`, and later
+stages may add what the game turns out to need.
+
+- **Effort:** how big the game is (areas or levels, characters, battles or
+  encounters, screens, pieces of art, animations, songs and sounds), and the
+  biggest and riskiest pieces of work.
+- **Cost:** roughly how much of the budget each kind of asset will use.
 
 ## Definition of done
 
