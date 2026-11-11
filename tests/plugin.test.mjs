@@ -434,6 +434,15 @@ test('estimates are forecasts; only --budget limits spending', () => {
   assert.match(read(`${REFS}/share-design.md`), /\*\*Leave out\s+prices and dollar figures\*\*/);
 });
 
+test('--change can fix GitHub issues, and never touches them itself', () => {
+  const ref = read(`${REFS}/change.md`);
+  assert.match(ref, /gh issue view <n> -R <owner\/repo>/);
+  assert.match(ref, /`Fixes #12`/);
+  assert.match(ref, /\*\*Never touch the issue itself\*\*/);
+  assert.match(skill, /references\/change\.md/);
+  assert.match(skill, /references\/setup\.md/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

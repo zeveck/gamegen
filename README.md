@@ -75,7 +75,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--mockups <dollars>` | With `--share-design`: how much to spend on the mock pictures, out of your budget. `0` for none. | `5` |
 | `--plan-only` | Stop after the design, before spending anything (apart from `--share-design`'s mock pictures), so you can read it and suggest changes. | off |
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
-| `--change <what to change>` | Change something in a finished game, keeping everything else. | off |
+| `--change <what to change>` | Change something in a finished game, keeping everything else. Or name GitHub issues to fix, such as `--change #12`; they close when you next publish. | off |
 | `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games, a page in a GitHub repository of yours. gamegen offers to start it the first time. | none |
 | `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |

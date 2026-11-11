@@ -103,7 +103,7 @@ value) is the game description. Flags and defaults:
 | `--share-design` | `page`, `doc` or `both`: share the reviewed design for comments (`references/share-design.md`) | off (`page` alone) |
 | `--mockups` | with `--share-design`: dollars for mock pictures, out of `--budget`; `0` for none | `5` |
 | `--continue` | pick up an unfinished game (`references/change.md`) | off |
-| `--change` | change a finished game: the words after it say what (`references/change.md`) | off |
+| `--change` | change a finished game: the words after it say what, or GitHub issues (`#12`) (`references/change.md`) | off |
 | `--3d` | a 3D game, with models from meshgen | off: 2D |
 | `--publish` | put a finished web game online: optionally the address (`example.com`, a full host, or `github.io`) (`references/publish.md`) | off |
 | `--gallery` | with `--publish`: the GitHub repo of a gallery of their games, or `none` | none |

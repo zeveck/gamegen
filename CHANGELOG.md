@@ -4,6 +4,17 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.11.2
+
+- **Fix GitHub issues with `--change #12`** (or several, or an issue's
+  address), with your own notes alongside if you like. gamegen reads each
+  issue and its screenshots, checks it's really something to change, and
+  fixes it; the issues close by themselves when you next publish. It never
+  comments on, labels or closes issues itself.
+- Behind the scenes, the skill's main file is about 15% shorter: the detail
+  for continuing, changing and setup now lives in its own reference files,
+  read only when needed.
+
 ## v2026.11.11
 
 - **`--share-design [page|doc|both]`** shares the reviewed design on

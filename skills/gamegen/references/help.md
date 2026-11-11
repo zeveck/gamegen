@@ -210,6 +210,18 @@ updates the logo, the link preview and the README), makes any new art in the
 game's existing style, plays the game again to make sure nothing broke, and
 gives you a fresh link.
 
+**Fix GitHub issues** by naming them, with your own notes if you like:
+
+```
+/gamegen --change #12
+/gamegen --change #12 #15 keep the last level hard, just make the jump fairer
+```
+
+gamegen reads each issue (and looks at its screenshots), checks it's
+really something to change (it asks about a question, a duplicate, or
+something that works as intended), and fixes it. The issues close by
+themselves when you next publish (`/gamegen --publish`).
+
 ## --publish
 
 **Put a finished game online**, free, with GitHub Pages. You need a GitHub

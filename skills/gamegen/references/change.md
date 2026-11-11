@@ -37,3 +37,34 @@ starting one; if the game isn't finished yet, suggest `--continue`. Then:
    report with a fresh link and what changed. If the game is published, end
    with "Run `/gamegen --publish` to put this version online." Never publish
    without being asked.
+
+## Changes from GitHub issues
+
+`--change` can name issues instead of (or as well as) describing the change:
+`#12`, several (`#12 #15`), or an issue's address
+(`https://github.com/owner/repo/issues/12`). `#12` means the game's own
+repo: its `origin` (or `github`, a remote an earlier publish added) on
+GitHub. If the game has no GitHub repo yet, say an issue number needs one,
+and stop.
+
+1. **Read each issue** with
+   `gh issue view <n> -R <owner/repo> --json number,title,body,comments,labels,state,url`,
+   and look at any screenshots in it or its comments (download them, then
+   Read them; if one can't be downloaded, as can happen in a private repo,
+   say so rather than guess what it shows). Anything the person typed after the issues adds to them, or
+   overrides them where it disagrees.
+2. **Check it's something to do.** A closed issue, a question, a duplicate,
+   or a report of something that works as designed (a "bug" that's really
+   the game's rules): say so and ask what they'd like, rather than changing
+   the game. With `--no-confirm`, leave those out and say so in the report.
+3. **Record it:** add `#12: <its title> (<its address>)` to the requests
+   list in `design/STATUS.md`, plus anything typed with it, exactly as
+   typed.
+4. **Make the change** as above (steps 1 to 5 of "Changing a finished
+   game"), one issue at a time when there are several, each with its own
+   commit whose message ends `Fixes #12`. The play-test at the end covers
+   them all.
+5. **Never touch the issue itself** (no comments, labels or closing).
+   GitHub closes it when the commit reaches the repo, which happens when the
+   person publishes (`/gamegen --publish`). The report lists each issue and
+   what changed for it, and says they'll close on the next publish.
