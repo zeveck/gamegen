@@ -127,6 +127,11 @@ after every change to levels, physics or controls; a solution that stops
 working means the level broke (or the solution needs re-recording, if the
 level was meant to change).
 
+Any script that replays the solutions, or checks balance or reachability,
+lives in the project's `tools/` folder. It belongs to the game, not this
+machine: it's published with the solutions (see publish.md), so a later
+change on a fresh machine can replay them.
+
 Generated levels: the generator itself checks each level is solvable before
 using it (for example, a search over the moves the player can make), and the
 play-test replays a few seeds.

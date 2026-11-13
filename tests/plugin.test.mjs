@@ -490,6 +490,14 @@ test('--feedback: bundles gh-feedback with link mode, and publishing sets up the
   assert.match(ref, /__reports/, 'the play-test checks normal play never opens it');
 });
 
+test('publishing: recorded solutions go online with the tools that replay them (#24)', () => {
+  const pub = read(`${REFS}/publish.md`);
+  assert.match(pub, /\*\*Recorded solutions go with the tools that replay them\.\*\*/);
+  assert.match(pub, /if solution files are staged,\s+their runner is too/);
+  assert.match(read(`${REFS}/readme-template.md`), /^## Replaying the tests$/m);
+  assert.match(read(`${REFS}/playtest-guide.md`), /lives in the project's `tools\/` folder/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

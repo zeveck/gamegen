@@ -169,6 +169,15 @@ correction: adjust, show the line again, and ask again.
    has its "How it was made" section. Without it, the README says nothing
    about how it was made, and `.gitignore` keeps `design/` out (if `design/`
    was published before, also `git rm -r --cached design`).
+   **Recorded solutions go with the tools that replay them.** When
+   `design/solutions/` goes in, so do the project's tools that play and check
+   them (usually `tools/`: the solution player, any full-run runner, and
+   balance or reachability checks), so anyone continuing from the repo can
+   prove a change broke nothing. Leave out only what's large or private in
+   there: source art, generator scratch, `__pycache__`. Before committing,
+   check the repo can replay its own tests: if solution files are staged,
+   their runner is too. The README's "Replaying the tests" section says how
+   to use them.
 2. **What never goes in:** `.gitignore` keeps out `.env`, `.gamegen/`,
    `.anim8gen/`, `assets/anim8gen/`, `.playwright/` and `.*-history.jsonl`.
 3. **The Pages workflow** is at the repository's root with `GAME_DIR` set to

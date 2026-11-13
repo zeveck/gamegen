@@ -59,6 +59,16 @@ animation, music and sound with these plugins, built it, and play-tested it:
 <Leave out any plugin that wasn't used. A picture of something each plugin
 made, beside its line, shows it off (as Hoard Hopper's README does).>
 
+## Replaying the tests
+
+<!-- Only when design/solutions/ is published (with --making-of), and only if
+the project has tools that replay them. -->
+
+Every level has a recorded solution in `design/solutions/`, the proof it can
+be finished. <How to replay them: serve the game, then the command, e.g.
+`tools/play.sh design/solutions/level-3.json`, and how to run them all.> <Any
+balance or reachability checks in `tools/`, one line each.>
+
 ## Playing locally
 
 <Game name> is a plain web page with no build step. Serve the `game` folder

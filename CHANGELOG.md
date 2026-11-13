@@ -4,6 +4,13 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.13.7
+
+- Publishing a game with its making-of notes now includes the tools that
+  replay its recorded level solutions, with a "Replaying the tests" section
+  in its README, so the game can still be checked level by level from its
+  repo (#24).
+
 ## v2026.11.13.6
 
 - Adding "Report a bug" to a game never changes its existing controls: the
