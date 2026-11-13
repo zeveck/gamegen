@@ -4,6 +4,12 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.13.5
+
+- The "Report a bug" form fits on phones: held upright it was half off the
+  screen, and held sideways it was taller than the screen (a fix in
+  gh-feedback).
+
 ## v2026.11.13.4
 
 - **Ctrl+Shift+F reports a bug from anywhere** in a game with `--feedback`,

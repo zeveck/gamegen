@@ -182,8 +182,11 @@ const STYLES = `
     z-index: 999999;
     width: 380px;
     max-width: calc(100vw - 32px);
-    max-height: 500px;
+    /* Never taller than the screen (a phone held sideways is ~390px tall). */
+    max-height: min(600px, calc(100vh - 32px));
+    max-height: min(600px, calc(100dvh - 32px));
     overflow-y: auto;
+    overscroll-behavior: contain;
     background: var(--_bg);
     color: var(--_text);
     border: 1px solid var(--_border);
@@ -200,11 +203,17 @@ const STYLES = `
   .popup.bottom-left  { bottom: 88px; left: 20px; }
   .popup.top-right    { top: 88px; right: 20px; }
   .popup.top-left     { top: 88px; left: 20px; }
+  .popup.bottom-right, .popup.bottom-left, .popup.top-right, .popup.top-left {
+    max-height: min(600px, calc(100vh - 108px));
+    max-height: min(600px, calc(100dvh - 108px));
+  }
   .popup.centered     { top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); }
   .popup.centered.open { transform: translate(-50%, -50%) scale(1); }
 
   @media (max-width: 479px) {
-    .popup.open {
+    /* .popup.centered.open is more specific than .popup.open: undo its centering too. */
+    .popup.open, .popup.centered.open {
+      transform: none;
       bottom: 0;
       left: 0;
       right: 0;
@@ -212,6 +221,7 @@ const STYLES = `
       width: 100%;
       max-width: 100%;
       max-height: 80vh;
+      max-height: 80dvh;
       border-radius: 12px 12px 0 0;
     }
   }
