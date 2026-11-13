@@ -89,6 +89,12 @@ and its menus can't be reached. It works whenever the game has a repo, with
 `on` or `hidden`, on the web and in the desktop app. It's Ctrl on a Mac
 too (Cmd+Shift+F switches some Mac browsers to full screen).
 
+**Adding the report never changes the game's existing controls.** Not a
+key, not a modifier, not how a menu is driven: the shortcut fits around the
+game, never the other way round. If one of the game's own keys is Shift or
+Ctrl and it also fires as the player presses the shortcut, leave it; the
+game pauses a moment later anyway.
+
 **Its letter is never one of the game's keys,** so normal play can never
 open it. If F is in the controls table, use another letter the game doesn't
 use and the browser doesn't take (not N, T, W, R, I, J, P or B), and write

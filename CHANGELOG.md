@@ -4,6 +4,11 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.13.6
+
+- Adding "Report a bug" to a game never changes its existing controls: the
+  shortcut fits around the game, never the other way round.
+
 ## v2026.11.13.5
 
 - The "Report a bug" form fits on phones: held upright it was half off the
