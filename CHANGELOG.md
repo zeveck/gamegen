@@ -4,6 +4,12 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.13.3
+
+- The "Report a bug" form no longer jumps back to its title box when a
+  player tabs or clicks to another field straight after opening it, or
+  closes it at once (a fix in gh-feedback).
+
 ## v2026.11.13.2
 
 - **`--gamepad`: play with a controller.** Plug a PS5 controller into your

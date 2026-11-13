@@ -531,6 +531,8 @@ class GhFeedback extends HTMLElement {
     if (this._isOpen) this._close();
     if (this._rateLimitTimer) { clearInterval(this._rateLimitTimer); this._rateLimitTimer = null; }
     if (this._autoCloseTimer) { clearTimeout(this._autoCloseTimer); this._autoCloseTimer = null; }
+    clearTimeout(this._focusTimer);
+    this._focusTimer = null;
   }
 
   attributeChangedCallback(name, oldVal, newVal) {
@@ -962,9 +964,15 @@ class GhFeedback extends HTMLElement {
       });
     });
 
-    // Focus title input
+    // Focus the title input once the popup shows, unless focus has already
+    // moved inside it, or it has closed again, by then.
     const titleInput = shadow.querySelector('#ghf-title');
-    setTimeout(() => titleInput?.focus(), 50);
+    clearTimeout(this._focusTimer);
+    this._focusTimer = setTimeout(() => {
+      this._focusTimer = null;
+      const active = shadow.activeElement;
+      if (this._isOpen && !(active && popup.contains(active))) titleInput?.focus();
+    }, 50);
 
     // Escape handler
     this._escapeHandler = (e) => {
@@ -1005,6 +1013,8 @@ class GhFeedback extends HTMLElement {
     const popup = shadow.querySelector('.popup');
 
     this._isOpen = false;
+    clearTimeout(this._focusTimer);
+    this._focusTimer = null;
     if (trigger) trigger.setAttribute('aria-expanded', 'false');
     backdrop.classList.remove('open');
     popup.classList.remove('open');
