@@ -4,6 +4,21 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.13.2
+
+- **`--gamepad`: play with a controller.** Plug a PS5 controller into your
+  computer (USB or Bluetooth), press any button, and play the whole game
+  with it, menus and all. Xbox, Switch Pro and most other controllers work
+  too, and the game shows the buttons of the one you're holding (✕ ○ □ △
+  for PlayStation). The play-test plays it with a pretend controller.
+- **`--feedback`: a "Report a bug" button.** In the pause menu and settings,
+  it lets players report a problem as a GitHub issue in the game's repo,
+  filled in with where they were in the game and any errors, and with a
+  screenshot of the moment ready to paste. `--feedback hidden` shows it only
+  to people who open the game with `?feedback` on its address, such as
+  testers. Publishing sets up the repo for it, and `--change #12` fixes what
+  comes in. Players need a GitHub account.
+
 ## v2026.11.13
 
 - Publishing to a new address on your own domain gets HTTPS on its own.

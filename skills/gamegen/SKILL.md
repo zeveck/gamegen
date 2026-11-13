@@ -94,6 +94,8 @@ value) is the game description. Flags and defaults:
 | Flag | Values | Default |
 |---|---|---|
 | `--platform` | `desktop`, `mobile`, `both` | `both` |
+| `--gamepad` | play with a controller: a PS5 controller (USB or Bluetooth) or the like (`references/gamepad.md`) | off |
+| `--feedback` | `on`, `hidden` or `off`: a "Report a bug" button that files GitHub issues (`references/feedback.md`) | off (`on` alone) |
 | `--style` | a description, or a URL (a game, store page, screenshot, video); repeatable | a look that suits the idea |
 | `--target` | `web`, or an engine or language (`godot`, `unity`, `unreal`, `pygame`, `love2d`…) | `web` |
 | `--scope` | `small`, `medium`, `large` | sized from the request |
@@ -182,6 +184,13 @@ other way and makes it whole without losing what they put in: follow
 `references/finish-or-remake.md`. It decides where their work ends up, so
 it's never guessed from wording, and their original is never changed
 (except on a new branch, with `--in-place`).
+
+**Controllers and bug reports.** With `--gamepad` (or a request for
+controller play in words), read `references/gamepad.md` when you write the
+design: it covers the design, the build and the play-test. With
+`--feedback`, read `references/feedback.md` when you build. Either one alone
+on a finished game is a change: add it (or, for `--feedback hidden` or
+`off`, switch it) as change.md says.
 
 **Packaging.** `--package` on its own (with `steam`, `windows` or `linux`)
 turns the finished game into desktop apps: follow `references/package.md`,
@@ -355,8 +364,9 @@ Build in milestones, and play each one (Phase 6's tools) before moving on:
 2. **Art and sound in.** Sprites, animations, backgrounds, music and effects.
 3. **All the content.** Every level, enemy and item in the design.
 4. **The whole game.** Title screen, how to play, pause, game over and win
-   screens, mute, saving progress, touch controls, phone layout, and (for web)
-   installing as an app.
+   screens, mute, saving progress, touch controls, phone layout, (for web)
+   installing as an app, and the controller and "Report a bug" button when
+   the settings ask for them.
 5. **Polish.** Screen shake, particles, little bounces, transitions and
    feedback sounds that make it feel alive (the design's "juice" list).
 

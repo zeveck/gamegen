@@ -28,6 +28,8 @@ idea ("for phones", "keep it tiny", "in Godot").
 | Option | What it does |
 |---|---|
 | `--platform desktop`, `mobile` or `both` | Where it'll be played (default: both) |
+| `--gamepad` | Play with a controller, such as a PS5 controller plugged into your computer |
+| `--feedback [on\|hidden\|off]` | A "Report a bug" button that turns players' reports into GitHub issues |
 | `--style <description or link>` | The look and feel to aim for |
 | `--target <web or an engine>` | What to build it in (default: web) |
 | `--scope small`, `medium` or `large` | How big a game (default: sized from your idea) |
@@ -65,6 +67,43 @@ idea ("for phones", "keep it tiny", "in Godot").
 ```
 /gamegen a rhythm game where you tap falling stars --platform mobile
 ```
+
+## --gamepad
+
+**Play it with a controller.** Plug a PS5 controller into your computer (by
+USB or Bluetooth), press any button, and play the whole game with it: moving,
+every menu, pausing. Xbox, Switch Pro and most other controllers work too,
+and the game shows the buttons of whichever one you're holding (✕ ○ □ △ for
+PlayStation). It works best in Chrome or Edge, and in the desktop apps
+`--package` makes (Steam builds always get it).
+
+```
+/gamegen a couch racing game with drifting hover-cars --gamepad
+```
+
+On a game you've already made, `/gamegen --gamepad` adds it.
+
+## --feedback
+
+**A "Report a bug" button in the game**, in its pause menu and settings.
+Players say what went wrong, and GitHub opens with an issue already filled
+in: what they wrote, plus where they were in the game, their browser and
+any errors. A screenshot of the moment is copied, ready to paste. Then
+`/gamegen --change #12` fixes it.
+
+- `--feedback` or `--feedback on`: everyone sees the button.
+- `--feedback hidden`: only people you give a special link to see it: the
+  game's address with `?feedback` on the end. Handy for testers. The game
+  remembers it for them; `?feedback=off` hides it again.
+- `--feedback off`: takes it out.
+
+```
+/gamegen --feedback hidden
+```
+
+Run it on its own to add the button to a game, or to switch between `on` and
+`hidden` later. Players need a GitHub account to report, and the button
+appears once the game is published (its repo must be public).
 
 ## --style
 

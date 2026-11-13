@@ -42,6 +42,9 @@ A table per targeted platform:
 | Action | Keyboard | Touch | (Gamepad, optional) |
 |---|---|---|---|
 
+The Gamepad column is required, covering every menu too, when the game has
+controller support (see gamepad.md).
+
 For touch, say where each control sits on screen, how big it is, and that it
 never hides the action. Say the phone orientation (landscape, portrait or
 either) and why.

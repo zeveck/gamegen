@@ -163,7 +163,8 @@ correction: adjust, show the line again, and ask again.
 ## 3. Get the repository ready
 
 1. **What goes in:** the game (`game/`), `README.md`, `media/`, `LICENSE` if
-   there is one, `.gitignore` and `.github/workflows/pages.yml`. With
+   there is one, `.gitignore`, `.github/workflows/pages.yml`, and
+   `.github/ISSUE_TEMPLATE/bug.yml` for a game with "Report a bug". With
    `--making-of` (or `GAMEGEN_MAKING_OF=on`), also `design/`, and the README
    has its "How it was made" section. Without it, the README says nothing
    about how it was made, and `.gitignore` keeps `design/` out (if `design/`
@@ -187,8 +188,13 @@ correction: adjust, show the line again, and ask again.
    and never over the title, its buttons or the touch controls. A tap on one
    opens the link without starting the game. On an update, keep them, and
    add whichever one is now due.
-6. If the folder isn't in git yet: `git init -b main`.
-7. **Before every commit** (first publish or update), look at what's staged
+6. **"Report a bug"** (when `design/STATUS.md` says `Feedback: on` or
+   `hidden`): fill in the game's repo, add the issue form and its labels, and
+   turn issues on if they're off, as "Publishing" in feedback.md says. The
+   confirmation mentions turning issues on, and, for a private repo, that
+   players won't be able to report.
+7. If the folder isn't in git yet: `git init -b main`.
+8. **Before every commit** (first publish or update), look at what's staged
    (`git status`, `git diff --cached`) and search it for anything that looks
    like a key (`sk-`, `AIza`, `xi-api-key`, `ghp_`, `github_pat_`, long
    random strings next to `key` or `token`) or a private path. If anything

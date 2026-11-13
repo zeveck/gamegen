@@ -37,6 +37,12 @@ audiogen plugins for art and sound, and meshgen for 3D games.
   Windows and Linux; `templates/steam/` has the SteamPipe upload files. The
   Electron version is pinned in `package.sh`: raise it on purpose, and
   re-test a packaged 2D and 3D game (`package.sh test`).
+- `--feedback` (references/feedback.md) bundles gh-feedback
+  (github.com/zeveck/gh-feedback, the owner's) into each game from
+  `templates/feedback/gh-feedback.js`, an unchanged copy of a release, named
+  in `templates/feedback/SOURCE`. To update it: copy the new release, change
+  the version in `SOURCE`, and run the tests. `--gamepad` is in
+  references/gamepad.md.
 - `docs/` is the site at gamegen.synapticnoise.com (GitHub Pages, from
   `main`'s `/docs`): the home page and the Steam guide (`docs/steam-guide.md`).
   Everything in `docs/` is public.

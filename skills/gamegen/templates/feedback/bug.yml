@@ -1,0 +1,14 @@
+# Issue form for player bug reports, from the game's "Report a bug" button.
+# gamegen's publishing copies this to .github/ISSUE_TEMPLATE/bug.yml.
+# The game fills the "description" field; GitHub adds the labels (they must exist).
+name: Bug report
+description: Something in the game isn't working
+labels: ["bug", "player-report"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Your report and the game's details. Paste your screenshot here too (Ctrl/Cmd+V).
+    validations:
+      required: true

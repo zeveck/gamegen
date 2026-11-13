@@ -443,6 +443,46 @@ test('--change can fix GitHub issues, and never touches them itself', () => {
   assert.match(skill, /references\/setup\.md/);
 });
 
+test('--gamepad: PlayStation-first controller support, play-tested with a pretend controller', () => {
+  const ref = read(`${REFS}/gamepad.md`);
+  assert.match(skill, /references\/gamepad\.md/);
+  assert.match(ref, /`Gamepad: yes`/, 'the setting is kept in STATUS.md');
+  assert.match(ref, /navigator\.getGamepads = \(\) =>/, 'the play-test replaces getGamepads');
+  assert.match(ref, /addInitScript/);
+  assert.match(ref, /054c/, 'recognises Sony controllers by vendor id');
+  assert.match(ref, /✕ \(cross\)/);
+  assert.match(ref, /mapping === 'standard'/);
+  assert.match(read(`${REFS}/package.md`), /gamepad\.md/, 'Steam builds use the same guidance');
+});
+
+test('--feedback: bundles gh-feedback with link mode, and publishing sets up the repo', () => {
+  const ref = read(`${REFS}/feedback.md`);
+  const dir = 'skills/gamegen/templates/feedback';
+  const component = read(`${dir}/gh-feedback.js`);
+  const form = read(`${dir}/bug.yml`);
+  assert.match(skill, /references\/feedback\.md/);
+  for (const v of ['on', 'hidden', 'off']) assert.match(ref, new RegExp('`' + v + '`'));
+  assert.match(ref, /templates\/feedback\/gh-feedback\.js/);
+  assert.match(ref, /templates\/feedback\/bug\.yml/);
+  assert.match(ref, /\?feedback=off/);
+  // The bundled copy has link mode, the screenshot hook and the desktop link hook.
+  for (const s of ["customElements.define('gh-feedback'", '_submitLink', 'getScreenshot', 'openLink']) {
+    assert.ok(component.includes(s), `bundled gh-feedback has ${s}`);
+  }
+  // The issue form's field is the one gh-feedback fills for a YAML form.
+  assert.match(component, /isForm \? 'description' : 'body'/);
+  assert.match(form, /id: description/);
+  assert.match(form, /labels: \["bug", "player-report"\]/);
+  assert.match(read(`${dir}/SOURCE`), /zeveck\/gh-feedback[\s\S]*version \d{4}\.\d+\.\d+/);
+  // Publishing fills in the repo and adds the form; the game ignores input while the form is open.
+  const pub = read(`${REFS}/publish.md`);
+  assert.match(pub, /feedback\.md/);
+  assert.match(pub, /ISSUE_TEMPLATE\/bug\.yml/);
+  assert.match(ref, /gh repo edit <repo> --enable-issues/);
+  assert.match(ref, /composedPath/);
+  assert.match(ref, /fb\.openLink/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

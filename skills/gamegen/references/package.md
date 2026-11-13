@@ -37,8 +37,12 @@ These go in the game itself, so they also work (or stay hidden) on the web.
 - **A gamepad.** For `steam`, the game must play with a controller (Steam
   Deck is a controller): the stick and d-pad move, A acts or confirms, B goes
   back, Start pauses, and every menu can be used with them, with the focused
-  button clearly shown. Add it to the input layer with the Gamepad API if
-  it's missing. For `windows` and `linux` it's worth adding too.
+  button clearly shown. If it's missing, add it as gamepad.md says (and play
+  it with the pretend controller there). For `windows` and `linux` it's worth
+  adding too.
+- **"Report a bug"** (games with `--feedback`): the bundled form works in
+  the app, and its link opens in the player's browser once `fb.openLink` is
+  set (see feedback.md). `hidden` means no button in the app.
 - **Words that fit.** "Tap to start" reads "Press any key" or "Click" on a
   desktop (`pointer: fine`), and no "install this app" or "add to home
   screen" hints show in the desktop app.
