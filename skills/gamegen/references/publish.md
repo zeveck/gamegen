@@ -220,8 +220,13 @@ correction: adjust, show the line again, and ask again.
    then `gh run watch <id> --exit-status`.
 5. For a custom address: `publish.sh https <account>/<repo>`, with the Bash
    tool's timeout set to 600000 (it waits up to 9 minutes for GitHub's
-   certificate). If it's still waiting, carry on: the game already works at
-   its address, and running `/gamegen --publish` later makes HTTPS required.
+   certificate). If GitHub hasn't started one after a couple of minutes, it
+   re-saves the address to nudge it (`https: nudged GitHub…`), as saving it
+   again in the repo's Settings > Pages would. If it's still waiting, carry
+   on: the game already works at its address, and running `/gamegen
+   --publish` later makes HTTPS required. (A site built from a branch rather
+   than the workflow, such as a gallery, records address changes as commits
+   by GitHub: `git pull --ff-only` before pushing to it again.)
 6. Load the address (`curl -sL`): it answers 200 and the page has the right
    canonical link and preview image. GitHub can take a minute or two to
    update; try a few times before calling it broken.

@@ -4,6 +4,16 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.13
+
+- Publishing to a new address on your own domain gets HTTPS on its own.
+  GitHub sometimes never asks for the certificate when the address is set
+  before its DNS has spread, so publishing now waits a few minutes for DNS
+  first, and if no certificate has started a couple of minutes later, it
+  re-saves the address to nudge GitHub (the same as saving it again in
+  Settings > Pages). If it still times out, it says how to nudge it by
+  hand (#22).
+
 ## v2026.11.11.2
 
 - **Fix GitHub issues with `--change #12`** (or several, or an issue's

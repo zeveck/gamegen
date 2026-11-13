@@ -487,7 +487,10 @@ case "$*" in
   "api -X POST repos/me/private/pages"*) echo "gh: Your current plan does not support GitHub Pages for this repository. (HTTP 422)" >&2; exit 1 ;;
   "api -X PUT repos/me/private/pages"*) echo "gh: Not Found (HTTP 404)" >&2; exit 1 ;;
   *"--jq .html_url") echo "https://frog.example.com/" ;;
-  *"https_certificate"*) echo "$CERT" ;;
+  *"--jq .cname // \"\""*) echo "frog.example.com" ;;
+  *"https_certificate"*)
+    # "nudge": no certificate until the address has been taken off and set again.
+    if [ "$CERT" = nudge ]; then grep -q -- "--input -" "$GH_LOG" && echo approved || echo none; else echo "$CERT"; fi ;;
 esac
 `);
   chmodSync(join(bin, 'gh'), 0o755);
@@ -495,7 +498,9 @@ esac
   const r = spawnSync('bash', [PUBLISH, ...args], {
     cwd: dir, encoding: 'utf8',
     env: { PATH: `${bin}:/usr/bin:/bin`, HOME: dir, GH_LOG: log, SIGNED_IN: signedIn ? '1' : '0',
-      CERT: cert, PUBLISH_WAIT: '0', PUBLISH_POLL: '0', ...env },
+      CERT: cert, PUBLISH_WAIT: '0', PUBLISH_POLL: '0',
+      // DNS answers as if the address already points at GitHub Pages.
+      PUBLISH_DNS: '185.199.108.153', PUBLISH_DNS_WAIT: '0', PUBLISH_NUDGE_AFTER: '0', ...env },
   });
   return { ...r, calls: existsSync(log) ? readFileSync(log, 'utf8').trim().split('\n') : [] };
 }
@@ -525,6 +530,9 @@ test('publish: turns on Pages at the custom address, then requires HTTPS', (t) =
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
   const r = publish(dir, ['pages', 'me/frog', 'frog.example.com']);
   assert.equal(r.stdout, 'url: https://frog.example.com/\n');
+  // An address whose DNS isn't there yet is still set, with a warning (after a bounded wait).
+  const early = publish(dir, ['pages', 'me/frog', 'frog.example.com'], { env: { PUBLISH_DNS: '' } });
+  assert.match(early.stdout, /^dns: frog\.example\.com doesn't point at GitHub Pages yet; setting it anyway/);
   assert.deepEqual(r.calls, [
     'api -X POST repos/me/frog/pages -f build_type=workflow',
     'api -X PUT repos/me/frog/pages -f cname=frog.example.com',
@@ -535,6 +543,21 @@ test('publish: turns on Pages at the custom address, then requires HTTPS', (t) =
   const refused = publish(dir, ['pages', 'me/private']);
   assert.equal(refused.status, 1);
   assert.equal(refused.stdout, "pages: couldn't turn on GitHub Pages for me/private (GitHub said: Your current plan does not support GitHub Pages for this repository. (HTTP 422))\n");
+  // GitHub never started a certificate: re-save the address (once), then it's on.
+  const fresh = scratch(); t.after(() => rmSync(fresh, { recursive: true, force: true }));
+  const nudged = publish(fresh, ['https', 'me/frog'], { cert: 'nudge' });
+  assert.equal(nudged.stdout, 'https: nudged GitHub to request the certificate\nhttps: on\n');
+  assert.deepEqual(nudged.calls.filter((c) => c.startsWith('api -X PUT')), [
+    'api -X PUT repos/me/frog/pages --input -',
+    'api -X PUT repos/me/frog/pages -f cname=frog.example.com',
+    'api -X PUT repos/me/frog/pages -F https_enforced=true',
+  ]);
+  // Not while the address doesn't point at GitHub yet: just say how to nudge it by hand.
+  const other = scratch(); t.after(() => rmSync(other, { recursive: true, force: true }));
+  const notYet = publish(other, ['https', 'me/frog'], { cert: 'none', env: { PUBLISH_DNS: '' } });
+  assert.equal(notYet.status, 2);
+  assert.ok(!notYet.calls.some((c) => c.includes('--input -')), 'no nudge before DNS is ready');
+  assert.match(notYet.stdout, /Settings > Pages/);
   const waiting = publish(dir, ['https', 'me/frog'], { cert: 'authorization_pending' });
   assert.equal(waiting.status, 2);
   assert.match(waiting.stdout, /still waiting/);

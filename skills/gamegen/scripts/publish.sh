@@ -34,6 +34,39 @@ die() { echo "$1"; exit 1; }
 # GitHub Pages serves every custom domain from these four addresses.
 PAGES_IPS="185.199.108.153 185.199.109.153 185.199.110.153 185.199.111.153"
 
+# The IPv4 addresses <host> resolves to, space-separated (empty if none):
+# the system's resolver first, then Google's public DNS over HTTPS, since a
+# record added minutes ago may still be cached as missing locally.
+# PUBLISH_DNS, when set, stands in for both (for tests).
+resolve() {
+  if [ -n "${PUBLISH_DNS+x}" ]; then printf '%s' "$PUBLISH_DNS"; return; fi
+  python3 - "$1" <<'PY'
+import json, socket, sys, urllib.request
+host, ips = sys.argv[1], set()
+try:
+    ips = {a[4][0] for a in socket.getaddrinfo(host, 443, socket.AF_INET)}
+except OSError:
+    pass
+if not ips:
+    try:
+        with urllib.request.urlopen(f"https://dns.google/resolve?name={host}&type=A", timeout=10) as r:
+            ips = {a["data"] for a in json.load(r).get("Answer", []) if a.get("type") == 1}
+    except Exception:
+        pass
+print(" ".join(sorted(ips)))
+PY
+}
+
+# Does <host> point at GitHub Pages (and only there)?
+on_pages() {
+  local ips ip
+  ips="$(resolve "$1")"
+  [ -n "$ips" ] || return 1
+  for ip in $ips; do
+    case " $PAGES_IPS " in *" $ip "*) ;; *) return 1 ;; esac
+  done
+}
+
 # A GAMEGEN_ setting from the environment, or else the nearest .env (only
 # that line is read: never the keys).
 setting() {
@@ -149,9 +182,7 @@ case "$cmd" in
 
   dns)
     host="${1:?dns needs a host}"; owner="${2:?dns needs the GitHub account}"
-    ips="$(python3 -c "import socket,sys
-try: print(' '.join(sorted({a[4][0] for a in socket.getaddrinfo(sys.argv[1], 443, socket.AF_INET)})))
-except OSError: pass" "$host")"
+    ips="$(resolve "$host")"
     # A subdomain needs a CNAME; a bare domain needs A records.
     case "$host" in
       *.*.*) record="a CNAME record: $host -> $owner.github.io" ;;
@@ -205,6 +236,17 @@ except OSError: pass" "$host")"
       die "pages: couldn't turn on GitHub Pages for $full${reason:+ (GitHub said: $reason)}"
     fi
     if [ -n "$host" ]; then
+      # GitHub checks the address's DNS when it's set; if the record hasn't
+      # spread yet, it never asks for an HTTPS certificate. So wait (a few
+      # minutes at most) until it points at GitHub.
+      until_dns=$(( $(date +%s) + ${PUBLISH_DNS_WAIT:-300} ))
+      until on_pages "$host"; do
+        if [ "$(date +%s)" -ge "$until_dns" ]; then
+          echo "dns: $host doesn't point at GitHub Pages yet; setting it anyway (HTTPS may need a nudge)"
+          break
+        fi
+        sleep "${PUBLISH_POLL:-15}"
+      done
       gh api -X PUT "repos/$full/pages" -f cname="$host" >/dev/null 2>&1 \
         || die "pages: couldn't set the address $host (is it used by another repo?)"
     fi
@@ -230,6 +272,7 @@ except OSError: pass" "$host")"
   https)
     full="${1:?https needs owner/name}"
     deadline=$(( $(date +%s) + ${PUBLISH_WAIT:-540} ))
+    since=$(date +%s); nudges=0
     while :; do
       state="$(gh api "repos/$full/pages" --jq '.https_certificate.state // "none"' 2>/dev/null)"
       if [ "$state" = approved ] || [ "$state" = issued ]; then
@@ -240,7 +283,27 @@ except OSError: pass" "$host")"
       case "$state" in errored|bad_authz|authorization_revoked)
         echo "https: stuck (certificate $state; remove the custom domain in the repo's Pages settings and add it back)"; exit 1 ;;
       esac
+      # No certificate started at all, though the address points at GitHub:
+      # GitHub missed its chance (usually because DNS was still spreading
+      # when the address was set). Re-save the address, as saving it again in
+      # Settings > Pages does, at most twice. A site that already has a
+      # certificate (any state but "none") is never touched.
+      if [ "$state" = none ] && [ "$nudges" -lt 2 ] && [ $(( $(date +%s) - since )) -ge "${PUBLISH_NUDGE_AFTER:-120}" ]; then
+        host="$(gh api "repos/$full/pages" --jq '.cname // ""' 2>/dev/null)"
+        if [ -n "$host" ] && on_pages "$host" \
+          && printf '{"cname":null}' | gh api -X PUT "repos/$full/pages" --input - >/dev/null 2>&1; then
+          gh api -X PUT "repos/$full/pages" -f cname="$host" >/dev/null 2>&1 \
+            || { sleep 5; gh api -X PUT "repos/$full/pages" -f cname="$host" >/dev/null 2>&1; } \
+            || die "https: took $host off to nudge GitHub, but couldn't set it back: set it again in the repo's Settings > Pages"
+          nudges=$((nudges + 1)); since=$(date +%s)
+          echo "https: nudged GitHub to request the certificate"
+          continue  # look again before giving up
+        fi
+      fi
       if [ "$(date +%s)" -ge "$deadline" ]; then
+        if [ "$state" = none ]; then
+          echo "https: still waiting (GitHub hasn't started the certificate; saving the custom domain again in the repo's Settings > Pages usually starts it, or run --publish again in a few minutes)"; exit 2
+        fi
         echo "https: still waiting (certificate $state; run --publish again in a few minutes)"; exit 2
       fi
       sleep "${PUBLISH_POLL:-15}"
