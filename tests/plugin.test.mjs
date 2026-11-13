@@ -481,6 +481,12 @@ test('--feedback: bundles gh-feedback with link mode, and publishing sets up the
   assert.match(ref, /gh repo edit <repo> --enable-issues/);
   assert.match(ref, /composedPath/);
   assert.match(ref, /fb\.openLink/);
+  // Ctrl+Shift+F works even when the game is stuck, and never on a game key.
+  assert.match(ref, /\*\*Ctrl\+Shift\+F\*\* opens the report from anywhere/);
+  assert.match(ref, /\*\*Its letter is never one of the game's keys,\*\*/);
+  assert.match(ref, /e\.ctrlKey[^\n]*e\.shiftKey[\s\S]*\}, true\);/, 'its own listener, in the capture phase');
+  assert.match(ref, /\*\*before\*\* the game's code/);
+  assert.match(ref, /__reports/, 'the play-test checks normal play never opens it');
 });
 
 test('the service worker template and the Pages workflow agree on placeholders', () => {

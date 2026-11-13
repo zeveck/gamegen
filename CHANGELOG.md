@@ -4,6 +4,13 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.13.4
+
+- **Ctrl+Shift+F reports a bug from anywhere** in a game with `--feedback`,
+  even when it's stuck and its menus can't be reached: on the web and in the
+  desktop apps, and with `hidden` too, for testers. It never uses one of the
+  game's own keys, so normal play can't open it.
+
 ## v2026.11.13.3
 
 - The "Report a bug" form no longer jumps back to its title box when a

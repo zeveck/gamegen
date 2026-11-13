@@ -80,6 +80,44 @@ const showReport = !!fb?.getAttribute('repo') &&
 
 In the desktop app (`window.desktop`), there's no address to add
 `?feedback` to, so `hidden` means no button there; `on` works as on the web.
+The shortcut below works in both.
+
+### The shortcut: Ctrl+Shift+F
+
+**Ctrl+Shift+F** opens the report from anywhere, even when the game is stuck
+and its menus can't be reached. It works whenever the game has a repo, with
+`on` or `hidden`, on the web and in the desktop app. It's Ctrl on a Mac
+too (Cmd+Shift+F switches some Mac browsers to full screen).
+
+**Its letter is never one of the game's keys,** so normal play can never
+open it. If F is in the controls table, use another letter the game doesn't
+use and the browser doesn't take (not N, T, W, R, I, J, P or B), and write
+it in the design next to the controls.
+
+Set it up in its own small script **before** the game's code, so an error in
+the game can't stop it:
+
+```html
+<script>
+  addEventListener('keydown', (e) => {
+    if (!e.ctrlKey || !e.shiftKey || e.altKey || e.metaKey || e.key.toLowerCase() !== 'f') return;
+    const fb = document.getElementById('report');
+    if (!fb?.getAttribute('repo') || document.activeElement === fb) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    try { window.reportShortcut?.(); } catch {}   // the game pauses, if it still can
+    fb.open();
+  }, true);
+</script>
+```
+
+The game sets `window.reportShortcut` to a function that pauses it the
+usual way (taking the snapshot below). If the game is stuck and that fails,
+the form still opens, with the canvas as it is.
+
+With `on`, the controls screen lists it ("Ctrl+Shift+F: report a bug"). With
+`hidden`, it stays off-screen; gamegen's report to the person mentions it,
+with the `?feedback` link, for testers.
 
 ### Opening it
 
@@ -123,7 +161,8 @@ before drawing the pause screen:
 ```js
 let pauseShot = null;
 function snapshot() { pauseShot = new Promise((r) => canvas.toBlob(r, 'image/png')); }
-// call snapshot() as the game pauses, right after the last game frame is drawn
+// call snapshot() as the game pauses, right after the last game frame is drawn,
+// and set pauseShot = null when it resumes, so an old picture is never sent
 fb.getScreenshot = () => pauseShot ?? new Promise((r) => canvas.toBlob(r, 'image/png'));
 ```
 
@@ -200,17 +239,28 @@ Then:
    `https://github.com/test/test/issues/new?`, and its `description` holds
    the details (game, address, state, errors). The form says the screenshot
    is copied.
-5. On a phone size: the form fits, and its text boxes take typing.
-6. For `hidden`: load without `?feedback` in a fresh browser: no button.
-   With `?feedback`: button. Again without: still there. `?feedback=off`:
-   gone.
-7. Screenshot the form over the game, and look at it: readable, in the
+5. **The shortcut:** mid-level, not paused, press Ctrl+Shift+F (or the
+   game's letter): the form opens over the paused game, with a picture of
+   the level. Escape leaves the game on its pause menu. Then resume, stop the
+   game's loop as a crash would, and press it again: the form still opens.
+   To stop the loop, turn off animation frames just long enough for the
+   game's next one to be lost, then turn them back on (the form needs them):
+   `page.evaluate(() => { const raf = requestAnimationFrame; window.requestAnimationFrame = () => 0; setTimeout(() => { window.requestAnimationFrame = raf; }, 150); })`,
+   then wait 300 ms.
+6. **Never by accident:** count opens
+   (`page.evaluate(() => { const fb = document.getElementById('report'), o = fb.open.bind(fb); window.__reports = 0; fb.open = () => (window.__reports++, o()); })`),
+   replay every level's recorded solution, and check `__reports` is still 0.
+7. On a phone size: the form fits, and its text boxes take typing.
+8. For `hidden`: load without `?feedback` in a fresh browser: no button,
+   but the shortcut still opens the form. With `?feedback`: button. Again
+   without: still there. `?feedback=off`: gone.
+9. Screenshot the form over the game, and look at it: readable, in the
    game's colors.
 
 ## In the report and README
 
 The README's "How to play" gets one line: "Found a bug? Pause and pick
-'Report a bug' (you'll need a GitHub account)." For `hidden`, the README
-says nothing; the report to the person gives the `?feedback` address to hand
-to testers. Either way, the report says that reports arrive as issues in the
+'Report a bug', or press Ctrl+Shift+F (you'll need a GitHub account)." For
+`hidden`, the README says nothing; the report to the person gives the
+`?feedback` address and the shortcut to hand to testers. Either way, the report says that reports arrive as issues in the
 game's repo, and `/gamegen --change #12` fixes one.

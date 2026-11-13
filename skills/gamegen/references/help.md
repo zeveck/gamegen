@@ -101,6 +101,10 @@ any errors. A screenshot of the moment is copied, ready to paste. Then
 /gamegen --feedback hidden
 ```
 
+**Ctrl+Shift+F** (Ctrl on a Mac too) opens the report from anywhere, even
+when the game is stuck and you can't reach its menus. It works with `hidden`
+too, and in the desktop apps, so testers can use it.
+
 Run it on its own to add the button to a game, or to switch between `on` and
 `hidden` later. Players need a GitHub account to report, and the button
 appears once the game is published (its repo must be public).
