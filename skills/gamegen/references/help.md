@@ -50,6 +50,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--in-place` | With `--finish`: work in your original project, on a new branch |
 | `--leeway little\|some\|lots` | With `--finish` or `--remake`: how freely to change it |
 | `--package [steam\|windows\|linux]` | Make Windows and Linux apps of a game, ready for Steam |
+| `--bugcheck` | Check a finished game for bugs worth fixing, and report them first |
 | `--out <folder>` | Where to put the game |
 
 `/gamegen help <option>` explains one, for example `/gamegen help style`.
@@ -432,6 +433,22 @@ you merge it. It needs the project to be in git, with nothing unsaved.
 - `lots`: treat it as a sketch, and build what it was reaching for.
 
 Without it, gamegen picks one from what it finds and tells you which.
+
+## --bugcheck
+
+**Check a finished game for bugs.** Fresh reviewers who didn't build it play
+it at every size and read its code, and you get a short list of what's
+worth fixing, most important first: what goes wrong, where, how often a
+player would meet it, and how big the fix is. Small things that don't matter
+get one line, not a page.
+
+```
+/gamegen --bugcheck
+```
+
+Nothing changes until you say which to fix. Then gamegen fixes them as a
+change, or, for a published game, can file them as GitHub issues for later
+(`/gamegen --change #12` fixes one). It costs nothing: nothing is generated.
 
 ## --package
 

@@ -23,6 +23,11 @@ Rules for every reviewer:
   quit there" is useful.
 - At most 10 findings, most important first. Fewer, better findings beat a
   long list.
+- Report what's real: a problem players or the build would plausibly hit,
+  or a safety one (anything unsafe, lost progress, a broken game or publish). Weigh how
+  likely it is, how bad it is and how big the fix would be; skip exotic edge
+  cases, and a rare, mild problem whose fix would be large. When it's close,
+  say which way you leaned.
 - Don't rewrite the design; that's the refiner's job.
 
 ## Player

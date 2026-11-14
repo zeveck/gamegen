@@ -33,8 +33,9 @@ question tool or a multiple-choice prompt.
 
 **`--no-confirm`** means: don't stop for approvals the person would give
 anyway (publishing's "Go ahead?", the plan for `--finish` and `--remake`):
-say what you're doing and carry on. A "did you mean…?" question isn't an
-approval: with `--no-confirm`, take the cautious choice (2D, when it might
+say what you're doing and carry on. `--bugcheck`'s "which should I fix?"
+isn't an approval either: it always stops for the person's answer. A "did
+you mean…?" question isn't an approval: with `--no-confirm`, take the cautious choice (2D, when it might
 be 3D) and say so in the first update. Safety stops always stop, flag or
 not: anything that looks like a key or private path about to go online,
 making a private repo public, using a repo or folder that isn't this
@@ -117,6 +118,7 @@ value) is the game description. Flags and defaults:
 | `--gallery` | with `--publish`: the GitHub repo of a gallery of their games, or `none` | none |
 | `--making-of` | the README also tells how the game was made; publishing includes `design/` | off |
 | `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game (`references/package.md`) | off (`steam` alone) |
+| `--bugcheck` | check a finished game for bugs worth fixing; report first, change nothing (`references/bugcheck.md`) | off |
 | `--finish` | a folder or repo of a game they started: finish it, in a copy (`references/finish-or-remake.md`) | off |
 | `--remake` | a folder or repo of a game they started: make it again, keeping their assets and ideas | off |
 | `--in-place` | with `--finish`: work in the original, on a new branch | off: a copy |
@@ -166,7 +168,7 @@ such as `hoard-hopper`). Never overwrite someone's files: an existing
 `design/GAME_DESIGN.md`, when `--continue` wasn't given) means a new folder.
 Say which folder you chose in your first update.
 
-**Finding an existing game** (for `--continue`, `--change` and `--publish`): use `--out`
+**Finding an existing game** (for `--continue`, `--change`, `--publish` and `--bugcheck`): use `--out`
 if given. Otherwise the current folder, if it holds a game (a
 `design/STATUS.md`). Otherwise the game folders directly below it: if there's
 one, use it; if there are several, use the one changed most recently and say
@@ -199,6 +201,13 @@ read `references/feedback.md` when you write the design: the design places
 the button, and the shortcut's letter if it isn't F. Either one alone
 on a finished game is a change: add it (or, for `--feedback hidden` or
 `off`, switch it) as change.md says.
+
+**Checking for bugs.** `--bugcheck` on its own checks a finished game with
+fresh reviewers and reports what's worth fixing: follow
+`references/bugcheck.md`, and do nothing else (no setup check: nothing is
+generated). It changes nothing until the person picks what to fix. It only
+runs alone: with a description or any other option, say so and ask which to
+do first.
 
 **Packaging.** `--package` on its own (with `steam`, `windows` or `linux`)
 turns the finished game into desktop apps: follow `references/package.md`,

@@ -657,6 +657,22 @@ test('the desktop app runs one copy at a time; the icon step takes paths as argu
   assert.match(read('skills/gamegen/scripts/package.sh'), /Image\.open\(sys\.argv\[1\]\)/);
 });
 
+test('--bugcheck reports what clears the bar, and changes nothing until asked', () => {
+  const ref = read(`${REFS}/bugcheck.md`);
+  assert.match(skill, /references\/bugcheck\.md/);
+  assert.match(ref, /^## The bar$/m);
+  assert.match(ref, /\*\*Check each finding yourself\*\*/);
+  assert.match(ref, /end by asking which to fix/);
+  assert.match(ref, /only when the person asks/);
+  assert.match(ref, /Run two at a time\s+at\s+most/);
+  assert.match(ref, /Always stop here, even with `--no-confirm`/);
+  assert.match(skill, /`--bugcheck`'s "which should I fix\?"\s+isn't an approval/);
+  assert.match(skill, /follow\s+`references\/bugcheck\.md`, and do nothing else/);
+  assert.match(ref, /Never file a\s+safety finding as an issue/);
+  // The same bar guides every reviewer, in ordinary builds too.
+  assert.match(read(`${REFS}/review-roles.md`), /Report what's real:/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

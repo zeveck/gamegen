@@ -87,6 +87,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--remake <folder or repo>` | Make a game you started again, as a new game in a new repo, keeping your art, levels and ideas. | off |
 | `--in-place` | With `--finish`: work in your original project, on a new branch, instead of a copy. | off |
 | `--leeway little`, `some` or `lots` | With `--finish` or `--remake`: how freely gamegen may change your game. | picked from your game |
+| `--bugcheck` | Check a finished game for bugs worth fixing: fresh reviewers play it and read its code, and you get a short list, most important first. Nothing changes until you pick what to fix; for a published game they can become GitHub issues instead. | off |
 | `--package [steam, windows or linux]` | Turn a finished game into apps for Windows and Linux that run without a browser, such as a Windows `.exe`. `steam` (the default) also makes the store images and upload files for Steam, plus a checklist of what's left to do in Steamworks; see the [Steam guide](https://gamegen.synapticnoise.com/steam-guide/). | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
 

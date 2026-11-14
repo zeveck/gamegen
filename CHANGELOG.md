@@ -4,6 +4,16 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.8
+
+- **`--bugcheck`: check a finished game for bugs.** Fresh reviewers play it
+  and read its code, and you get a short list of what's worth fixing, most
+  important first, with how often players would meet each one and how big
+  the fix is. Nothing changes until you pick what to fix; for a published
+  game they can become GitHub issues instead.
+- Every review, in ordinary builds too, now reports what's real (problems
+  players would meet, or safety ones) rather than every edge case.
+
 ## v2026.11.14.7
 
 - A `.env` file saved on Windows now works for publishing settings and DNS.
