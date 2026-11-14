@@ -117,6 +117,24 @@ else. Aim for:
   and nothing cut off or spilling out of its box at any size.
 - **A first load that appears once and stays still:** the title shows up
   with its real fonts and art, and nothing jumps or changes after that.
+- **Screens that hand over cleanly:** closing one screen never shows what's
+  underneath unless that's meant to be the next view. When a full-screen
+  screen (the title, a story picture, a chapter card) or an overlay in a
+  sequence (a dialog line, a toast, one menu replacing another) closes, the
+  next often opens a frame or more later: a script carries on after the
+  frame is drawn, or awaits an image or a load. For those frames the game
+  map (or the scene with no dialog box) flashes through. Any of these fixes
+  it:
+  - **Hold the closed screen:** keep drawing it, frozen and not clickable,
+    until the next one opens, which ends the hold at once. Cap it: about 20
+    frames for a full-screen screen (longer from New Game to the first story
+    picture while the level loads), 2 or 3 for a dialog line or a toast, so
+    the last one in a sequence doesn't hang around.
+  - **Open the next before closing the current one,** with its art loaded
+    first (with a stack of screens, remove the old one by name, not by
+    popping the top).
+  - **Reveal the game on purpose,** with a fade, never by the cover simply
+    disappearing.
 - **One consistent style of icons** that shows up on every device (emoji and
   symbol characters often don't).
 - **Pop-up messages** that don't cover each other or the action.
@@ -235,6 +253,9 @@ state and set up situations, without playing for it:
 ```js
 window.__game = {
   state: () => ({ screen, level, lives, score, player: { x, y }, levelComplete, gameWon }),
+  // What was drawn, as [screen, frames] pairs: one pair per change of
+  // screen, top screen last ('title', 'map', 'map>dialog'). See below.
+  frames: () => frameLog,
   levels: () => /* number of levels */,
   goToLevel: (n) => { /* start level n fresh, as if just arrived */ },
   audioState: () => ({ context: audioCtx?.state, musicMuted, sfxMuted }),
@@ -242,6 +263,29 @@ window.__game = {
   buttons: () => [{ label: 'Credits', x, y, w, h }],
 };
 ```
+
+**The frame log** records what each drawn frame showed, so the play-test
+can catch a screen that flashes for a frame or two (see "Screens that hand
+over cleanly"). Push it where the frame is drawn (`draw()` or the
+`requestAnimationFrame` callback), naming what's actually on screen,
+including a screen that's being held after it closed. Name screens, not
+their contents: a fade or an animation keeps one name all the way through.
+Keep only changes, and at most 200 of them:
+
+```js
+const frameLog = [];
+function logFrame(name) { // call once per drawn frame
+  const last = frameLog[frameLog.length - 1];
+  if (last && last[0] === name) last[1]++;
+  else { frameLog.push([name, 1]); if (frameLog.length > 200) frameLog.shift(); }
+}
+```
+
+With a stack of screens, the name is their kinds joined with `>`. With a
+single `screen` variable, it's that plus any open overlay
+(`screen + (dialogOpen ? '>dialog' : '')`). For menus made of HTML elements,
+log the visible ones in a `requestAnimationFrame` callback (for example the
+ids of `[data-screen]:not([hidden])`, joined with `>`).
 
 Keep it harmless: it shouldn't change normal play. The play-test drives the
 game with real key presses and touches, and uses the hook only to read state

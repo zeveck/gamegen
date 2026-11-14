@@ -4,6 +4,15 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.3
+
+- No more flashes between screens. When one screen closes and the next opens
+  a moment later (between story pictures, or two lines of a conversation),
+  the game could show what's underneath for a frame or two: too quick for a
+  screenshot, but players see it, often right at the start. Games now hand
+  screens over cleanly, and the play-test checks the opening and every story
+  scene frame by frame (#23).
+
 ## v2026.11.14.2
 
 - Play-tests serve the game with caching off, so a long test session never

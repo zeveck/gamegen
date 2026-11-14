@@ -552,6 +552,26 @@ test('long play-test runs report progress, have limits and get checked (#15)', (
   assert.match(read(`${REFS}/3d.md`), /\*\*Skip drawing in long runs\.\*\*/);
 });
 
+test('screens hand over cleanly, checked frame by frame (#23)', () => {
+  const web = read(`${REFS}/web-target.md`);
+  const guide = read(`${REFS}/playtest-guide.md`);
+  assert.match(web, /\*\*Screens that hand over cleanly:\*\*/);
+  assert.match(web, /frames: \(\) => frameLog/, 'the debug hook has a frame log');
+  assert.match(guide, /^## Screen changes, frame by frame$/m);
+  assert.match(read(`${REFS}/review-roles.md`), /\*\*Flashes between screens:\*\*/);
+  assert.match(skill, /check screen changes\s+frame by frame/);
+  // Run the guide's own check on sample logs: the flashes from the issue are
+  // found, a clean run and a long fade aren't, and an empty log says so.
+  const section = guide.slice(guide.indexOf('## Screen changes, frame by frame'));
+  const code = section.match(/eval "(\(\(\) => \{[\s\S]*?\}\)\(\))"/)[1];
+  const check = (log) => JSON.parse(new Function('window', `return ${code}`)({ __game: { frames: () => log } }));
+  const issue = check([['title', 60], ['map', 4], ['picture', 90], ['map', 1], ['picture', 90], ['explore>dialog', 40], ['explore', 1], ['explore>dialog', 40], ['explore', 600]]);
+  assert.deepEqual(issue.flashes, ['map x4', 'map x1', 'explore x1']);
+  assert.deepEqual(check([['title', 60], ['fade', 20], ['picture', 90], ['explore', 600]]).flashes, ['fade x20'], 'a short screen between two others is listed for a look');
+  assert.deepEqual(check([['title', 60], ['picture', 90], ['explore', 600]]).flashes, []);
+  assert.equal(check([]).frames, 0, 'an empty log is reported as empty, not as a pass');
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

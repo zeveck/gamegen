@@ -161,6 +161,11 @@ The polish checklist:
 - **Icons** that don't match each other, or don't show.
 - **The first load:** anything that flickers, jumps or changes once the
   title is up.
+- **Flashes between screens:** through the opening and every scripted
+  change (story pictures, chapter cards, dialog lines, losing and winning),
+  anything that shows for a frame or two between two screens. Read the
+  debug hook's frame log, as playtest-guide.md's "Screen changes, frame by
+  frame" says; screenshots can't show it.
 - **Anything else that looks unfinished.**
 
 Use the same finding format, with the screen, the size and a screenshot for

@@ -199,8 +199,10 @@ Work through the design's definition of done. At minimum:
    (`localstorage-list`).
 8. **Pausing.** Pausing, switching tabs and coming back, and resizing in the
    middle of a level all work.
-9. **The first load** (see "The first load" below): the title appears once,
-   in its real fonts and art, and nothing jumps afterwards.
+9. **The first load and screen changes** (see "The first load" and "Screen
+   changes, frame by frame" below): the title appears once, in its real
+   fonts and art, and nothing jumps afterwards; and no screen flashes
+   between two others, from New Game on.
 10. **The words on screen** pass the text scanner at every screenshot (see
     "Screenshots").
 11. **Offline** (web games that install): in a fresh session, open the game
@@ -237,6 +239,34 @@ loading and when the picture changed. Look at the filmstrip. The title should
 appear once, in its real fonts and with its art, and then stay put: every
 change after it appears is a flicker or a jump to fix (see "Looking finished"
 in web-target.md). A fade-in as the title appears is fine.
+
+## Screen changes, frame by frame
+
+A screen that flashes for a frame or two between two others (the game map
+between the title and the first story picture, the scene with no dialog box
+between two lines of a conversation) never shows in a screenshot: they're
+taken once things have settled. The debug hook's frame log shows it (see
+web-target.md). Play through, then read it:
+
+- New Game, through any intro, to the first moment the player is in control;
+- every chapter card or story picture, and each scripted conversation;
+- losing, winning and the ending.
+
+After each, list the screens that showed for half a second or less between
+two others:
+
+```bash
+playwright-cli -s=desktop eval "(() => { const log = window.__game.frames(); const frames = log.reduce((t, [, n]) => t + n, 0); const flashes = log.filter(([, n], i) => i > 0 && i < log.length - 1 && n <= 30).map(([s, n]) => s + ' x' + n); return JSON.stringify({ frames, changes: log.length, flashes }); })()"
+```
+
+- **`frames` is 0 or tiny:** the log isn't working (or a 3D game is still
+  in `quiet` mode); fix that first, or the check proves nothing.
+- **Each entry in `flashes`** is a screen to fix ("Screens that hand over
+  cleanly" in web-target.md), unless it's meant to be there (a fade
+  between two screens, or a deliberate one-frame white flash on a hit).
+- **Look at the whole log too** (`frames()`): the game view showing between
+  two full-screen screens is a flash however long it lasts, unless it's a
+  deliberate pause.
 
 ## Screenshots
 

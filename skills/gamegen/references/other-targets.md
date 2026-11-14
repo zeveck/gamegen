@@ -43,6 +43,11 @@ reviews: the Builder and Bug hunter reviews matter even more.
   `godot --headless --path <project> --quit` to check it loads; a test scene
   or script that plays through levels). Pygame: a test mode that steps the
   game without a window and checks each level can be finished.
+- **Flashes between screens:** where the engine runs here, its test mode
+  records the top screen each frame and the same check runs on that log
+  (see "Screen changes, frame by frame" in playtest-guide.md). Where it
+  doesn't, look in the code for a screen that closes with the next opening
+  later (after an await, a signal or a load) and nothing covering the gap.
 - **Engines that don't:** check what can be checked without them (scripts
   parse, every referenced asset exists, scene files are well formed), and say
   plainly what wasn't tested.

@@ -391,7 +391,8 @@ every level, start to finish, with no errors in the console. Prove each level
 can be completed, and once, after the last fixes, play the whole game from New
 Game to the win screen in one run. Open everything every button opens, not just the main
 screens. Take screenshots of each screen and level into `design/screenshots/`,
-run the text scanner at each one, film the first load, and look at them all.
+run the text scanner at each one, film the first load, check screen changes
+frame by frame, and look at them all.
 
 Checking that it works isn't enough: it has to look finished too. Junk text
 on screen is a bug like any other.
