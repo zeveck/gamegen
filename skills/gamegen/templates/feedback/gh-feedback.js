@@ -478,6 +478,27 @@ function canCopyImage() {
     (typeof ClipboardItem.supports !== 'function' || ClipboardItem.supports('image/png'));
 }
 
+/** Stop "@name" from pinging a GitHub user (a zero-width space after the @). */
+function noMentions(s) {
+  return String(s).replace(/(^|[^\w])@(?=\w)/g, '$1@\u200B');
+}
+
+/** Make a value safe inside one cell of a Markdown table. */
+function escCell(s) {
+  return noMentions(String(s)
+    .replace(/\r\n|\r|\n/g, ' ')
+    .replace(/\\/g, '\\\\')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/([|`*_~])/g, '\\$1'));
+}
+
+/** A CSS colour, or null if the value isn't one. */
+function cssColor(v) {
+  return v && CSS.supports('color', v) && !/["'<>&]/.test(v) ? v : null;
+}
+
 function esc(str) {
   const d = document.createElement('div');
   d.textContent = str;
@@ -515,6 +536,26 @@ class GhFeedback extends HTMLElement {
     this._shot = null;       // Promise<Blob|null> captured when the form opened (link mode)
     this._shotUrl = null;    // object URL for the thumbnail / download link
     this._shotRemoved = false;
+    this._submitId = 0;      // bumped on close/reset, so a late result from an old submit is ignored
+    this._abort = null;      // AbortController of the in-flight request
+    this._returnFocus = null;
+    // While open, keep keys and pointer input typed into the popup away from the
+    // page (a game's own listeners). Bubbling phase, so page capture listeners still run.
+    const stop = (e) => {
+      if (!this._isOpen) return;
+      e.stopPropagation();
+      // Escape no longer reaches the document listener from here: close directly.
+      if (e.type === 'keydown' && e.key === 'Escape') this._close();
+    };
+    for (const t of ['keydown', 'keyup', 'keypress', 'pointerdown', 'pointerup', 'pointermove',
+      'mousedown', 'mouseup', 'mousemove', 'click', 'dblclick', 'contextmenu', 'touchstart', 'touchmove', 'touchend', 'wheel']) {
+      this.shadowRoot.addEventListener(t, stop);
+    }
+  }
+
+  /** True while the feedback popup is open. */
+  get isOpen() {
+    return this._isOpen;
   }
 
   /** Set token via JS property to avoid exposing it in the DOM. */
@@ -607,6 +648,7 @@ class GhFeedback extends HTMLElement {
   }
 
   _applyColor(color) {
+    color = cssColor(color);
     if (color) {
       this.style.setProperty('--gh-feedback-primary', color);
       this.style.setProperty('--gh-feedback-primary-hover', this._lighten(color, 15));
@@ -619,6 +661,7 @@ class GhFeedback extends HTMLElement {
   }
 
   _applyPopupColor(color) {
+    color = cssColor(color);
     if (color) {
       this.style.setProperty('--gh-feedback-popup-color', color);
       this.style.setProperty('--gh-feedback-popup-color-hover', this._lighten(color, 15));
@@ -717,7 +760,7 @@ class GhFeedback extends HTMLElement {
     const smIconSize = isPixelSize ? Math.round(size * 0.35) : { sm: 14, md: 16, lg: 18 }[size];
 
     // Border customization
-    const borderColor = this.getAttribute('border-color');
+    const borderColor = cssColor(this.getAttribute('border-color'));
     const borderWidth = this.getAttribute('border-width');
     const borderRadius = this.getAttribute('border-radius');
 
@@ -768,15 +811,16 @@ class GhFeedback extends HTMLElement {
       if (isPixelSize && buttonText) {
         // Override to pill shape
         const styleParts = [];
+        const bw = parseInt(borderWidth, 10);
+        const br = parseInt(borderRadius, 10);
         if (borderColor) {
-          const bw = borderWidth ? `${borderWidth}px` : '1px';
-          styleParts.push(`border: ${bw} solid ${borderColor}`);
-        } else if (borderWidth) {
-          styleParts.push(`border-width: ${borderWidth}px`);
+          styleParts.push(`border: ${bw > 0 ? bw : 1}px solid ${borderColor}`);
+        } else if (bw > 0) {
+          styleParts.push(`border-width: ${bw}px`);
           styleParts.push('border-style: solid');
         }
         styleParts.push(`min-height: ${size}px`, `height: auto`, `width: auto`, `padding: 0 ${Math.round(size * 0.4)}px`);
-        styleParts.push(`border-radius: ${borderRadius ? borderRadius + 'px' : Math.round(size / 2) + 'px'}`);
+        styleParts.push(`border-radius: ${isNaN(br) ? Math.round(size / 2) : br}px`);
         fabStyle = ` style="${styleParts.join('; ')}"`;
       }
       const pillTextStyle = isPixelSize ? ` style="font-size: ${Math.max(12, Math.round(size * 0.3))}px"` : '';
@@ -942,8 +986,23 @@ class GhFeedback extends HTMLElement {
   }
 
   _open() {
-    // Screenshot first, while the page is still uncovered (only on a fresh open)
-    if (!this._isOpen) this._captureScreenshot();
+    if (this._isOpen) {
+      // Already open: after a link-mode submit show a fresh form, otherwise just focus it.
+      if (this.shadowRoot.querySelector('.link-note')) this._resetForm();
+      const focusable = this._getFocusableElements();
+      const title = this.shadowRoot.querySelector('#ghf-title');
+      (focusable.includes(title) ? title : focusable[0])?.focus();
+      return;
+    }
+    // Screenshot first, while the page is still uncovered
+    this._captureScreenshot();
+    this._returnFocus = document.activeElement;
+
+    // A game may hold the pointer or have its canvas fullscreen: release both so the popup can be used.
+    document.exitPointerLock?.();
+    if (document.fullscreenElement && !document.fullscreenElement.contains(this)) {
+      document.exitFullscreen?.()?.catch?.(() => {});
+    }
 
     // Close all other instances first
     document.querySelectorAll('gh-feedback').forEach(el => {
@@ -998,21 +1057,16 @@ class GhFeedback extends HTMLElement {
       if (e.key !== 'Tab' || !this._isOpen) return;
       const focusable = this._getFocusableElements();
       if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (e.shiftKey) {
-        if (shadow.activeElement === first || document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (shadow.activeElement === last || document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
+      // Focus outside the popup's visible controls counts as an end, so it wraps.
+      const i = focusable.indexOf(shadow.activeElement);
+      if (e.shiftKey ? i <= 0 : (i === -1 || i === focusable.length - 1)) {
+        e.preventDefault();
+        focusable[e.shiftKey ? focusable.length - 1 : 0].focus();
       }
     };
     shadow.addEventListener('keydown', this._focusTrapHandler);
+
+    this.dispatchEvent(new CustomEvent('gh-feedback:open', { bubbles: true, composed: true }));
   }
 
   _close() {
@@ -1037,8 +1091,8 @@ class GhFeedback extends HTMLElement {
       }
     }, 160);
 
-    // Return focus to trigger (deferred so Firefox processes the close before focus moves)
-    if (trigger) setTimeout(() => trigger.focus(), 0);
+    // Stop an in-flight request
+    if (this._abort) { this._abort.abort(); this._abort = null; }
 
     // Remove listeners
     if (this._escapeHandler) {
@@ -1071,6 +1125,18 @@ class GhFeedback extends HTMLElement {
       this._render();
       this._bindEvents();
     }
+
+    // Return focus to what had it before opening, else the trigger (read after any
+    // re-render; deferred so Firefox processes the close before focus moves).
+    const back = this._returnFocus;
+    this._returnFocus = null;
+    setTimeout(() => {
+      if (this._isOpen) return;
+      if (back && back !== this && back !== document.body && back.isConnected) back.focus();
+      else this._getTriggerEl()?.focus();
+    }, 0);
+
+    this.dispatchEvent(new CustomEvent('gh-feedback:close', { bubbles: true, composed: true }));
   }
 
   _getFocusableElements() {
@@ -1078,8 +1144,8 @@ class GhFeedback extends HTMLElement {
     const popup = shadow.querySelector('.popup');
     if (!popup) return [];
     return Array.from(popup.querySelectorAll(
-      'button:not([disabled]), input:not([disabled]), textarea:not([disabled])'
-    ));
+      'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled])'
+    )).filter(el => el.getClientRects().length > 0);
   }
 
   _resetForm() {
@@ -1092,6 +1158,7 @@ class GhFeedback extends HTMLElement {
     const formView = shadow.querySelector('.form-view');
     const submitBtn = shadow.querySelector('.submit-btn');
 
+    this._submitId++;
     this._clearScreenshot();
     const note = shadow.querySelector('.link-note');
     if (note) note.remove();
@@ -1202,12 +1269,15 @@ class GhFeedback extends HTMLElement {
     }
     if (context) payload.context = context;
 
+    const id = this._submitId;
+    const abort = this._abort = new AbortController();
     try {
       let response;
       if (mode === 'proxy') {
         // Proxy mode
         response = await fetch(endpoint, {
           method: 'POST',
+          signal: abort.signal,
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...payload, repo })
         });
@@ -1221,6 +1291,7 @@ class GhFeedback extends HTMLElement {
 
         response = await fetch(`https://api.github.com/repos/${repo}/issues`, {
           method: 'POST',
+          signal: abort.signal,
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json',
@@ -1239,9 +1310,12 @@ class GhFeedback extends HTMLElement {
       try {
         data = await response.json();
       } catch {
+        if (id !== this._submitId) return;
         this._onError('Unexpected response — check endpoint URL');
         return;
       }
+      if (id !== this._submitId) return; // closed or reset meanwhile
+      this._abort = null;
 
       if (!response.ok) {
         if (response.status >= 500) {
@@ -1265,6 +1339,8 @@ class GhFeedback extends HTMLElement {
       this._onSuccess(issueNumber, issueUrl);
 
     } catch (err) {
+      if (id !== this._submitId) return; // aborted by close, or stale
+      this._abort = null;
       // Network / CORS error
       if (err instanceof TypeError && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
         this._onError('Request blocked — this may be a CORS issue. Check that your endpoint allows requests from this origin.');
@@ -1290,14 +1366,7 @@ class GhFeedback extends HTMLElement {
     if (context && typeof context === 'object') payload.context = context;
 
     const shot = this._shotRemoved ? null : this._shot;
-    const url = this._buildLinkUrl(payload, repo, !!shot);
-
-    const detail = { ...payload, labels: this._getLabels(), repo, mode: 'link', url };
-    delete detail.context;
-    const submitEvent = new CustomEvent('gh-feedback:submit', {
-      bubbles: true, composed: true, cancelable: true, detail
-    });
-    if (!this.dispatchEvent(submitEvent)) return;
+    const id = this._submitId;
 
     this._setFieldsDisabled(true);
     const submitBtn = shadow.querySelector('.submit-btn');
@@ -1316,6 +1385,20 @@ class GhFeedback extends HTMLElement {
       } catch { copied = false; }
     }
     const blob = shot ? await Promise.race([shot, new Promise(r => setTimeout(() => r(null), 1000))]) : null;
+    if (id !== this._submitId) return; // closed while waiting
+
+    // Built only now, so it says "screenshot copied" only when one was.
+    const url = this._buildLinkUrl(payload, repo, copied);
+    const detail = { ...payload, labels: this._getLabels(), repo, mode: 'link', url };
+    delete detail.context;
+    const submitEvent = new CustomEvent('gh-feedback:submit', {
+      bubbles: true, composed: true, cancelable: true, detail
+    });
+    if (!this.dispatchEvent(submitEvent)) {
+      this._setFieldsDisabled(false);
+      submitBtn.disabled = false;
+      return;
+    }
 
     let opened = false;
     if (typeof this.openLink === 'function') {
@@ -1327,6 +1410,7 @@ class GhFeedback extends HTMLElement {
       if (tab) { try { tab.opener = null; } catch { /* cross-origin */ } }
       opened = !!tab;
     }
+    if (id !== this._submitId) return;
 
     this._onLinkOpened({ url, opened, copied, blob });
   }
@@ -1502,7 +1586,7 @@ class GhFeedback extends HTMLElement {
 
   _buildIssueBody(payload, { shotHint = false } = {}) {
     const typeLabel = TYPE_DEFS[payload.type]?.label || 'Bug';
-    const desc = payload.description || 'No description provided';
+    const desc = payload.description ? noMentions(payload.description) : 'No description provided';
     let body = `**Type:** ${typeLabel}\n`;
 
     if (payload.severity) {
@@ -1515,9 +1599,8 @@ class GhFeedback extends HTMLElement {
 
     // Append context if available
     if (payload.context && typeof payload.context === 'object') {
-      const escMd = (s) => String(s).replace(/([|`*_~])/g, '\\$1');
       const rows = Object.entries(payload.context)
-        .map(([k, v]) => `| ${escMd(k)} | ${escMd(v)} |`)
+        .map(([k, v]) => `| ${escCell(k)} | ${escCell(v)} |`)
         .join('\n');
       body += `\n<details>\n<summary>Context</summary>\n\n| Key | Value |\n|-----|-------|\n${rows}\n\n</details>\n`;
     }

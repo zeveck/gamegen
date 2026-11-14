@@ -194,7 +194,9 @@ it's never guessed from wording, and their original is never changed
 **Controllers and bug reports.** With `--gamepad` (or a request for
 controller play in words), read `references/gamepad.md` when you write the
 design: it covers the design, the build and the play-test. With
-`--feedback`, read `references/feedback.md` when you build. Either one alone
+`--feedback` (for web games and web exports only, not engine targets),
+read `references/feedback.md` when you write the design: the design places
+the button, and the shortcut's letter if it isn't F. Either one alone
 on a finished game is a change: add it (or, for `--feedback hidden` or
 `off`, switch it) as change.md says.
 

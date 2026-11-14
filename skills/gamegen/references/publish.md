@@ -350,7 +350,9 @@ live gallery shows the new game (it can take a few minutes).
 
 Short and happy: the game's address, first and on its own line; the repo; the
 gallery, if any; for a game with "Report a bug" in a private repo, that it
-has no button there, since players can't see the repo; and anything still
+has no button there, since players can't see the repo; for a game with
+`Feedback: hidden`, the `?feedback` link and the shortcut to hand to
+testers; and anything still
 pending (DNS to add, HTTPS still switching on, the repo's preview image),
 with exactly what to do, and that updating
 later is just `/gamegen --change …` and then `/gamegen --publish`. End with

@@ -102,7 +102,8 @@ any errors. A screenshot of the moment is copied, ready to paste. Then
 ```
 
 **Ctrl+Shift+F** (Ctrl on a Mac too) opens the report from anywhere, even
-when the game is stuck and you can't reach its menus. It works with `hidden`
+when the game is stuck and you can't reach its menus. (If the game already
+uses Ctrl and Shift together, it picks another letter and says which.) It works with `hidden`
 too, and in the desktop apps, so testers can use it.
 
 Run it on its own to add the button to a game, or to switch between `on` and

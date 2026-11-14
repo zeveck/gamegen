@@ -523,7 +523,7 @@ test('--feedback: bundles gh-feedback with link mode, and publishing sets up the
   assert.match(ref, /templates\/feedback\/bug\.yml/);
   assert.match(ref, /\?feedback=off/);
   // The bundled copy has link mode, the screenshot hook and the desktop link hook.
-  for (const s of ["customElements.define('gh-feedback'", '_submitLink', 'getScreenshot', 'openLink']) {
+  for (const s of ["customElements.define('gh-feedback'", '_submitLink', 'getScreenshot', 'openLink', 'get isOpen']) {
     assert.ok(component.includes(s), `bundled gh-feedback has ${s}`);
   }
   // The issue form's field is the one gh-feedback fills for a YAML form.
@@ -535,12 +535,18 @@ test('--feedback: bundles gh-feedback with link mode, and publishing sets up the
   const pub = read(`${REFS}/publish.md`);
   assert.match(pub, /feedback\.md/);
   assert.match(pub, /ISSUE_TEMPLATE\/bug\.yml/);
-  assert.match(ref, /gh repo edit <repo> --enable-issues/);
-  assert.match(ref, /composedPath/);
+  assert.match(pub, /gh repo edit <repo> --enable-issues/);
+  assert.match(ref, /if \(fb\?\.isOpen\) return;/, 'the game ignores its own input while the form is open');
+  assert.match(ref, /button 1\), which calls\s+`fb\?\.close\(\)`/, 'a controller player can close the form');
+  assert.match(ref, /const showReport = \(\) =>/, 'the menus ask each time they draw');
+  assert.match(ref, /addInitScript/, 'the play-test sets the repo before every load');
   assert.match(ref, /fb\.openLink/);
-  // Ctrl+Shift+F works even when the game is stuck, and never on a game key.
+  // Ctrl+Shift+F works even when the game is stuck, on non-Latin layouts too.
   assert.match(ref, /\*\*Ctrl\+Shift\+F\*\* opens the report from anywhere/);
-  assert.match(ref, /\*\*Its letter is never one of the game's keys,\*\*/);
+  assert.match(ref, /e\.code !== 'KeyF'/);
+  assert.match(ref, /fb\.isOpen\) return;\n    e\.preventDefault\(\)/, 'the shortcut checks fb.isOpen');
+  assert.match(ref, /uses Ctrl and Shift together as controls/);
+  assert.match(skill, /read `references\/feedback\.md` when you write the design/);
   assert.match(ref, /\*\*Adding the report never changes the game's existing controls\.\*\*/);
   assert.match(ref, /e\.ctrlKey[^\n]*e\.shiftKey[\s\S]*\}, true\);/, 'its own listener, in the capture phase');
   assert.match(ref, /\*\*before\*\* the game's code/);

@@ -4,6 +4,19 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.6
+
+- "Report a bug" works better with the latest gh-feedback: the game simply
+  ignores its own controls while the form is open, and a controller player
+  can close it with the back button (○ or B).
+- The shortcut is Ctrl+Shift+F (non-Latin keyboards too), even when F is one of
+  the game's keys. Only a game that already uses Ctrl and Shift together
+  picks another letter.
+- Screenshots of 3D games come out right, and the play-test keeps its test
+  settings across reloads.
+- `--feedback off` also removes the issue form, and testers of a `hidden`
+  game get the `?feedback` link and the shortcut in the publish report.
+
 ## v2026.11.14.5
 
 - Bug reports from players are treated as reports, not orders. When

@@ -16,7 +16,8 @@ is a good model.
 install, works on desktop and on phones.
 <!-- Until it's published, replace the Play line with how to play locally. -->
 <!-- That line is for `both`. For `desktop`: "No install. Made for a
-computer, with keyboard and mouse (or a controller)." For `mobile`: "No
+computer, with keyboard and mouse." (adding "(or a controller)" only when
+the game has controller support). For `mobile`: "No
 install. Made for phones." plus the design's "On other devices" words, such
 as "(plays with a mouse too)". -->
 
