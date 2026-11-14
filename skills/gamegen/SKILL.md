@@ -7,7 +7,7 @@ description: >-
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
 argument-hint: "<your game idea> [--scope small|medium|large] [--3d] | --change <what> | --continue | --publish | help"
-allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/package.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(python3 -m http.server *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/serve.py *), Bash(playwright-cli *)"
+allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/package.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(python3 -m http.server *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/serve.py *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/art-sheet.py *), Bash(playwright-cli *)"
 ---
 
 # /gamegen — make a game from a description
@@ -111,6 +111,7 @@ value) is the game description. Flags and defaults:
 | `--plan-only` | stop after the reviewed design, before spending (except `--share-design`'s mock pictures) | off |
 | `--share-design` | `page`, `doc` or `both`: share the reviewed design for comments (`references/share-design.md`) | off (`page` alone) |
 | `--mockups` | with `--share-design`: dollars for mock pictures, out of `--budget`; `0` for none | `5` |
+| `--art-sheet` | a page showing all the game's art and audio, once it's ready (`references/art-sheet.md`) | off |
 | `--continue` | pick up an unfinished game (`references/change.md`) | off |
 | `--change` | change a finished game: the words after it say what, or GitHub issues (`#12`) (`references/change.md`) | off |
 | `--3d` | a 3D game, with models from meshgen | off: 2D |
@@ -201,6 +202,10 @@ read `references/feedback.md` when you write the design: the design places
 the button, and the shortcut's letter if it isn't F. Either one alone
 on a finished game is a change: add it (or, for `--feedback hidden` or
 `off`, switch it) as change.md says.
+
+**The art sheet.** `--art-sheet` on its own, on a finished game, makes (or
+updates) the page showing all its art: follow `references/art-sheet.md`, and
+do nothing else.
 
 **Checking for bugs.** `--bugcheck` on its own checks a finished game with
 fresh reviewers and reports what's worth fixing: follow
@@ -367,6 +372,10 @@ Hand groups of assets to agents to keep your own context free (audio can run
 in parallel with the images, since it doesn't depend on them). The guide says
 what each agent needs to be told. Make every take in `.gamegen/candidates/`
 and copy only the accepted one into `game/assets/`.
+
+**With `--art-sheet`**, once every asset is accepted, make the art sheet: a
+page showing all of it (`references/art-sheet.md`). If one was made before
+(its link is in `design/STATUS.md`), update that one instead.
 
 ## Phase 5 — Build
 

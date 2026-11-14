@@ -28,7 +28,8 @@ starting one; if the game isn't finished yet, suggest `--continue`. Then:
    style anchor and style line.
 2. For anything that changes how the game plays, run one short design review
    round on the change.
-3. Make only the assets the change needs. Each change gets its own budget:
+3. Make only the assets the change needs (and if the game has an art sheet,
+   update it once they're accepted: art-sheet.md). Each change gets its own budget:
    `--budget` if given now, otherwise the default $20.
 4. Build it, play-test what changed (with the text scanner on every screen
    it touched, at every size), and replay every level's solution to make

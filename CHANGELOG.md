@@ -4,6 +4,15 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.9
+
+- **`--art-sheet`: a page showing all your game's art.** As soon as the art
+  is ready, gamegen makes a page on claude.ai with everything made for the
+  game: the cast, places, animations, 3D models, colours, music and sounds,
+  in the game's own style. It's private to you until you share it. Run
+  `/gamegen --art-sheet` on its own for a game you've already made; later
+  changes update the same page.
+
 ## v2026.11.14.8
 
 - **`--bugcheck`: check a finished game for bugs.** Fresh reviewers play it

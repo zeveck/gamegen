@@ -75,6 +75,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
 | `--share-design [page, doc or both]` | Share the reviewed design on claude.ai, with a few mock pictures of the main characters and places, so others can weigh in before the real work starts: a web page (the default), a Claude Doc people can comment on, or both to compare. Later runs read the comments and keep it up to date. | off |
 | `--mockups <dollars>` | With `--share-design`: how much to spend on the mock pictures, out of your budget. `0` for none. | `5` |
+| `--art-sheet` | A page on claude.ai showing everything made for the game, once the art is ready: the cast, places, animations, models, colours, music and sounds. Run it on its own for a game you've already made; later changes update the same page. | off |
 | `--plan-only` | Stop after the design, before spending anything (apart from `--share-design`'s mock pictures), so you can read it and suggest changes. | off |
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
 | `--change <what to change>` | Change something in a finished game, keeping everything else. Or name GitHub issues to fix, such as `--change #12`; they close when you next publish. | off |

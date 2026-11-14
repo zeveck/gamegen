@@ -37,6 +37,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--rounds <1 to 4>` | Rounds of design review (default: 2) |
 | `--share-design [page\|doc\|both]` | Share the design, with mock pictures, so others can weigh in |
 | `--mockups <dollars>` | With `--share-design`: how much to spend on mock pictures (default: 5) |
+| `--art-sheet` | A page showing all the game's art, animation and music, to see and share |
 | `--plan-only` | Stop after the design, before spending anything |
 | `--continue` | Build a saved design, or finish an interrupted game |
 | `--change <what>` | Change something in a finished game, keeping the rest |
@@ -177,6 +178,21 @@ synthesized in code.
 In each round, a player, a builder and an art-and-sound director each read the
 design and point out problems, and the design gets fixed. More rounds mean
 more polish before anything gets made, and take a bit longer.
+
+## --art-sheet
+
+**A page showing everything made for your game:** the characters, places,
+animations, models, colours, music and sounds, all in one place, as soon as
+the art is ready. It's a page on claude.ai, private to you until you share
+it, so it's easy to show the look to others.
+
+```
+/gamegen a cozy farming game under the sea --art-sheet
+/gamegen --art-sheet
+```
+
+Run it on its own to make one for a game you've already made. After a change
+that adds art, it updates the same page, so the link stays the same.
 
 ## --plan-only
 

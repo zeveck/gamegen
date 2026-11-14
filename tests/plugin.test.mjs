@@ -673,6 +673,53 @@ test('--bugcheck reports what clears the bar, and changes nothing until asked', 
   assert.match(read(`${REFS}/review-roles.md`), /Report what's real:/);
 });
 
+test('--art-sheet shows every accepted asset once the art is ready, and keeps one link', () => {
+  const ref = read(`${REFS}/art-sheet.md`);
+  assert.match(skill, /references\/art-sheet\.md/);
+  assert.match(skill, /\*\*With `--art-sheet`\*\*, once every asset is accepted/);
+  assert.match(ref, /\.gamegen\/art-sheet\/manifest\.json/, 'built outside the game\'s repo');
+  assert.match(ref, /never candidates/);
+  assert.match(ref, /Leave out prices, file paths/);
+  assert.match(ref, /republish that artifact/);
+  assert.match(ref, /Never stop the run over it/);
+  assert.match(skill.match(/^allowed-tools: (.*)$/m)[1], /scripts\/art-sheet\.py \*/);
+});
+
+test('art-sheet.py builds the page from a manifest, and lists missing files', { skip: spawnSync('python3', ['-c', 'import PIL']).status !== 0 && 'no Pillow' }, (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'gg-art-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const script = join(ROOT, 'skills/gamegen/scripts/art-sheet.py');
+  const py = (code) => spawnSync('python3', ['-c', code], { cwd: dir });
+  py("from PIL import Image\nfor i,c in enumerate(['red','blue']): Image.new('RGBA',(64,64),c).save(f'f{i}.png')\nImage.new('RGB',(2000,1000),'green').save('bg.jpg')");
+  writeFileSync(join(dir, 'song.mp3'), 'ID3');
+  mkdirSync(join(dir, '.gamegen/art-sheet'), { recursive: true });
+  mkdirSync(join(dir, 'game/audio'), { recursive: true });
+  writeFileSync(join(dir, 'game/audio/keep.mp3'), 'ID3');
+  writeFileSync(join(dir, '.gamegen/art-sheet/manifest.json'), JSON.stringify({ title: 'Test <Game>: The Art', colors: { accent: 'red}</style><script>alert(1)</script>', bg: '#123' }, hero: { file: 'bg.jpg', alt: 'A field' },
+    sections: [{ title: 'Cast', kind: 'cards', items: [{ file: 'f0.png', name: 'Red', caption: 'You', mark: true }, { frames: ['f0.png', 'f1.png'], name: 'Blink' }] },
+      { title: 'Music', kind: 'audio', items: [{ file: 'song.mp3', name: 'Theme' }] }, { title: 'Colours', kind: 'colors', items: [{ color: '#ff0000', name: 'Red' }, { color: 'red;background:url(https://x)', name: 'Bad' }] }] }));
+  const r = spawnSync('python3', [script, '.gamegen/art-sheet/manifest.json'], { cwd: dir, encoding: 'utf8' });
+  assert.equal(r.status, 0, r.stderr);
+  const page = readFileSync(join(dir, '.gamegen/art-sheet/index.html'), 'utf8');
+  assert.ok(!page.includes('<script'), 'colour values never become markup');
+  assert.ok(!page.includes('url(https'), 'a swatch is only ever a colour');
+  assert.match(page, /background:#112233ee/, 'short colours are expanded');
+  assert.match(page, /<h1>Test &lt;Game&gt;: The Art<\/h1>/, 'text is escaped');
+  assert.match(page, /<img src="img\/bg\.jpg" alt="A field" width="1400" height="700">/, 'the key art is resized');
+  assert.match(page, /img\/f0-2\.gif|img\/f0\.gif/, 'frames become an animation');
+  assert.match(page, /<audio controls preload="none" aria-label="Theme" src="audio\/song\.mp3">/);
+  writeFileSync(join(dir, '.gamegen/art-sheet/manifest.json'), JSON.stringify({ sections: [{ title: 'X', items: [{ file: 'nope.png' }] }] }));
+  const bad = spawnSync('python3', [script, '.gamegen/art-sheet/manifest.json'], { cwd: dir, encoding: 'utf8' });
+  assert.notEqual(bad.status, 0);
+  assert.match(bad.stderr, /these files don't exist:\s+nope\.png/);
+  // It only ever works in a .gamegen folder, so it can't clear the game's own.
+  writeFileSync(join(dir, 'game/manifest.json'), JSON.stringify({ sections: [] }));
+  const wrong = spawnSync('python3', [script, 'game/manifest.json'], { cwd: dir, encoding: 'utf8' });
+  assert.notEqual(wrong.status, 0);
+  assert.match(wrong.stderr, /must be in a \.gamegen folder/);
+  assert.ok(existsSync(join(dir, 'game/audio/keep.mp3')), "the game's files are untouched");
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {
