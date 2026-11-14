@@ -202,7 +202,9 @@ understand it:
      important inside the middle 1040x560 or so, with only background
      outside: link previews (Teams, Slack, phones) crop to their own shapes.
   2. Screenshot it with `playwright-cli` at exactly 1200x630: serve the
-     project root on 127.0.0.1 only (it may hold `.env`), open the page,
+     project root with `python3 "${CLAUDE_SKILL_DIR}/scripts/serve.py" <port> .`
+     (127.0.0.1 only, caching off, and never hidden files like `.env`), open
+     the page,
      `resize 1200 630`, `screenshot --filename=design/social-card.png`, then
      stop that server.
   3. Look at it, then save it as `game/social-card.jpg` (Pillow, quality

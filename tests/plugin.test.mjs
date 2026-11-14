@@ -513,6 +513,45 @@ test('a GitHub preview image is made, and the person is asked to upload it (#26)
   assert.match(read(`${REFS}/change.md`), /GitHub preview image/);
 });
 
+test('play-test server: serves the game with caching off, on 127.0.0.1 only (#15)', async (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'gg-serve-'));
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, 'game.js'), 'console.log(1)');
+  const port = 20000 + Math.floor(Math.random() * 20000);
+  const { spawn } = await import('node:child_process');
+  const server = spawn('python3', [join(ROOT, 'skills/gamegen/scripts/serve.py'), String(port), dir]);
+  t.after(() => server.kill());
+  await new Promise((resolve, reject) => {
+    server.stdout.on('data', (d) => { if (String(d).includes('serving')) resolve(); });
+    server.on('exit', (code) => reject(new Error(`serve.py exited ${code}`)));
+  });
+  writeFileSync(join(dir, '.env'), 'SECRET=1');
+  const res = await fetch(`http://127.0.0.1:${port}/game.js`);
+  assert.equal(res.status, 200);
+  assert.equal(await res.text(), 'console.log(1)');
+  assert.equal(res.headers.get('cache-control'), 'no-store');
+  assert.equal((await fetch(`http://127.0.0.1:${port}/.env`)).status, 404, 'never serves hidden files');
+  assert.equal((await fetch(`http://127.0.0.1:${port}/%2eenv`)).status, 404, 'even with the dot encoded');
+  const listing = await fetch(`http://127.0.0.1:${port}/`);
+  assert.equal(listing.status, 404, 'never lists a folder');
+  assert.ok(!(await listing.text()).includes('.env'));
+  assert.match(read('skills/gamegen/scripts/serve.py'), /\(\s*"127\.0\.0\.1",\s*port\s*\)/, 'binds 127.0.0.1 only');
+  const bad = spawnSync('python3', [join(ROOT, 'skills/gamegen/scripts/serve.py'), 'x', dir], { encoding: 'utf8' });
+  assert.notEqual(bad.status, 0);
+  assert.match(bad.stderr, /the port must be a number/);
+  assert.match(skill.match(/^allowed-tools: (.*)$/m)[1], /scripts\/serve\.py \*/);
+  assert.match(read(`${REFS}/playtest-guide.md`), /scripts\/serve\.py" 8123 game/);
+});
+
+test('long play-test runs report progress, have limits and get checked (#15)', () => {
+  const guide = read(`${REFS}/playtest-guide.md`);
+  assert.match(guide, /^## Long runs$/m);
+  for (const s of ['Reports progress as it goes', 'Has limits', 'Gets checked', 'Starts small', 'Reports repeated losses as findings']) {
+    assert.ok(guide.includes(`**${s}`), `long runs: ${s}`);
+  }
+  assert.match(read(`${REFS}/3d.md`), /\*\*Skip drawing in long runs\.\*\*/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

@@ -28,8 +28,14 @@ and its sessions belong to that folder. If the config is missing, create it:
 running for the whole play-test (any free port):
 
 ```bash
-python3 -m http.server 8123 --bind 127.0.0.1 --directory game
+python3 "${CLAUDE_SKILL_DIR}/scripts/serve.py" 8123 game
 ```
+
+It's `python3 -m http.server` with caching turned off (`Cache-Control:
+no-store`), on 127.0.0.1 only. The plain server lets the browser keep using
+cached files, so a long-lived `playwright-cli` session can go on testing old
+code after an edit, without any sign of it. If an earlier session was opened
+against a caching server, open a fresh one.
 
 Stop it with the background task controls when you're done. Never use
 `kill -9`, `pkill` or `killall`: they can take down other things in the
@@ -116,6 +122,33 @@ playwright-cli -s=phone run-code "async page => {
 Read the controls' real positions from the page (`eval` on their bounding
 boxes) rather than guessing coordinates.
 
+## Long runs
+
+A replay of every solution, or a whole-game run, can take a long time, and a
+run that's stuck (losing the same fight over and over, waiting on a screen
+that never comes) looks just like a healthy one from outside. So every long
+run:
+
+- **Reports progress as it goes:** one line per level or fight, with win or
+  loss and the time, somewhere you can read while it runs. Not only at the
+  end, and not behind a filter that prints at the end.
+- **Has limits:** a time limit for the whole run, and a stop after 3
+  straight failures at the same place.
+- **Gets checked:** look at its progress on a schedule (every few minutes,
+  or when you'd expect a level to be done). Only say a run is "still going"
+  after checking that it is moving.
+- **Starts small:** try a short run first (one or two levels), and estimate
+  the whole run's time from it before starting.
+- **Reports repeated losses as findings:** a level the run keeps losing is a
+  result (a balance problem, or a broken solution), not something to wait
+  out.
+
+`playwright-cli run-code` can't `import()` Node modules, so it can't write a
+log file itself. Keep progress in the page (for example `window.__runLog`,
+pushed to as each level ends) and read it with a separate `eval`. A slow
+scene can outlast the default 30-second timeout of a click; pass a longer
+`timeout` to that call rather than letting the run fail.
+
 ## Prove every level can be finished
 
 For each level, record a solution while building it: an input timeline (keys
@@ -126,6 +159,11 @@ checks `window.__game.state()` says the level is complete. Replay all of them
 after every change to levels, physics or controls; a solution that stops
 working means the level broke (or the solution needs re-recording, if the
 level was meant to change).
+
+A solution recorded outside the browser (by a Node script running the game's
+update loop) is only proven once it has been replayed in the browser and
+finishes there. Replay it there twice and compare the end states: a solution
+that doesn't finish the same way twice isn't proof yet.
 
 Any script that replays the solutions, or checks balance or reachability,
 lives in the project's `tools/` folder. It belongs to the game, not this

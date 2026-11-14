@@ -4,6 +4,15 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.2
+
+- Play-tests serve the game with caching off, so a long test session never
+  keeps testing old code after a fix (#15).
+- Long play-test runs (replaying every level, playing the whole game) now
+  report progress as they go, stop themselves when stuck, and get checked
+  while they run, instead of looking healthy while looping. 3D games can skip
+  drawing during those runs, which makes them many times faster (#15).
+
 ## v2026.11.14
 
 - **A preview picture for your game's GitHub repo.** Links to the repo used
