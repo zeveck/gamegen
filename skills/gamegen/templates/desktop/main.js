@@ -37,6 +37,14 @@ function saveSettings(s) {
   try { fs.writeFileSync(settingsFile(), JSON.stringify(s)); } catch { /* not important */ }
 }
 
+// One copy at a time: a second launch (a double double-click, Steam starting
+// it twice) brings the running one forward instead, so saves aren't shared.
+if (!app.requestSingleInstanceLock()) { app.quit(); return; }
+app.on('second-instance', () => {
+  const [win] = BrowserWindow.getAllWindows();
+  if (win) { if (win.isMinimized()) win.restore(); win.focus(); }
+});
+
 app.whenReady().then(() => {
   protocol.handle('app', (request) => {
     const url = new URL(request.url);

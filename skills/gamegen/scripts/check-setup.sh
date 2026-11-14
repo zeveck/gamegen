@@ -33,7 +33,7 @@ done
 key() {
   local name="$1" value="${!1:-}"
   if [ -z "$value" ] && [ -n "$envfile" ]; then
-    value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$name[[:space:]]*=" "$envfile" | tail -1 \
+    value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$name[[:space:]]*=" "$envfile" | tail -1 | tr -d '\r' \
       | sed -E "s/^[^=]*=[[:space:]]*//; s/[[:space:]]+#.*$//; s/^[\"']//; s/[\"'][[:space:]]*$//")"
   fi
   printf '%s' "$value"

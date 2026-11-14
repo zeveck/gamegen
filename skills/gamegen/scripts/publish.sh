@@ -74,7 +74,7 @@ setting() {
   if [ -z "$value" ]; then
     while :; do
       if [ -f "$dir/.env" ]; then
-        value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$1[[:space:]]*=" "$dir/.env" | tail -1 \
+        value="$(grep -E "^[[:space:]]*(export[[:space:]]+)?$1[[:space:]]*=" "$dir/.env" | tail -1 | tr -d '\r' \
           | sed -E "s/^[^=]*=[[:space:]]*//; s/[[:space:]]+#.*$//; s/^[\"']//; s/[\"'][[:space:]]*$//")"
         break
       fi

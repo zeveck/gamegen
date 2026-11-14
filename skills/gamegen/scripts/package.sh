@@ -75,8 +75,9 @@ case "$cmd" in
 
       if [ "$target" = windows ]; then
         icon="game/icon-512.png"; [ -f "$icon" ] || icon="game/icon-192.png"
-        if [ -f "$icon" ] && python3 -c "from PIL import Image
-Image.open('$icon').convert('RGBA').save('$build/icon.ico', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])" 2>/dev/null; then
+        if [ -f "$icon" ] && python3 -c "import sys
+from PIL import Image
+Image.open(sys.argv[1]).convert('RGBA').save(sys.argv[2], sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])" "$icon" "$build/icon.ico" 2>/dev/null; then
           node "$here/desktop-icon.mjs" "$tools/node_modules" "$out/$app.exe" "$build/icon.ico" "$name" "$version" \
             || echo "windows icon: couldn't be set (the game still runs, with Electron's icon)"
         else

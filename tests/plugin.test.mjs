@@ -650,6 +650,13 @@ test('games handle the device they were not made for (#25)', () => {
   assert.match(read(`${REFS}/readme-template.md`), /For `desktop`: "No install\. Made for a\s+computer/);
 });
 
+test('the desktop app runs one copy at a time; the icon step takes paths as arguments', () => {
+  const main = read('skills/gamegen/templates/desktop/main.js');
+  assert.match(main, /if \(!app\.requestSingleInstanceLock\(\)\) \{ app\.quit\(\); return; \}/, 'the second copy stops right there');
+  assert.match(main, /app\.on\('second-instance'/);
+  assert.match(read('skills/gamegen/scripts/package.sh'), /Image\.open\(sys\.argv\[1\]\)/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {
@@ -776,6 +783,11 @@ test('publish: settings come from the environment or the .env, and never the key
   const deep = join(dir, 'frog'); mkdirSync(deep);
   const r = publish(deep, ['settings'], { env: { GAMEGEN_MAKING_OF: 'on' } });
   assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\nGAMEGEN_DNS: not set\n');
+  // A .env saved with Windows line endings reads the same.
+  writeFileSync(join(dir, '.env'), 'GAMEGEN_DOMAIN=example.com\r\nGAMEGEN_DNS=godaddy\r\n');
+  const crlf = publish(deep, ['settings'], {});
+  assert.match(crlf.stdout, /^GAMEGEN_DOMAIN: example\.com$/m);
+  assert.match(crlf.stdout, /^GAMEGEN_DNS: godaddy$/m);
 });
 
 test('publish: the credit comes from the .env, then GitHub, then git, and is never made up', (t) => {

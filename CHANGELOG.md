@@ -4,6 +4,14 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.7
+
+- A `.env` file saved on Windows now works for publishing settings and DNS.
+- Packaging works when the project's folder has an apostrophe in its name
+  (it used to drop the Windows icon).
+- The desktop app runs one copy at a time: starting it again brings the open
+  one forward, so two copies never share a save.
+
 ## v2026.11.14.6
 
 - "Report a bug" works better with the latest gh-feedback: the game simply
