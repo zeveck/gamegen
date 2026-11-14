@@ -344,9 +344,16 @@ When the game is in a git repository, add `.github/workflows/pages.yml` at the
 **repository's root** (GitHub ignores workflows anywhere else), with `GAME_DIR`
 replaced by the game's folder relative to that root (`game`, or for example
 `hoard-hopper/game`). Skip this if the repository already has a Pages workflow
-or a Pages site: don't replace someone's existing site. After the repository is
-on GitHub, turning on Pages (Settings, Pages, Source: GitHub Actions) publishes
-the game on every push to `main`:
+or a Pages site that gamegen didn't add: don't replace someone's existing site.
+gamegen's own site is built by this workflow (`gh api repos/<owner>/<repo>/pages --jq .build_type`
+says `workflow`, and this `pages.yml`, with its "Stamp service worker" step,
+is at the repository's root). Any other site is the person's. When the game
+folder is that repository's root, publishing (publish.md, step 1.2) says so
+and asks before switching it to this workflow, even with `--no-confirm`;
+when the game is in a subfolder, the site is left alone and the game gets
+its own repo when published. After the repository is on GitHub,
+turning on Pages (Settings, Pages, Source: GitHub Actions) publishes the game
+on every push to `main`:
 
 ```yaml
 name: Deploy to GitHub Pages

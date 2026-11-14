@@ -126,7 +126,10 @@ await page.addInitScript(() => {
 
 It needs a real page load (`page.goto`), not `setContent`. The game polls,
 so hold each press for at least 50 ms (three frames) before releasing it,
-or the game may never see it. Then, as well as the usual play-test:
+or the game may never see it. A 3D game frozen for the play-test (`step` in
+3d.md) doesn't update while you wait, so there, press the button, call
+`step(0.1)`, release it, and call `step(0.1)` again. Then, as well as the usual
+play-test:
 
 1. **PlayStation:** `__pad.connect()`, and play from the title screen through
    the first level and back to the title, controller only: start, pause

@@ -77,7 +77,7 @@ bash "${CLAUDE_SKILL_DIR}/scripts/package.sh" build <windows|linux|both> "<Game 
 Run the Linux build on a virtual display and look at the screenshot:
 
 ```bash
-bash "${CLAUDE_SKILL_DIR}/scripts/package.sh" test "dist/linux/<Game name>" design/screenshots/desktop-title.png
+bash "${CLAUDE_SKILL_DIR}/scripts/package.sh" test "dist/linux/<App>" design/screenshots/desktop-app-title.png
 ```
 
 It checks the app starts, finds the desktop bridge, saves work and the

@@ -262,7 +262,9 @@ gives you a fresh link.
 
 gamegen reads each issue (and looks at its screenshots), checks it's
 really something to change (it asks about a question, a duplicate, or
-something that works as intended), and fixes it. The issues close by
+something that works as intended), and fixes it. For an issue someone
+else filed, it tells you what it plans to change and asks first. The issues
+close by
 themselves when you next publish (`/gamegen --publish`).
 
 ## --publish
@@ -372,8 +374,10 @@ it's doing, then just carries on:
 It's for that one run. If something's unclear (say, whether you meant a 3D
 game), it makes the cautious choice and tells you. It still stops if
 something looks wrong: anything like a key about to be published, a private
-repo that would need to be made public, a repo that isn't this game's, or
-anything that would overwrite your files. With `--change … --publish`, the
+repo that would need to be made public, a repo that isn't this game's, a
+website gamegen didn't set up that publishing would replace, a merge that
+isn't a plain fast-forward, a change for a bug report someone else filed,
+or anything that would overwrite your files. With `--change … --publish`, the
 change goes live without you trying it first, so it's best for small
 changes.
 

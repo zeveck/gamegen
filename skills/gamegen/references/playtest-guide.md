@@ -166,7 +166,11 @@ run:
 
 `playwright-cli run-code` can't `import()` Node modules, so it can't write a
 log file itself. Keep progress in the page (for example `window.__runLog`,
-pushed to as each level ends) and read it with a separate `eval`. A slow
+pushed to as each level ends) and read it with a separate `eval`
+(`playwright-cli -s=desktop eval "() => window.__runLog"`). A long run in
+the foreground hits the Bash tool's timeout, so start a long `run-code` with
+the Bash tool's `run_in_background` option, or split it into one `run-code`
+per level, and check its progress with that `eval` while it runs. A slow
 scene can outlast the default 30-second timeout of a click; pass a longer
 `timeout` to that call rather than letting the run fail.
 

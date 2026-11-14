@@ -67,7 +67,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 |---|---|---|
 | `--platform desktop`, `mobile` or `both` | Where it'll be played. Phones get touch controls. | `both` |
 | `--gamepad` | Play the whole game with a controller, such as a PS5 controller plugged into your computer (USB or Bluetooth). Xbox and other controllers work too, and the game shows the right buttons for each. Works best in Chrome or Edge. | off |
-| `--feedback [on, hidden or off]` | A "Report a bug" button in the game's pause menu and settings, plus Ctrl+Shift+F to report from anywhere, even when the game is stuck. Players' reports open as GitHub issues in the game's repo, with the game's details and a screenshot to paste, ready for `--change #12`. `hidden` shows the button only to people who open the game with `?feedback` on its address (the shortcut works for testers either way). Players need a GitHub account. | off (`on` if given alone) |
+| `--feedback [on, hidden or off]` | A "Report a bug" button in the game's pause menu and settings, plus Ctrl+Shift+F to report from anywhere, even when the game is stuck. Players' reports open as GitHub issues in the game's repo, with the game's details and a screenshot to paste, ready for `--change #12`. `hidden` shows the button only to people who open the game with `?feedback` on its address (the shortcut works for testers either way). Players need a GitHub account, and the game's repo has to be public (in a private one, the button is left out). | off (`on` if given alone) |
 | `--style <description or link>` | The look and feel to aim for: a description, a game's name, or a link to a game, store page or screenshot. Use it more than once to mix influences. | gamegen picks a look that suits your idea |
 | `--target <web or an engine>` | What to build it in: `web`, or an engine such as `godot` or `pygame`. Engines are experimental: gamegen makes the project and all its art and sound, but it can only play-test what it can run, and editors like Unity and Unreal usually can't run here. | `web` |
 | `--scope small`, `medium` or `large` | How big a game: one strong idea in a few minutes of play, several levels in twenty to thirty minutes, or a full game with a world or story to work through. | sized from your idea |
@@ -143,10 +143,11 @@ GODADDY_API_TOKEN=...
 
 ```
 your-game/
-  game/               the game itself
-  design/             the design, review notes, asset list with costs, and every play-test screenshot
-  media/screenshots/  the best screenshots, for the README
-  README.md           a README for your game, with screenshots and how to play (and how it was made, with --making-of)
+  game/                    the game itself
+  design/                  the design, review notes, asset list with costs, and every play-test screenshot
+  media/screenshots/       the best screenshots, for the README
+  media/github-social.png  the picture shown when someone shares the game's GitHub page
+  README.md                a README for your game, with screenshots and how to play (and how it was made, with --making-of)
 ```
 
 gamegen makes the game right where you run it if the folder is empty, or in a new folder named after the game if it isn't. It never overwrites your files.
@@ -240,7 +241,7 @@ gamegen does the planning, building and testing itself, and uses companion plugi
 7. **Play-test.** It plays the game in a real browser at desktop and phone sizes: every screen and every level, start to finish, checking for errors, sound, saving and offline play. It opens everything every button opens, reads the words on every screen, and films the game loading to catch anything that flickers.
 8. **Final review.** A **playtester** and a **bug hunter** go over the finished game, and gamegen fixes what they find.
 9. **Polish pass.** A fresh reviewer who didn't build the game goes over every screen at every size with a checklist of what players notice first: stray code showing as text, a word left alone on a line, text that's cut off, messages covering the action, a title that flickers as it loads. gamegen fixes all of it.
-10. **Wrap up.** It makes the link-preview image, writes your game's README, starts the game and gives you the link.
+10. **Wrap up.** It makes the link-preview images (one for the game, one for its GitHub page), writes your game's README, starts the game and gives you the link.
 
 ## Costs
 

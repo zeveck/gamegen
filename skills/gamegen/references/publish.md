@@ -42,14 +42,29 @@ stop publishing before anything else:
    a git repository whose `origin` (or `github`, a remote an earlier publish
    added) is a GitHub repo the person can push to
    (`gh api repos/<owner>/<repo> --jq .permissions.push` says `true`) and that
-   has a Pages site (`gh api repos/<owner>/<repo>/pages` works). Then work
-   out the address and the gallery (items 3 and 4 below) and follow
-   "Updating a published game". With an `origin` they can push to but no
-   Pages site, publish into that repo (it's already the game's own) and skip
-   creating one. If that repo is private, it stays private: never make a repo
+   has a Pages site gamegen set up: `gh api repos/<owner>/<repo>/pages --jq .build_type`
+   says `workflow`, and the local checkout has gamegen's
+   `.github/workflows/pages.yml` at its root (the one from web-target.md,
+   with its "Stamp service worker" step). Check its visibility and issues too
+   (`gh repo view <repo> --json visibility,hasIssuesEnabled`). Then work out the address and the gallery (items 3 and 4 below)
+   and follow "Updating a published game". With an `origin` they can push to
+   but no Pages site, publish into that repo (it's already the game's own)
+   and skip creating one.
+   **A Pages site gamegen didn't set up** (it's built from a branch, or there's
+   no gamegen `pages.yml` at the repo's root) is someone's own site, not a
+   published game. Say so in the confirmation, plainly ("zeveck/snakez
+   already has a website, built from its `gh-pages` branch: publishing would
+   replace it with the game."), and ask before switching it to the workflow
+   (`publish.sh pages`) and adding `pages.yml`. This is a safety stop, even
+   with `--no-confirm`. If they agree, publish into that repo as when it has
+   no Pages site; if not, stop, with nothing changed.
+   If that repo is private, it stays private: never make a repo
    public unless they ask. GitHub's paid plans publish Pages from a private
    repo (the game is public at its address; the repo and its README stay
-   private); if theirs can't, step 4.3 says so. With an `origin` they can't push to, publish as a new repo
+   private); if theirs can't, step 4.3 says so. In a private repo, players
+   can't see the repo to file a bug, so a game with "Report a bug" gets no
+   button and no shortcut there (step 3, item 7): say so in the
+   confirmation. With an `origin` they can't push to, publish as a new repo
    and leave that `origin` alone (add the new one as `github`, and push to
    `github` from then on).
 3. **The address.** In order: the `--publish` value; otherwise
@@ -140,7 +155,13 @@ then ask. For example:
   bigger one.
 - **Publishing from a private repo they already have:** say it stays private,
   and that the game itself will be public at its address. Don't say Pages
-  needs a public repo: paid GitHub plans don't.
+  needs a public repo: paid GitHub plans don't. For a game with "Report a
+  bug", say players won't be able to report bugs from it, since they can't
+  see the repo, so the game won't show the button.
+- **Turning on issues** for "Report a bug", when they're off (step 4.1 or
+  "Updating a published game"): say so.
+- **A Pages site gamegen didn't set up** (step 1.2): say what's there and
+  that publishing would replace it, and ask, whatever `--no-confirm` says.
 - **Leave out** how settings were decided and what's kept out of the repo.
 - **End with a plain question** ("Go ahead?"), so a correction in their own
   words is a natural answer. If they ask for another spot in the gallery
@@ -151,8 +172,10 @@ then ask. For example:
 carry on without waiting. These still stop and ask, whatever the flag says
 (see SKILL.md): something that looks like a key or a
 private path in what's about to be committed (step 3), making a private
-repo public (step 4.3), reusing a repo that isn't already this game's, and
-a gallery whose layout isn't clear (step 5). The credit is used as
+repo public (step 4.3), reusing a repo that isn't already this game's,
+switching a Pages site gamegen didn't set up over to the game (step 1.2),
+a merge that isn't a plain fast-forward (step 1), and a gallery whose
+layout isn't clear (step 5). The credit is used as
 suggested; the report says which name went online.
 
 A plain "no": say nothing was published, and how to change it
@@ -164,11 +187,14 @@ correction: adjust, show the line again, and ask again.
 
 1. **What goes in:** the game (`game/`), `README.md`, `media/`, `LICENSE` if
    there is one, `.gitignore`, `.github/workflows/pages.yml`, and
-   `.github/ISSUE_TEMPLATE/bug.yml` for a game with "Report a bug". With
+   `.github/ISSUE_TEMPLATE/bug.yml` for a game with "Report a bug" (public
+   repo). With
    `--making-of` (or `GAMEGEN_MAKING_OF=on`), also `design/`, and the README
    has its "How it was made" section. Without it, the README says nothing
    about how it was made, and `.gitignore` keeps `design/` out (if `design/`
-   was published before, also `git rm -r --cached design`).
+   was published before, also `git rm -r --cached design`). The replay tools
+   (`tools/`) go in only with the solutions below, so without `--making-of`
+   they stay out too.
    **Recorded solutions go with the tools that replay them.** When
    `design/solutions/` goes in, so do the project's tools that play and check
    them (usually `tools/`: the solution player, any full-run runner, and
@@ -216,10 +242,17 @@ correction: adjust, show the line again, and ask again.
    opens the link without starting the game. On an update, keep them, and
    add whichever one is now due.
 7. **"Report a bug"** (when `design/STATUS.md` says `Feedback: on` or
-   `hidden`): fill in the game's repo, add the issue form and its labels, and
-   turn issues on if they're off, as "Publishing" in feedback.md says. The
-   confirmation mentions turning issues on, and, for a private repo, that
-   players won't be able to report.
+   `hidden`; see "Publishing" in feedback.md):
+   - **A public repo:** set `repo="<owner>/<repo>"` on the `<gh-feedback>`
+     element in `game/index.html`, and copy the issue form to
+     `.github/ISSUE_TEMPLATE/bug.yml`.
+   - **A private repo:** leave `repo` empty, so the game shows no button and
+     no shortcut (players can't see a private repo, so they couldn't
+     report). The confirmation and the report say so.
+
+   The labels and the check that issues are on come later,
+   once the repo exists: right after step 4.1 for a new repo, or before
+   pushing when updating.
 8. If the folder isn't in git yet: `git init -b main`.
 9. **Before every commit** (first publish or update), look at what's staged
    (`git status`, `git diff --cached`) and search it for anything that looks
@@ -235,6 +268,15 @@ correction: adjust, show the line again, and ask again.
    (no `--push` yet: Pages must be on before the first push, or the first
    deploy fails). Add it as `origin` (or as `github`, when step 1.2 left
    another `origin` alone).
+   **Then, for a public repo and a game with "Report a bug"** (step 3, item 7),
+   new repo or not: create the issue form's labels, `bug` and
+   `player-report`, if they're missing (`gh label list -R <repo>`, then
+   `gh label create bug -R <repo> --color d73a4a --description "Something isn't working"`
+   and `gh label create player-report -R <repo> --color c5def5 --description "Reported from the game"`;
+   never change an existing label), and check issues are on
+   (`gh repo view <repo> --json hasIssuesEnabled`; if not,
+   `gh repo edit <repo> --enable-issues`). A new public repo has issues on
+   already, but still needs the labels.
 2. If the confirmation said gamegen would add the DNS record:
    `publish.sh dns-add <host> <account>`. It adds one CNAME and never
    changes or overwrites another record. If it says the record was added or
@@ -242,11 +284,15 @@ correction: adjust, show the line again, and ask again.
    say why (it prints the reason) and carry on with the free address, as
    when DNS isn't ready.
 3. `publish.sh pages <account>/<repo> [host]`, with the host only if its DNS
-   is ready (or the person said it's fine). It prints the address. If it
+   is ready (or the person said it's fine). With a host, run it with the Bash
+   tool's timeout set to 600000: it waits up to 5 minutes for the DNS to
+   reach GitHub. It prints the address. If it
    fails, tell them GitHub's reason (it prints it) and that nothing is online
    yet. If the plan can't publish Pages from a private repo, ask whether to
    make that repo public or publish to a new public one; never decide for
-   them.
+   them. If they choose either, it's now a public repo: redo step 3, item 7
+   for it (`repo=` and the issue form), commit (with the check in step 3,
+   item 9), then create the labels and check issues as after step 4.1.
 4. `git push -u origin main` (or `github`), then wait for the deploy of that
    commit. Its run can take a few seconds to appear, so look for it a few times:
    `gh run list --workflow pages.yml --commit "$(git rev-parse HEAD)" --json databaseId --jq '.[0].databaseId'`,
@@ -303,8 +349,10 @@ live gallery shows the new game (it can take a few minutes).
 ## 6. Report
 
 Short and happy: the game's address, first and on its own line; the repo; the
-gallery, if any; and anything still pending (DNS to add, HTTPS still switching
-on, the repo's preview image), with exactly what to do, and that updating
+gallery, if any; for a game with "Report a bug" in a private repo, that it
+has no button there, since players can't see the repo; and anything still
+pending (DNS to add, HTTPS still switching on, the repo's preview image),
+with exactly what to do, and that updating
 later is just `/gamegen --change …` and then `/gamegen --publish`. End with
 what they'd need to list it anywhere else by hand:
 
@@ -347,12 +395,15 @@ Then:
 1. Get the repository ready as in step 3 (with the new address, if it moved),
    including the check before committing.
 2. If it moved: add its DNS record first if the confirmation said so
-   (step 4.2), then `publish.sh pages <owner>/<repo> <host>`.
-3. Push, and wait for that commit's deploy (step 4.4).
-4. If it's on a custom address and HTTPS isn't required yet:
+   (step 4.2), then `publish.sh pages <owner>/<repo> <host>`, with the Bash
+   tool's timeout set to 600000 (step 4.3).
+3. For a public repo and a game with "Report a bug": the labels and the
+   issues check, as after step 4.1.
+4. Push, and wait for that commit's deploy (step 4.4).
+5. If it's on a custom address and HTTPS isn't required yet:
    `publish.sh https <owner>/<repo>` (step 4.5).
-5. Check the live page and look at the live game (steps 4.6 and 4.7).
-6. If it moved, or the title, tagline or social card changed, update its entry
+6. Check the live page and look at the live game (steps 4.6 and 4.7).
+7. If it moved, or the title, tagline or social card changed, update its entry
    in the gallery (step 5). If it was never in one and a gallery is now set,
    add it, or start it (step 5).
-7. Report as in step 6.
+8. Report as in step 6.

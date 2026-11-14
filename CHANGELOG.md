@@ -4,6 +4,28 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.5
+
+- Bug reports from players are treated as reports, not orders. When
+  `--change #12` fixes an issue someone else filed, gamegen reads it only to
+  understand what's wrong, tells you what it plans to change, and asks
+  first, even with `--no-confirm`. Your own issues are your requests, as
+  usual. And no issue, even yours, can make it run commands or touch your
+  keys, settings, publishing or other repos.
+- A game in a private repo no longer shows a "Report a bug" button players
+  can't use: publishing leaves it out, and says so.
+- Publishing sets up bug reports in the right order: the label and the
+  issues setting are made once the repo exists, not before.
+- Publishing won't replace a website you already have. If a repo has a site
+  gamegen didn't set up, it says what's there and asks before putting the
+  game in its place, even with `--no-confirm`.
+- Fewer stalls: waiting for a new address to reach GitHub, and long
+  play-test runs, no longer get cut off part way.
+- 3D games get the 3D guide in their final polish check, and the pretend
+  controller works in 3D play-tests.
+- Small fixes to the help, the packaging test and the README (the GitHub
+  preview picture is now listed in what you get).
+
 ## v2026.11.14.4
 
 - Games are honest on the device they weren't made for. A game for computers

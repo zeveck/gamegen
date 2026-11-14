@@ -104,7 +104,8 @@ Show the plan in a few plain lines and ask:
 - **moving the game into `game/`**, if it isn't already there, as one commit
   ("Move the game into game/"), and what that affects: with `--in-place`, a
   site already published from the project's top level changes once the
-  branch is merged and published again;
+  branch is merged and published again (if gamegen didn't set that site up,
+  publishing says so and asks before replacing it with the game);
 - the estimated cost of new assets;
 - and, if the survey says so, that the other verb would suit better ("This
   would be easier to remake than finish, because…: say so if you'd like
