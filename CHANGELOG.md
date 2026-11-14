@@ -4,6 +4,15 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14
+
+- **A preview picture for your game's GitHub repo.** Links to the repo used
+  to show GitHub's plain card of its name and description (and link previews
+  kept showing old wording long after it changed). gamegen now makes a
+  1280x640 picture from the game's own art, and when publishing asks you to
+  upload it in the repo's settings (GitHub only lets you do that yourself),
+  reminding you until it's there (#26).
+
 ## v2026.11.13.7
 
 - Publishing a game with its making-of notes now includes the tools that

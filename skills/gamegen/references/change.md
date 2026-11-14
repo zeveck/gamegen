@@ -24,8 +24,8 @@ starting one; if the game isn't finished yet, suggest `--continue`. Then:
 1. Add the change request, exactly as typed, to the requests list in
    `design/STATUS.md`. Update the design with the change, and follow it
    through: a new title also means the title screen, logo, app name and icon
-   labels, social card and README; new art matches the style anchor and
-   style line.
+   labels, social card, GitHub preview image and README; new art matches the
+   style anchor and style line.
 2. For anything that changes how the game plays, run one short design review
    round on the change.
 3. Make only the assets the change needs. Each change gets its own budget:

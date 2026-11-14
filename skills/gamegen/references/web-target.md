@@ -21,6 +21,7 @@ game/
   assets/               art and audio (see asset-guide.md)
 README.md               the game's README (see readme-template.md)
 media/screenshots/      screenshots for the README
+media/github-social.png 1280x640, the GitHub repo's preview picture
 design/                 gamegen's design documents and play-test screenshots
 .github/workflows/pages.yml
 ```
@@ -197,14 +198,28 @@ understand it:
   1. Write `design/social-card.html`: a 1200x630 page with the game's title
      art or a striking screenshot as the background, the main character, and
      the game's name in its own font and colors (load them from `game/` with
-     relative paths). Keep the name large and away from the edges; previews
-     crop a little.
+     relative paths). Keep the name large, and keep it and anything
+     important inside the middle 1040x560 or so, with only background
+     outside: link previews (Teams, Slack, phones) crop to their own shapes.
   2. Screenshot it with `playwright-cli` at exactly 1200x630: serve the
      project root on 127.0.0.1 only (it may hold `.env`), open the page,
      `resize 1200 630`, `screenshot --filename=design/social-card.png`, then
      stop that server.
   3. Look at it, then save it as `game/social-card.jpg` (Pillow, quality
      about 85).
+- **A GitHub preview image**: `media/github-social.png`, 1280x640, the image
+  shown when someone shares the link to the game's GitHub repo (otherwise
+  GitHub shows a plain card of the repo's name and description, which link
+  previews then cache, old wording and all). Same recipe as the social card:
+  `design/github-social.html` at 1280x640 (the social card's page, resized
+  and rebalanced for the wider shape), screenshotted with `resize 1280 640`
+  to `media/github-social.png`, and looked at. Keep the name and characters
+  inside the middle 1000x500 or so, with only background in the outer 140 px
+  left and right and 70 px top and bottom, so a crop loses background, not
+  the game. GitHub's limit is 1 MB: if the PNG is bigger, save
+  `media/github-social.jpg` instead (quality about 85).
+  GitHub has no way for gamegen to set it; publishing asks the person to
+  upload it (see publish.md).
 - **Once the game's web address is known** (when publishing, see
   publish.md): a `<link rel="canonical">`, absolute URLs in the preview
   tags (some sites need them for the image), `robots.txt` and a one-page

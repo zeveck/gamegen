@@ -436,10 +436,11 @@ fixed spot.
 
 ## Phase 9 — Wrap up
 
-1. **Make the social card and check the page's details** (web games): the
-   1200x630 image link previews show, made from the game's own art and
-   screenshotted with `playwright-cli`, plus the title, description and
-   preview tags. See "Sharing and search" in `references/web-target.md`.
+1. **Make the preview pictures and check the page's details** (web games):
+   the social card (1200x630) and the GitHub preview image (1280x640), from
+   the game's own art, screenshotted with `playwright-cli`; then check the
+   title, description and preview tags. See "Sharing and search" in
+   `references/web-target.md`.
 2. **Write the game's README** from `references/readme-template.md`: what the
    game is, how to play on desktop and phone, screenshots, and how to run it.
    With `--making-of`, also how it was made: every request in

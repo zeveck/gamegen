@@ -498,6 +498,21 @@ test('publishing: recorded solutions go online with the tools that replay them (
   assert.match(read(`${REFS}/playtest-guide.md`), /lives in the project's `tools\/` folder/);
 });
 
+test('a GitHub preview image is made, and the person is asked to upload it (#26)', () => {
+  const web = read(`${REFS}/web-target.md`);
+  const pub = read(`${REFS}/publish.md`);
+  assert.match(web, /`media\/github-social\.png`, 1280x640/);
+  assert.match(web, /GitHub's limit is 1 MB/);
+  assert.match(pub, /usesCustomOpenGraphImage/, 'publishing checks whether one is set');
+  assert.match(pub, /One thing only you can do:/);
+  assert.match(pub, /GitHub preview image: to upload \(none set\)/);
+  assert.match(pub, /GitHub preview image: to upload \(changed <date>\)/);
+  assert.match(skill, /GitHub preview image \(1280x640\)/);
+  assert.match(pub, /only shows it for a public repo/, 'never asks for a private repo');
+  assert.match(web, /middle 1000x500/, 'leaves a safe margin for cropping');
+  assert.match(read(`${REFS}/change.md`), /GitHub preview image/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

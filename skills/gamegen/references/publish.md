@@ -182,12 +182,30 @@ correction: adjust, show the line again, and ask again.
    `.anim8gen/`, `assets/anim8gen/`, `.playwright/` and `.*-history.jsonl`.
 3. **The Pages workflow** is at the repository's root with `GAME_DIR` set to
    `game`.
-4. **The address in the game.** In `game/index.html`: `<link rel="canonical">`
+4. **The GitHub preview image.** `media/github-social.png` (or `.jpg`) exists
+   and matches the game as it is now (its title and art); a game made before
+   gamegen made one gets it now, as "Sharing and search" in web-target.md
+   says. GitHub only lets a person set a repo's preview picture, in its
+   settings, and only shows it for a public repo, so decide now whether to
+   ask them, and record it in `design/STATUS.md` before the commit:
+   - **A private repo:** don't ask, and remove any such line.
+   - **A repo step 4.1 will create** (it's public, with no picture yet), or
+     an existing public one where
+     `gh api graphql -f query='{repository(owner:"<owner>",name:"<repo>"){usesCustomOpenGraphImage}}' --jq .data.repository.usesCustomOpenGraphImage`
+     says `false`: write "GitHub preview image: to upload (none set)". Once
+     that check says `true`, remove it.
+   - **The picture changed** since the last publish (anything staged, or in
+     commits not yet pushed, under `media/github-social.*`) and one is
+     already set: write "GitHub preview image: to upload (changed <date>)".
+     Remove it only when the person says it's done.
+
+   Never try to set the picture any other way.
+5. **The address in the game.** In `game/index.html`: `<link rel="canonical">`
    and `og:url` set to the address, `og:image` and `twitter:image` as
    absolute URLs of `social-card.jpg`, plus `robots.txt` and a one-page
    `sitemap.xml` in `game/` (see "Sharing and search" in web-target.md).
    In the README, the "Play" link points at the address.
-5. **Links on the title screen.** With a gallery, a small link in the
+6. **Links on the title screen.** With a gallery, a small link in the
    lower-left corner to the gallery, showing its address without `https://`
    (`synapticnoise.com`). With `--making-of`, a small link in the
    lower-right to the game's repo, labelled `GitHub` (title and label: "<Game>
@@ -197,13 +215,13 @@ correction: adjust, show the line again, and ask again.
    and never over the title, its buttons or the touch controls. A tap on one
    opens the link without starting the game. On an update, keep them, and
    add whichever one is now due.
-6. **"Report a bug"** (when `design/STATUS.md` says `Feedback: on` or
+7. **"Report a bug"** (when `design/STATUS.md` says `Feedback: on` or
    `hidden`): fill in the game's repo, add the issue form and its labels, and
    turn issues on if they're off, as "Publishing" in feedback.md says. The
    confirmation mentions turning issues on, and, for a private repo, that
    players won't be able to report.
-7. If the folder isn't in git yet: `git init -b main`.
-8. **Before every commit** (first publish or update), look at what's staged
+8. If the folder isn't in git yet: `git init -b main`.
+9. **Before every commit** (first publish or update), look at what's staged
    (`git status`, `git diff --cached`) and search it for anything that looks
    like a key (`sk-`, `AIza`, `xi-api-key`, `ghp_`, `github_pat_`, long
    random strings next to `key` or `token`) or a private path. If anything
@@ -284,13 +302,25 @@ gallery shows the new game (it can take a few minutes).
 ## 6. Report
 
 Short and happy: the game's address, first and on its own line; the repo; the
-gallery, if any; and anything still pending (DNS to add, HTTPS still
-switching on), with exactly what to do, and that updating later is just
-`/gamegen --change …` and then `/gamegen --publish`. End with what they'd
-need to list it anywhere else by hand:
+gallery, if any; and anything still pending (DNS to add, HTTPS still switching
+on, the repo's preview image), with exactly what to do, and that updating
+later is just `/gamegen --change …` and then `/gamegen --publish`. End with
+what they'd need to list it anywhere else by hand:
 
 > **To list it elsewhere:** link https://…, title "…", description "…",
 > picture https://…/social-card.jpg (1200×630).
+
+**The repo's preview image.** While `design/STATUS.md` has a "GitHub
+preview image: to upload" line (step 3, item 4), the report asks for it, in
+plain steps, with the real file name:
+
+> **One thing only you can do:** give the repo its preview picture, so links
+> to it show the game. Open https://github.com/<owner>/<repo>/settings, find
+> "Social preview", choose Edit, then "Upload an image…", and pick
+> `<game folder>/media/github-social.<png or jpg>`.
+
+On later publishes, while the line is still there, a one-sentence reminder
+is enough.
 
 ## Updating a published game
 
