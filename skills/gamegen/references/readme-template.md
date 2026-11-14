@@ -14,7 +14,11 @@ is a good model.
 
 **[▶ Play <Game name>](<link, once it's published>)** in your browser. No
 install, works on desktop and on phones.
-<!-- Until it's published, replace the line above with how to play locally. -->
+<!-- Until it's published, replace the Play line with how to play locally. -->
+<!-- That line is for `both`. For `desktop`: "No install. Made for a
+computer, with keyboard and mouse (or a controller)." For `mobile`: "No
+install. Made for phones." plus the design's "On other devices" words, such
+as "(plays with a mouse too)". -->
 
 ![<Title screen>](media/screenshots/title.png)
 

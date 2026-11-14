@@ -70,6 +70,27 @@ Test the sizes the platform setting covers:
   your phone" overlay.
 - **both:** all of the above.
 
+**The other kind of device** (for `desktop` or `mobile` games): open it
+there too, and check its notice (see "On other devices" in web-target.md).
+
+- **A desktop game, in a phone session** (`--device "iPhone 15"`, or
+  `--mobile`). First make sure the session counts as touch-only:
+  `eval "navigator.maxTouchPoints > 0 && !matchMedia('(any-pointer: fine)').matches"`
+  prints `true`.
+  - The notice shows, reads well and fits. "Send link to yourself" says
+    what it did.
+  - "Look around anyway" dismisses it, and after a reload it stays gone.
+  - Clear it (`eval "localStorage.clear()"`), reload, and dismiss it with a
+    key press. The game must not also start. With controller support, try
+    the pretend controller too (gamepad.md).
+  - It never shows in the desktop sessions. Don't try to emulate a
+    touchscreen laptop (a desktop session with touch turned on): Playwright
+    drops the mouse then, so the notice shows, where a real laptop with a
+    trackpad wouldn't.
+- **A mobile game, in a desktop session:** it plays with a mouse, or says
+  why it can't, and a portrait game shows as a centred column with no "turn
+  your phone" message.
+
 ## Play it with real input
 
 Drive the game the way a player would: real key presses, clicks and touches.

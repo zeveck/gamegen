@@ -4,6 +4,14 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.14.4
+
+- Games are honest on the device they weren't made for. A game for computers
+  opened on a phone (with touch alone) now says so kindly, says what can and
+  can't be done by tapping, and offers to send you the link for later; a
+  keyboard or controller makes it go away. Touchscreen laptops and the desktop
+  apps never show it. The README says which devices a game is for (#25).
+
 ## v2026.11.14.3
 
 - No more flashes between screens. When one screen closes and the next opens

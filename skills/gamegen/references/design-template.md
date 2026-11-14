@@ -49,6 +49,13 @@ For touch, say where each control sits on screen, how big it is, and that it
 never hides the action. Say the phone orientation (landscape, portrait or
 either) and why.
 
+**On other devices** (skip for `both`): one or two lines on what a player
+sees on the kind of device the game isn't made for. For `desktop`: on a
+phone or tablet with touch alone, what works by tapping and what can't be
+played. For `mobile`: on a computer, whether it plays with a mouse, or what
+it needs that a computer lacks (several fingers at once, tilting, a tall
+portrait screen). The build's notice uses these words.
+
 ## Structure and difficulty
 
 Levels, areas, rounds or waves, in order, each with what's new about it (a

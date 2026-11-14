@@ -443,7 +443,8 @@ fixed spot.
    title, description and preview tags. See "Sharing and search" in
    `references/web-target.md`.
 2. **Write the game's README** from `references/readme-template.md`: what the
-   game is, how to play on desktop and phone, screenshots, and how to run it.
+   game is, how to play on each device it's made for, screenshots, and how
+   to run it.
    With `--making-of`, also how it was made: every request in
    `design/STATUS.md`, exactly as typed, and what gamegen and each plugin did.
    Here and in the game's own credits, credit the person by the name

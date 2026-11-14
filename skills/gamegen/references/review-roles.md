@@ -133,7 +133,9 @@ You read the code and try to break the game.
 - Stuck states: softlocks, a level you can't finish, menus you can't leave,
   input that stops responding after pausing or losing focus.
 - Phone problems: touch controls, rotating the phone, resizing, the page
-  scrolling or zooming, the notch and home bar.
+  scrolling or zooming, the notch and home bar. For a desktop-only or
+  mobile-only game, also the other device's notice ("On other devices" in
+  web-target.md).
 - Audio that never starts, keeps playing when muted, or stacks up.
 - Saves that get lost or corrupted.
 - For web: anything loaded from the internet at runtime (it should work
@@ -161,6 +163,8 @@ The polish checklist:
 - **Icons** that don't match each other, or don't show.
 - **The first load:** anything that flickers, jumps or changes once the
   title is up.
+- **The other device's notice** (a desktop-only or mobile-only game): open
+  it on the other kind of device too, as playtest-guide.md says.
 - **Flashes between screens:** through the opening and every scripted
   change (story pictures, chapter cards, dialog lines, losing and winning),
   anything that shows for a frame or two between two screens. Read the

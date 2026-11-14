@@ -288,16 +288,17 @@ first sentence. Add a short `README.md` ("<Name>'s games, to play at
 on to step 6.
 
 **An existing gallery** (cloned in step 1.4): add this game the same way the
-gallery already shows the others, whether it's an HTML page, a Markdown
-list, a data file or anything else, and even if gamegen made it (the person
-may have changed it since). Match the existing entries exactly (what they
-show, in the same markup), using the game's address, title, the README's
-tagline or first sentence, and its social card if the entries have
-pictures. If it shows no games yet, or it isn't clear how, show the person
-what you'd add and where, and ask before pushing. Put it where the
-confirmation said. If the gallery has a `sitemap.xml`, add the game's
-address to it. Commit ("Add Pomegranate Panic 3"), push, and check the live
-gallery shows the new game (it can take a few minutes).
+gallery already shows the others, whether it's an HTML page, a Markdown list,
+a data file or anything else, and even if gamegen made it (the person may
+have changed it since). Match the existing entries exactly (what they show,
+in the same markup), using the game's address, title, the README's tagline or
+first sentence, and its social card if the entries have pictures. If the game
+is made for only one kind of device and the entries have room for a few
+words, say so ("for computers"). If it shows no games yet, or it isn't clear
+how, show the person what you'd add and where, and ask before pushing. Put it
+where the confirmation said. If the gallery has a `sitemap.xml`, add the
+game's address to it. Commit ("Add Pomegranate Panic 3"), push, and check the
+live gallery shows the new game (it can take a few minutes).
 
 ## 6. Report
 

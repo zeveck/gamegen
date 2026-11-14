@@ -572,6 +572,21 @@ test('screens hand over cleanly, checked frame by frame (#23)', () => {
   assert.equal(check([]).frames, 0, 'an empty log is reported as empty, not as a pass');
 });
 
+test('games handle the device they were not made for (#25)', () => {
+  const web = read(`${REFS}/web-target.md`);
+  assert.match(read(`${REFS}/design-template.md`), /\*\*On other devices\*\*/);
+  assert.match(web, /^## On other devices$/m);
+  assert.match(web, /navigator\.maxTouchPoints > 0 && !matchMedia\('\(any-pointer: fine\)'\)\.matches/, 'detects touch-only devices, not narrow windows');
+  assert.match(web, /Any key or controller button dismisses it/);
+  assert.match(web, /&& !window\.desktop/, 'never in the desktop app');
+  assert.match(web, /navigator\.share\(\{ url \}\)/, 'offers the share sheet');
+  const guide = read(`${REFS}/playtest-guide.md`);
+  assert.match(guide, /\*\*The other kind of device\*\*/);
+  assert.match(guide, /after a reload it stays gone/);
+  assert.match(guide, /Don't try to emulate a\s+touchscreen laptop/);
+  assert.match(read(`${REFS}/readme-template.md`), /For `desktop`: "No install\. Made for a\s+computer/);
+});
+
 test('the service worker template and the Pages workflow agree on placeholders', () => {
   const web = read(`${REFS}/web-target.md`);
   for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {

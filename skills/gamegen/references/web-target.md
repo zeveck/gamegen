@@ -80,11 +80,56 @@ pressed?".
   where thumbs rest, semi-transparent, and never over the important action.
   Use pointer events and support several fingers at once.
 - **Menus:** clickable and tappable, not only keyboard-driven.
+- **The device it isn't made for:** see "On other devices" below.
 - **Orientation:** if the game needs landscape (or portrait), show a friendly
   "turn your phone" overlay in the wrong orientation, and lock it in the
   manifest.
 - A fullscreen button on phones is a nice touch (`requestFullscreen`, where
   supported).
+
+## On other devices
+
+A game made for one kind of device still gets opened on the other, and it
+shouldn't just feel broken there. Use the design's "On other devices" line.
+
+**A desktop-only game on a touch-only device** shows a notice first: an
+HTML overlay (not drawn on the canvas, so its text is phone-sized and its
+buttons at least 44 px), honest about what works, for example: "Made for a
+computer, or a tablet with a keyboard or controller. With touch alone you
+can look around, but the battles can't be played."
+
+- **Who sees it:** only touch-only devices, never a touchscreen laptop or
+  desktop, and never the desktop app. Test the device, not the window's
+  width: `navigator.maxTouchPoints > 0 && !matchMedia('(any-pointer: fine)').matches && !window.desktop`.
+  If a mouse or trackpad turns up later (a `change` on
+  `matchMedia('(any-pointer: fine)')`), hide it.
+- **Buttons:** "Send link to yourself" and a quieter "Look around anyway".
+  Offer "Play anyway" instead only if the game can really be finished by
+  touch. The link is the clean address (`location.origin +
+  location.pathname`). Use `navigator.share({ url })` where it exists;
+  otherwise copy it (inside `try`; both need https or localhost); otherwise
+  show the address in a selected, read-only box. Say what happened ("Link
+  copied") and leave the notice up.
+- **Any key or controller button dismisses it** (a tablet with a keyboard or
+  controller can play), except Tab, Shift+Tab and the modifier keys, which
+  move between its buttons; Enter or Space press the focused button, and
+  Escape dismisses it. The press that dismisses it does
+  nothing else: it doesn't reach the game, which waits on its title screen
+  behind the notice. It does count as the first input for sound (resume the
+  `AudioContext`). The input layer keeps reading the controller while the
+  notice is up.
+- **Accessible:** `role="dialog"`, `aria-modal="true"`, `aria-labelledby`
+  on its heading; focus moves to its main button when it opens, and back to
+  the game when it closes.
+- **Remembered** once dismissed, under the game's save key in
+  `localStorage` (inside `try`, as in "Saving"), so it shows once.
+
+**A mobile-only game on a computer** usually plays fine with a mouse. If it
+needs what a computer lacks (several fingers at once, tilting), show a short
+notice saying so, the same way, but only where `navigator.maxTouchPoints ===
+0` (a touchscreen laptop can do it). A portrait game on a computer shows as
+a centred column, not a "turn your phone" message: that overlay is for
+touch devices only.
 
 ## Audio
 
