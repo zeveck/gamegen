@@ -4,6 +4,17 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.19
+
+- **No more getting stuck.** gamegen now plays every game wrong on purpose
+  (the wrong way first, things in the wrong order, every pit) and makes sure
+  the game can always go on, by playing, not by a surprise death. Reviewers
+  look for the ways your kind of game gets stuck: a pit too deep to climb out
+  of, a puzzle with no moves left, an item you can miss for good.
+- **Buttons that work.** On-screen buttons are clicked the way a person
+  clicks them, which catches buttons (like mute) that ignored real clicks
+  while passing quick test clicks.
+
 ## v2026.11.14.9
 
 - **`--art-sheet`: a page showing all your game's art.** As soon as the art

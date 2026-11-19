@@ -80,6 +80,11 @@ pressed?".
   where thumbs rest, semi-transparent, and never over the important action.
   Use pointer events and support several fingers at once.
 - **Menus:** clickable and tappable, not only keyboard-driven.
+- **Buttons that keep working:** never rebuild a clickable element every
+  frame (setting its `innerHTML`, or replacing its icon). If the element under
+  the pointer is replaced between press and release, the browser drops the
+  click and the button does nothing. Update a button only when its state
+  changes (keep the last state and compare).
 - **The device it isn't made for:** see "On other devices" below.
 - **Orientation:** if the game needs landscape (or portrait), show a friendly
   "turn your phone" overlay in the wrong orientation, and lock it in the

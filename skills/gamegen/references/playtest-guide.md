@@ -216,10 +216,16 @@ Work through the design's definition of done. At minimum:
 3. **Every level can be finished:** replay every recorded solution. Play the
    first level from the title screen with no help.
 4. **Losing works.** Lose a life and lose the game; retry; nothing gets stuck.
+   **Play it wrong, too** (see "Play it wrong" below): the game can always go
+   on.
 5. **Controls.** Every action on the keyboard; on the phone, every on-screen
-   control, holding a button, and two at once.
+   control, holding a button, and two at once. Click every on-screen button
+   (pause, mute, map, settings rows) the way a person does, not with an
+   instant click (see "Click like a person" below), and check it does what it
+   says.
 6. **Audio.** After the first input, `eval "JSON.stringify(window.__game.audioState())"`
-   shows the audio context `running`, and after pressing mute it shows muted.
+   shows the audio context `running`, and it shows muted after the M key and
+   after clicking the mute button on screen (each one, on its own).
 7. **Saving.** Make progress, reload, and check it's still there
    (`localstorage-list`).
 8. **Pausing.** Pausing, switching tabs and coming back, and resizing in the
@@ -246,6 +252,28 @@ again the way a player would. Read each screen's buttons from the page
 elements); for menus drawn on the canvas, the debug hook's `buttons()` lists
 them (see web-target.md). Do this at every size: a popup that fits a desktop
 can run off a phone held sideways.
+
+## Play it wrong
+
+A recorded solution proves the right path works, not that a player who goes
+the wrong way can't get stuck. In every level, and above all the first one
+(a curious player's first move is often the wrong way), play it wrong on
+purpose: go the wrong way first, use things in the wrong order, waste what
+can be wasted, fall in every pit, walk off every ledge. Then check the game
+can still go on, by playing. The rule, and the ways each kind of game gets
+stuck, are in "No soft-locks" in review-roles.md. If the game has a tool that
+proves levels can be finished, have it also prove the reverse: every place
+the player can reach can still get to an exit, a checkpoint or the goal.
+
+## Click like a person
+
+A person's click holds the button down for about a tenth of a second.
+Playwright's default click is near-instant, so it can pass where a person's
+click fails, for example when the game redraws the button between press and
+release. Click on-screen buttons with a real press: `mousedown`, wait about
+120 ms, `mouseup` (in a script: `page.mouse.down()`, a short wait,
+`page.mouse.up()`). On phones, tap them too. Never `el.click()` from `eval`:
+it skips the pointer entirely.
 
 ## The first load
 

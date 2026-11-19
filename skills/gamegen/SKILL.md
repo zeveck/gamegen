@@ -416,7 +416,9 @@ phone sizes (as the platform setting requires), and play it: every screen,
 every level, start to finish, with no errors in the console. Prove each level
 can be completed, and once, after the last fixes, play the whole game from New
 Game to the win screen in one run. Open everything every button opens, not just the main
-screens. Take screenshots of each screen and level into `design/screenshots/`,
+screens. Play it wrong on purpose (the wrong way, the wrong order) to show
+the game can always go on, and click every on-screen button the way a person
+does. Take screenshots of each screen and level into `design/screenshots/`,
 run the text scanner at each one, film the first load, check screen changes
 frame by frame, and look at them all.
 

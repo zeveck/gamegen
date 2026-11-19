@@ -66,6 +66,9 @@ expect things to go wrong. Find the places where they will.
   anim8gen makes short loops from a reference character), clean transparent
   edges, tiles that repeat without seams, text inside images (avoid it; draw
   text in code), and sizes.
+- **Soft-locks.** Where could a player get into a state the game can't go
+  on from? Look for the ways this kind of game does it (see "No soft-locks"
+  below), and fix them in the design: the level, the rules, an undo.
 - **Testability.** Can the play-test prove every level is completable? Does
   the design include the debug hook needed to check it?
 - **Scope and budget.** Is it realistic for this scope and budget? Is the cut
@@ -135,8 +138,12 @@ as must-fix.
 You read the code and try to break the game.
 
 - Crashes and errors in the console, at any size.
-- Stuck states: softlocks, a level you can't finish, menus you can't leave,
-  input that stops responding after pausing or losing focus.
+- Soft-locks (see "No soft-locks" below): play it wrong on purpose and find
+  a state the game can't go on from. Also a level you can't finish, menus you
+  can't leave, input that stops responding after pausing or losing focus.
+- Buttons that don't do what they say: click every on-screen button the way
+  a person does (press, about a tenth of a second, release) and tap it on a
+  phone. Toggles too (mute, settings), not just buttons that open something.
 - Phone problems: touch controls, rotating the phone, resizing, the page
   scrolling or zooming, the notch and home bar. For a desktop-only or
   mobile-only game, also the other device's notice ("On other devices" in
@@ -180,3 +187,45 @@ The polish checklist:
 Use the same finding format, with the screen, the size and a screenshot for
 each. Every finding here is at least should-fix: these are what a player
 notices in the first minute.
+
+## No soft-locks
+
+Every reviewer who looks for stuck states uses this rule.
+
+**The game can always go on.** From anything the player can get into, the
+game must be able to continue: toward winning, or to a prompt, clear loss
+the player saw coming, then a retry. A soft-lock is a state where neither
+can happen. The player can't make progress and nothing ends it, so they'd
+have to wait a long time, quit, reload, or find a menu option they don't
+know about.
+
+- A pit that kills you is fine. So is a pit with an enemy that reliably gets
+  you, soon. A pit you can just sit in, or an enemy you can dodge forever, is
+  a soft-lock.
+- A hazard that only chips away at health is fine only if it ends in a loss.
+  In a game with no game over, it may never end.
+- Fix soft-locks in the design: the level, the rules, a way back, an undo.
+  Never by adding a surprise death or a timer the player didn't see coming;
+  that only swaps being stuck for an unexplained loss.
+- A menu escape ("back to the start of the level") is a good safety net, but
+  not a fix. Most stuck players never find it.
+
+How games soft-lock depends on the kind of game. For example:
+
+- **Platformers and metroidvanias:** a pit or drop that's higher than you can
+  jump back out of, a one-way path, a key or item used up in the wrong place.
+- **Puzzle games:** a box pushed into a corner, or a board with no moves left
+  that isn't a loss. These need an undo or a restart.
+- **Adventure and RPGs:** a required item you can miss for good, a character
+  who leaves, a door that locks behind you.
+- **Resource and economy games:** running out of the money, ammo or keys you
+  need, with no way to get more.
+- **Turn-based and card games:** no legal move, and no game over either.
+- **Any game:** a screen you can't leave, input dead after pausing or losing
+  focus, a loss screen that never comes.
+
+To find them, play it wrong: go the wrong way first, use things in the wrong
+order, waste what can be wasted, fall in every pit. Then check the game can
+still go on. A recorded solution only proves the right path works. If the
+game has a tool that proves levels can be finished, have it also check the
+reverse: every place the player can reach can still lead somewhere.
