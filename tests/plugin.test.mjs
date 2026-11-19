@@ -939,6 +939,11 @@ test('--controls: players change keys and buttons; menus can never be locked out
   assert.match(read(`${REFS}/controls.md`), /\*\*The game's default\s+controls stay exactly as they are:\*\*/);
 });
 
+test('art fits: parts in proportion, and an object is the same everywhere it appears (#46)', () => {
+  assert.match(read(`${REFS}/asset-guide.md`), /\*\*Check that things fit\.\*\*/);
+  assert.match(read(`${REFS}/review-roles.md`), /\*\*Made once\.\*\*/);
+});
+
 test('browsers.sh finds browsers left behind and says whether there is room for another (#28)', (t) => {
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
   const bin = join(dir, 'bin'); mkdirSync(bin);

@@ -4,6 +4,12 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.19.3
+
+- **Art that fits together:** parts of a picture are in proportion (a lid
+  fits its cup), and an object that appears in several pictures, or in a
+  story picture and then in play, is the same object every time.
+
 ## v2026.11.19.2
 
 - **"Report a bug" matches your game better:** the form's title says

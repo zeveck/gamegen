@@ -123,6 +123,9 @@ missing.
 - **One look.** Will images from different tools (nanogen, imagegen2,
   anim8gen) match? Is there a style anchor, and is it made first and reused as
   a reference? Are the palette and resolution settled?
+- **Made once.** Which objects appear in more than one image (a prop in
+  play and in a story picture, before and after)? Each is designed once,
+  and the asset list says to make the others from it as a reference.
 - **Complete list.** Does the asset list cover every character, animation,
   background, tile, item, UI piece, icon and sound the design mentions?
   Anything listed that the design never uses?

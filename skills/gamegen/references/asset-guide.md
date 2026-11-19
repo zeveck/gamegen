@@ -128,6 +128,13 @@ twice. If two better prompts don't fix it, change approach: a simpler
 version, another tool, or drawn in code. Drop it only if nothing works, and
 say so.
 
+**Check that things fit.** Within an image, parts are in proportion: a lid
+fits its cup, a held item fits the hand. An object that appears in several
+images (upright and tipped, in play and in a story picture, before and
+after) is the same object in each: make the later ones with the first as a
+reference, and look at them side by side. A story picture of something the
+player then sees in play shows it the same way, in the same place.
+
 ## Budget
 
 Keep `design/ASSETS.md` as you go:
