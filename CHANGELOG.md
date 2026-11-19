@@ -4,6 +4,15 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.19.6
+
+- **`/gamegen --plans`** puts a game you've already made (or planned) on your
+  plans page, and does nothing else. Publishing it again does too. It only
+  ever posts the plan the game already has; it never writes a new one.
+- A game whose public repo already shows its plan (published with
+  `--making-of`) gets a card that links there, with nothing copied.
+- The plans page links to your gallery; the gallery still doesn't link to it.
+
 ## v2026.11.19.5
 
 - **The plans page goes where you say,** apart from your gallery:

@@ -948,14 +948,15 @@ test('the plans page: asks first, never STATUS.md, cards from the template (#47)
   const ref = read(`${REFS}/plans.md`);
   assert.match(skill, /references\/plans\.md/);
   assert.match(ref, /## Asking first/);
-  assert.match(ref, /Never `design\/STATUS\.md`/);
+  assert.match(ref, /Never copy `design\/STATUS\.md`/);
   const page = read('skills/gamegen/templates/plans.html');
-  for (const p of ['PLANS_TITLE', 'PLAN_URL', 'PLAN_IMAGE', 'PLAN_STATUS', 'GAME_TITLE', 'GAME_DESCRIPTION']) assert.ok(page.includes(p), p);
+  for (const p of ['PLANS_TITLE', 'GALLERY_URL', 'PLAN_URL', 'PLAN_IMAGE', 'PLAN_STATUS', 'GAME_TITLE', 'GAME_DESCRIPTION']) assert.ok(page.includes(p), p);
   // publish.sh settings reports it.
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
   writeFileSync(join(dir, '.env'), 'GAMEGEN_PLANS=example.com/plans\n');
   assert.match(publish(dir, ['settings']).stdout, /^GAMEGEN_PLANS: example\.com\/plans$/m);
-  assert.match(ref, /Never change the gallery's own page/);
+  assert.match(ref, /the gallery page never links to it/);
+  assert.match(ref, /never writes one/);
   assert.match(ref, /is the gallery's own address, or no\s+gallery is set, say so/);
 });
 

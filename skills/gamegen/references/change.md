@@ -7,10 +7,11 @@ an existing game" in SKILL.md).
 
 With `--continue`, read the game's `design/STATUS.md` and design, and resume
 at the first unfinished phase. With the address of a plan on a plans page
-(`https://github.com/<repo>/tree/main/<folder>/<slug>`, plans.md), make a new
-folder named for it and fetch the plan's files into its `design/` (`gh api
-repos/<repo>/contents/<folder>/<slug>`, then each file's `download_url`),
-leaving out its README.md. Start `STATUS.md` with the design and its review
+(`https://github.com/<repo>/tree/main/<path>`, plans.md), make a new folder
+named for the plan (the repo's name when the address ends in `design`) and
+fetch the plan's files into its `design/` (`gh api
+repos/<repo>/contents/<path>`, then each file's `download_url`, and the same
+for its subfolders): never its README.md or a `STATUS.md`. Start `STATUS.md` with the design and its review
 done: the budget from the flags (or the default), the credit and what's
 available from this machine, and the requests list from the brief's "What
 they asked for". Say the budget and credit in the first update, then

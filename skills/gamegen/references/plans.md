@@ -13,8 +13,11 @@ address adds to the gallery's own address (`gh api repos/<gallery>/pages
 `you.github.io/my-games/plans` with it at `you.github.io/my-games`. If the
 address isn't on the gallery's site, is the gallery's own address, or no
 gallery is set, say so and carry on. It's a page of its
-own: the gallery page doesn't link to it, and it doesn't link to the
-gallery.
+own: the gallery page never links to it (the plans page links to the
+gallery, from the template).
+
+It only ever puts up a plan the game already has (its `design/` folder); it
+never writes one. A game without one gets "there's no plan for this game".
 
 ## When
 
@@ -24,12 +27,18 @@ gallery.
   with a link to play. After `--continue` or `--change` that changed the
   design: update its plan files.
 
+- `--plans` on its own, in a game's folder: add or update just this game's
+  card now, and do nothing else (no setup check: nothing is generated). If
+  `GAMEGEN_PLANS` isn't set, say so, show the line to add to `.env`
+  (`GAMEGEN_PLANS=<your gallery's address>/plans`), and stop.
+
 Never for a game with `--plans none` in its requests; say so once.
 
 ## Asking first
 
 A plan goes public, so before a game's first card, show what will go up
-(its name, one line, the mock picture if any, and the files below) and ask,
+(its name, one line, the mock picture if any, and the files below, or,
+for a game whose repo already shows its plan, just the card) and ask,
 as publishing does: "Add Bloom Hop's plan to your plans page at …? It
 includes your request in your words. Go ahead?" With `--no-confirm`, go
 on. Record "Plans page: yes" (or "no", and then never ask again for it) in
@@ -47,7 +56,13 @@ with access.
 
 ## What goes up
 
-In `<plans folder>/<game-slug>/`:
+**A game whose public repo already has its `design/` folder** (published
+with `--making-of`) shows its plan there: its card links to that folder
+(`https://github.com/<owner>/<repo>/tree/main/design`, or where the game
+folder is), and nothing is copied. Its `STATUS.md` is already public there;
+that's the only exception to the rule below.
+
+**Any other game's plan** goes in `<plans folder>/<game-slug>/`:
 
 - Copies of `BRIEF.md`, `GAME_DESIGN.md` and `REVIEW_LOG.md`, cleaned as
   share-design.md's "What goes in" says (no prices or dollar figures, the
@@ -58,16 +73,17 @@ In `<plans folder>/<game-slug>/`:
   shared with; the art sheet, likewise; the game, once published), and how
   to build it: "Run `/gamegen --continue <this page's address>`."
 
-Never `design/STATUS.md` (it holds costs and settings), `.env`, prices, or
+Never copy `design/STATUS.md` (it holds costs and settings), `.env`, prices, or
 paths on this machine. The credit name only if the person allowed it for
 publishing (`publish.sh credit`).
 
 `<plans folder>/index.html` is the page of cards, from
 `${CLAUDE_SKILL_DIR}/templates/plans.html` the first time ("<their name>'s
-game plans", the credit as for a new gallery). Each card: the mock picture
+game plans", the credit as for a new gallery; `GALLERY_URL` the gallery's
+address). Each card: the mock picture
 (or the game's social card, once there is one), name, one line, status, and
-a link to `https://github.com/<gallery repo>/tree/main/<plans folder>/<game-slug>`
-(GitHub shows the README and lets anyone download the files, however the
+a link to the plan (the game repo's `design/` folder, or
+`https://github.com/<gallery repo>/tree/main/<plans folder>/<game-slug>`; GitHub shows the README and lets anyone download the files, however the
 gallery site is built). Newest first; a game already there gets its card
 updated, not a second one. Never change the gallery's own page.
 
