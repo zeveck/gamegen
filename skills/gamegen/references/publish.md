@@ -320,6 +320,17 @@ correction: adjust, show the line again, and ask again.
 
 ## 5. Add it to the gallery
 
+**On a custom address, only once HTTPS works** (it was already required,
+or `publish.sh https` printed `https: on`). Before then the gallery's links
+would open a certificate warning and its picture would be broken. If it's
+still waiting, leave a new game out of the gallery for now; if the gallery
+already lists it at its old address, leave its link (it still reaches the
+game) but, for a public repo, point its picture at
+`https://raw.githubusercontent.com/<owner>/<repo>/main/game/social-card.jpg`.
+Write "Gallery: to add or update once HTTPS works" in `design/STATUS.md`,
+and say in the report that the next `/gamegen --publish` does it. Remove that
+line once it's done.
+
 **Starting a new gallery:** make it in `.gamegen/gallery/` from
 `templates/gallery.html`, saved as `index.html`: replace `GALLERY_TITLE`
 with "<their name>'s games" (the confirmed credit, or `publish.sh credit`;
@@ -353,7 +364,7 @@ gallery, if any; for a game with "Report a bug" in a private repo, that it
 has no button there, since players can't see the repo; for a game with
 `Feedback: hidden`, the `?feedback` link and the shortcut to hand to
 testers; and anything still
-pending (DNS to add, HTTPS still switching on, the repo's preview image),
+pending (DNS to add, HTTPS still switching on and the gallery waiting for it, the repo's preview image),
 with exactly what to do, and that updating
 later is just `/gamegen --change …` and then `/gamegen --publish`. End with
 what they'd need to list it anywhere else by hand:
@@ -405,7 +416,8 @@ Then:
 5. If it's on a custom address and HTTPS isn't required yet:
    `publish.sh https <owner>/<repo>` (step 4.5).
 6. Check the live page and look at the live game (steps 4.6 and 4.7).
-7. If it moved, or the title, tagline or social card changed, update its entry
-   in the gallery (step 5). If it was never in one and a gallery is now set,
-   add it, or start it (step 5).
+7. If it moved, the title, tagline or social card changed, or
+   `design/STATUS.md` says the gallery is waiting for HTTPS, update its entry
+   in the gallery, or add it if it isn't there (step 5). If it was never in
+   one and a gallery is now set, add it, or start it (step 5).
 8. Report as in step 6.

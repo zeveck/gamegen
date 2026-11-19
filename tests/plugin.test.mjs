@@ -498,6 +498,12 @@ test('publishing: never takes over a Pages site gamegen didn\'t set up', () => {
   assert.match(read(`${REFS}/help.md`), /a merge that\s+isn't a plain fast-forward/);
 });
 
+test('publishing: the gallery waits for HTTPS on a custom address (#31)', () => {
+  const pub = read(`${REFS}/publish.md`);
+  assert.match(pub, /\*\*On a custom address, only once HTTPS works\*\*/);
+  assert.match(pub, /the gallery is waiting for HTTPS, update its entry/);
+});
+
 test('publishing: `pages` with an address runs with a long Bash timeout', () => {
   // publish.sh pages waits for DNS (PUBLISH_DNS_WAIT, 300 s by default).
   assert.match(read('skills/gamegen/scripts/publish.sh'), /PUBLISH_DNS_WAIT:-300/);
