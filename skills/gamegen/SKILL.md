@@ -127,6 +127,7 @@ value) is the game description. Flags and defaults:
 |---|---|---|
 | `--platform` | `desktop`, `mobile`, `both` | `both` |
 | `--gamepad` | play with a controller: a PS5 controller (USB or Bluetooth) or the like (`references/gamepad.md`) | off |
+| `--controls` | players can change which keys (and buttons) do what, on a Controls screen (`references/controls.md`) | off |
 | `--feedback` | `on`, `hidden` or `off`: a "Report a bug" button that files GitHub issues (`references/feedback.md`) | off (`on` alone) |
 | `--style` | a description, or a URL (a game, store page, screenshot, video); repeatable | a look that suits the idea |
 | `--target` | `web`, or an engine or language (`godot`, `unity`, `unreal`, `pygame`, `love2d`…) | `web` |
@@ -224,7 +225,8 @@ it's never guessed from wording, and their original is never changed
 
 **Controllers and bug reports.** With `--gamepad` (or a request for
 controller play in words), read `references/gamepad.md` when you write the
-design: it covers the design, the build and the play-test. With
+design: it covers the design, the build and the play-test. So does
+`references/controls.md`, with `--controls`. With
 `--feedback` (for web games and web exports only, not engine targets),
 read `references/feedback.md` when you write the design: the design places
 the button, and the shortcut's letter if it isn't F. Either one alone

@@ -52,6 +52,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 |---|---|
 | `--target <web or an engine>` | What to build it in (default: web) |
 | `--gamepad` | Play with a controller, such as a PS5 controller plugged into your computer |
+| `--controls` | Let players change which keys and buttons do what |
 | `--feedback [on\|hidden\|off]` | A "Report a bug" button that turns players' reports into GitHub issues |
 | `--rounds <1 to 4>` | Rounds of design review (default: 2) |
 | `--no-confirm` | Don't stop to ask for approvals (publishing, a finish or remake plan) |
@@ -120,6 +121,19 @@ PlayStation). It works best in Chrome or Edge, and in the desktop apps
 ```
 
 On a game you've already made, `/gamegen --gamepad` adds it.
+
+## --controls
+
+**Let players change the controls.** The game gets a Controls screen, from
+its settings, where players pick which keys do what (and which controller
+buttons, with `--gamepad`). Every prompt and hint in the game shows their
+choice, it's remembered, and "Reset to defaults" puts it back. Pausing and
+the menu keys always stay the same, so nobody gets locked out. Your game's
+own controls don't change unless a player changes them.
+
+```
+/gamegen --controls
+```
 
 ## --feedback
 

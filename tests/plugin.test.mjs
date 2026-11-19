@@ -903,6 +903,42 @@ test('--report-issue files a self-contained issue, asking first (#45)', () => {
   assert.match(ref, /no `\.env` values\s+or keys, no names or emails/);
 });
 
+test('--controls: players change keys and buttons; menus can never be locked out (#40)', () => {
+  const store = new Map();
+  const page = { window: {}, JSON, Object, Array,
+    localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) } };
+  const load = () => {
+    vm.runInNewContext(read('skills/gamegen/templates/web/controls.js'), page);
+    return page.window.gameControls.setup({ key: 'g', actions: {
+      jump: { name: 'Jump', keys: ['Space', 'KeyZ'], pad: [0] },
+      fire: { name: 'Fire', keys: ['KeyX'], pad: [2] },
+      pause: { name: 'Pause', keys: ['Escape', 'KeyP'], pad: [9], fixed: true },
+    } });
+  };
+  let c = load();
+  assert.equal(c.keyAction('KeyZ'), 'jump');
+  // Taking another action's key swaps them, and says whose it was.
+  assert.equal(c.bindKey('jump', 0, 'KeyX'), 'fire');
+  assert.deepEqual([c.keys('jump'), c.keys('fire')], [['KeyX', 'KeyZ'], ['Space']]);
+  // Never: a fixed action's key, Escape, or another action's only key.
+  assert.equal(c.bindKey('jump', 0, 'KeyP'), false);
+  assert.equal(c.bindKey('pause', 0, 'KeyQ'), false);
+  assert.equal(c.bindKey('fire', 0, 'Escape'), false);
+  assert.equal(c.clear('fire', 0), false, 'an action keeps at least one key');
+  assert.equal(c.clear('jump', 1), true);
+  assert.equal(c.bindKey('fire', 1, 'KeyX'), false, "jump's only key stays");
+  // Remembered across a reload; reset puts the defaults back.
+  c = load();
+  assert.equal(c.keyAction('KeyX'), 'jump');
+  c.reset();
+  assert.deepEqual(load().keys('jump'), ['Space', 'KeyZ']);
+  // Saved choices that now clash with the game's own (a newer version took the key) give way to the defaults.
+  store.set('g-controls', JSON.stringify({ fire: { keys: ['KeyP'], pad: [2] } }));
+  assert.deepEqual(load().keys('fire'), ['KeyX']);
+  assert.deepEqual([c.label('Space'), c.label('KeyZ'), c.label('ArrowUp')], ['Space', 'Z', '↑']);
+  assert.match(read(`${REFS}/controls.md`), /\*\*The game's default\s+controls stay exactly as they are:\*\*/);
+});
+
 test('browsers.sh finds browsers left behind and says whether there is room for another (#28)', (t) => {
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
   const bin = join(dir, 'bin'); mkdirSync(bin);
