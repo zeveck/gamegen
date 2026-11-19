@@ -44,7 +44,7 @@ stop publishing before anything else:
    (`gh api repos/<owner>/<repo> --jq .permissions.push` says `true`) and that
    has a Pages site gamegen set up: `gh api repos/<owner>/<repo>/pages --jq .build_type`
    says `workflow`, and the local checkout has gamegen's
-   `.github/workflows/pages.yml` at its root (the one from web-target.md,
+   `.github/workflows/pages.yml` at its root (gamegen's `templates/web/pages.yml`, as web-target.md describes,
    with its "Stamp service worker" step). Check its visibility and issues too
    (`gh repo view <repo> --json visibility,hasIssuesEnabled`). Then work out the address and the gallery (items 3 and 4 below)
    and follow "Updating a published game". With an `origin` they can push to
@@ -216,10 +216,9 @@ correction: adjust, show the line again, and ask again.
    ask them, and record it in `design/STATUS.md` before the commit:
    - **A private repo:** don't ask, and remove any such line.
    - **A repo step 4.1 will create** (it's public, with no picture yet), or
-     an existing public one where
-     `gh api graphql -f query='{repository(owner:"<owner>",name:"<repo>"){usesCustomOpenGraphImage}}' --jq .data.repository.usesCustomOpenGraphImage`
-     says `false`: write "GitHub preview image: to upload (none set)". Once
-     that check says `true`, remove it.
+     an existing public one where `publish.sh preview <repo>` says `none`:
+     write "GitHub preview image: to upload (none set)". Once it says
+     `set`, remove it.
    - **The picture changed** since the last publish (anything staged, or in
      commits not yet pushed, under `media/github-social.*`) and one is
      already set: write "GitHub preview image: to upload (changed <date>)".
@@ -269,14 +268,10 @@ correction: adjust, show the line again, and ask again.
    deploy fails). Add it as `origin` (or as `github`, when step 1.2 left
    another `origin` alone).
    **Then, for a public repo and a game with "Report a bug"** (step 3, item 7),
-   new repo or not: create the issue form's labels, `bug` and
-   `player-report`, if they're missing (`gh label list -R <repo>`, then
-   `gh label create bug -R <repo> --color d73a4a --description "Something isn't working"`
-   and `gh label create player-report -R <repo> --color c5def5 --description "Reported from the game"`;
-   never change an existing label), and check issues are on
-   (`gh repo view <repo> --json hasIssuesEnabled`; if not,
-   `gh repo edit <repo> --enable-issues`). A new public repo has issues on
-   already, but still needs the labels.
+   new repo or not: `publish.sh labels <repo>`. It turns issues on if
+   they're off and adds the issue form's labels, `bug` and `player-report`,
+   if they're missing (never changing an existing one). A new public repo
+   has issues on already, but still needs the labels.
 2. If the confirmation said gamegen would add the DNS record:
    `publish.sh dns-add <host> <account>`. It adds one CNAME and never
    changes or overwrites another record. If it says the record was added or

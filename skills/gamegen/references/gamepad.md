@@ -96,32 +96,15 @@ asks "is jump pressed?".
 
 ## Play-testing it
 
-There's no controller in the play-test's browser, so give it a pretend one:
-replace `navigator.getGamepads` before the game loads, with a controller the
-test can press. In `playwright-cli`, add it with `run-code` and reload
-(`playwright-cli -s=desktop run-code "async page => { await page.addInitScript(…); await page.reload(); }"`),
-then press with `eval` (`playwright-cli -s=desktop eval "() => __pad.connect()"`).
-The script, for `addInitScript`:
+There's no controller in the play-test's browser, so give it a pretend one,
+`${CLAUDE_SKILL_DIR}/scripts/fake-gamepad.js`, which replaces
+`navigator.getGamepads` with a controller the test can press. Load it before
+the game and reload, then press with `eval` (`__pad.connect(id?)`,
+`__pad.disconnect()`, `__pad.button(i, down)`, `__pad.stick(x, y)`):
 
-```js
-await page.addInitScript(() => {
-  const blank = () => ({ pressed: false, touched: false, value: 0 });
-  const pad = { id: 'DualSense Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 0ce6)',
-    index: 0, connected: false, mapping: 'standard', timestamp: 0,
-    axes: [0, 0, 0, 0], buttons: Array.from({ length: 18 }, blank) };
-  const fire = (type) => {
-    const e = new Event(type);
-    Object.defineProperty(e, 'gamepad', { value: pad });
-    window.dispatchEvent(e);
-  };
-  window.__pad = {
-    connect(id) { if (id) pad.id = id; pad.connected = true; fire('gamepadconnected'); },
-    disconnect() { pad.connected = false; fire('gamepaddisconnected'); },
-    button(i, down) { pad.buttons[i] = down ? { pressed: true, touched: true, value: 1 } : blank(); pad.timestamp = performance.now(); },
-    stick(x, y) { pad.axes[0] = x; pad.axes[1] = y; pad.timestamp = performance.now(); },
-  };
-  navigator.getGamepads = () => [pad.connected ? pad : null, null, null, null];
-});
+```bash
+playwright-cli -s=desktop run-code "async page => { await page.addInitScript({ path: '${CLAUDE_SKILL_DIR}/scripts/fake-gamepad.js' }); await page.reload(); }"
+playwright-cli -s=desktop eval "() => __pad.connect()"
 ```
 
 It needs a real page load (`page.goto`), not `setContent`. The game polls,

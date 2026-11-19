@@ -1,0 +1,38 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      # Only the game folder is published. Stamp the service worker with this
+      # version and the list of files to cache.
+      - name: Stamp service worker
+        working-directory: GAME_DIR
+        run: |
+          files=$(find . -type f ! -name sw.js | sed 's|^\./||' | sort | sed 's/.*/"&"/' | paste -sd, -)
+          sed -i "s|'__BUILD__'|'${GITHUB_SHA::12}'|; s|/\*__FILES__\*/|$files|" sw.js
+          ! grep -q -e __BUILD__ -e __FILES__ sw.js
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: GAME_DIR
+      - id: deployment
+        uses: actions/deploy-pages@v4

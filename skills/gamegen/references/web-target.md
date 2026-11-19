@@ -97,44 +97,47 @@ pressed?".
 A game made for one kind of device still gets opened on the other, and it
 shouldn't just feel broken there. Use the design's "On other devices" line.
 
-**A desktop-only game on a touch-only device** shows a notice first: an
-HTML overlay (not drawn on the canvas, so its text is phone-sized and its
-buttons at least 44 px), honest about what works, for example: "Made for a
-computer, or a tablet with a keyboard or controller. With touch alone you
-can look around, but the battles can't be played."
+**A desktop-only game on a touch-only device** shows a notice first, honest
+about what works, for example: "Made for a computer, or a tablet with a
+keyboard or controller. With touch alone you can look around, but the
+battles can't be played." Its buttons are "Send link to yourself" and a
+quieter "Look around anyway"; offer "Play anyway" instead only if the game
+can really be finished by touch.
 
-- **Who sees it:** only touch-only devices, never a touchscreen laptop or
-  desktop, and never the desktop app. Test the device, not the window's
-  width: `navigator.maxTouchPoints > 0 && !matchMedia('(any-pointer: fine)').matches && !window.desktop`.
-  If a mouse or trackpad turns up later (a `change` on
-  `matchMedia('(any-pointer: fine)')`), hide it.
-- **Buttons:** "Send link to yourself" and a quieter "Look around anyway".
-  Offer "Play anyway" instead only if the game can really be finished by
-  touch. The link is the clean address (`location.origin +
-  location.pathname`). Use `navigator.share({ url })` where it exists;
-  otherwise copy it (inside `try`; both need https or localhost); otherwise
-  show the address in a selected, read-only box. Say what happened ("Link
-  copied") and leave the notice up.
-- **Any key or controller button dismisses it** (a tablet with a keyboard or
-  controller can play), except Tab, Shift+Tab and the modifier keys, which
-  move between its buttons; Enter or Space press the focused button, and
-  Escape dismisses it. The press that dismisses it does
-  nothing else: it doesn't reach the game, which waits on its title screen
-  behind the notice. It does count as the first input for sound (resume the
-  `AudioContext`). The input layer keeps reading the controller while the
-  notice is up.
-- **Accessible:** `role="dialog"`, `aria-modal="true"`, `aria-labelledby`
-  on its heading; focus moves to its main button when it opens, and back to
-  the game when it closes.
-- **Remembered** once dismissed, under the game's save key in
-  `localStorage` (inside `try`, as in "Saving"), so it shows once.
-
-**A mobile-only game on a computer** usually plays fine with a mouse. If it
-needs what a computer lacks (several fingers at once, tilting), show a short
-notice saying so, the same way, but only where `navigator.maxTouchPoints ===
-0` (a touchscreen laptop can do it). A portrait game on a computer shows as
+**A mobile-only game on a computer** usually plays fine with a mouse. Only if
+it needs what a computer lacks (several fingers at once, tilting), show a
+short notice saying so, the same way. A portrait game on a computer shows as
 a centred column, not a "turn your phone" message: that overlay is for
 touch devices only.
+
+Copy `${CLAUDE_SKILL_DIR}/templates/web/other-devices.js` into the game
+unchanged, load it before the game's code, and call it as the game starts,
+with the game waiting on its title screen behind it:
+
+```js
+window.otherDevices?.show({ kind: 'desktop-only', key: 'pp3',
+  heading: 'Made for a computer', text: '…the design\'s words…',
+  main: 'Send link to yourself', quiet: 'Look around anyway', onClose });
+```
+
+It decides who sees it (the device, not the window's width: never a
+touchscreen laptop or the desktop app; hidden again if a mouse turns up),
+draws an HTML overlay with phone-sized text and 44 px buttons, shares or
+copies the game's clean address (or shows it to copy by hand), lets Tab,
+Enter and Space work its buttons while any other key or Escape dismisses it
+without reaching the game, makes it an accessible dialog, puts focus back
+afterwards, and remembers that it was dismissed. The game:
+
+- styles `.od-notice`, `.od-box`, `.od-main`, `.od-quiet` and `.od-link` like
+  its other screens (the template's own styles are plain defaults the game's
+  always win over), and passes its own words for `copied` and `shared`
+  ("Link copied", "Link sent") if they differ;
+- works the same whether or not the notice shows: `show()` returns `false`
+  and calls nothing when it isn't needed, and `onClose` only resumes the
+  `AudioContext` (the dismissing press counts as the first input);
+- in its controller layer, while `window.otherDevices?.isOpen()`, keeps
+  reading button states, calls `window.otherDevices.dismiss()` on a new
+  press, and does nothing else with it.
 
 ## Audio
 
@@ -208,10 +211,12 @@ The play-test checks these (see playtest-guide.md).
 - Make the icon sizes from one square image in code, for example with
   Python's Pillow (`python3 -c "from PIL import Image; ..."`); anim8gen
   already needs Pillow.
-- A service worker for offline play, using the template below. Once
-  installed it serves cached files, so register it only when the game isn't
-  running locally, or when asked to with `?sw=1` (how the play-test checks
-  offline play):
+- A service worker for offline play: copy
+  `${CLAUDE_SKILL_DIR}/templates/web/sw.js` into the game folder and replace
+  `GAME-SLUG` in its `PREFIX` with the game's slug (keep the trailing `-`). The Pages workflow (below) stamps it with each
+  deploy's version and file list. Once installed it serves cached files, so
+  register it only when the game isn't running locally, or when asked to
+  with `?sw=1` (how the play-test checks offline play):
 
   ```js
   const local = ['localhost', '127.0.0.1'].includes(location.hostname);
@@ -223,41 +228,6 @@ The play-test checks these (see playtest-guide.md).
 - Installing as an app needs the game published over https (GitHub Pages is
   fine). From `localhost` on the same computer it works too, but not from
   another device over plain http on your network.
-
-```js
-// sw.js: offline play. The GitHub Pages workflow stamps VERSION with the
-// commit and fills FILES with everything in the game folder, so each deploy
-// caches a fresh copy on the next launch. Unstamped (local) copies cache as
-// they go.
-'use strict';
-const VERSION = '__BUILD__';
-const FILES = [/*__FILES__*/];
-const PREFIX = 'GAME-SLUG-';            // replace with the game's slug
-const CACHE = PREFIX + VERSION;
-
-self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE)
-    .then(cache => cache.addAll(['./', ...FILES].map(url => new Request(url, { cache: 'reload' }))))
-    .then(() => self.skipWaiting()));
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(caches.keys()
-    .then(keys => Promise.all(keys.filter(k => k.startsWith(PREFIX) && k !== CACHE).map(k => caches.delete(k))))
-    .then(() => self.clients.claim()));
-});
-
-self.addEventListener('fetch', event => {
-  const req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
-  const key = req.mode === 'navigate' ? './' : req;
-  event.respondWith(caches.open(CACHE).then(cache =>
-    cache.match(key, { ignoreSearch: true }).then(hit => hit || fetch(req).then(res => {
-      if (res.ok) cache.put(key, res.clone());
-      return res;
-    }))));
-});
-```
 
 ## Sharing and search
 
@@ -354,9 +324,10 @@ result for the same inputs (seed any randomness per level).
 
 ## Publishing on GitHub Pages
 
-When the game is in a git repository, add `.github/workflows/pages.yml` at the
-**repository's root** (GitHub ignores workflows anywhere else), with `GAME_DIR`
-replaced by the game's folder relative to that root (`game`, or for example
+When the game is in a git repository, copy
+`${CLAUDE_SKILL_DIR}/templates/web/pages.yml` to `.github/workflows/pages.yml`
+at the **repository's root** (GitHub ignores workflows anywhere else), with
+`GAME_DIR` replaced by the game's folder relative to that root (`game`, or for example
 `hoard-hopper/game`). Skip this if the repository already has a Pages workflow
 or a Pages site that gamegen didn't add: don't replace someone's existing site.
 gamegen's own site is built by this workflow (`gh api repos/<owner>/<repo>/pages --jq .build_type`
@@ -367,45 +338,5 @@ and asks before switching it to this workflow, even with `--no-confirm`;
 when the game is in a subfolder, the site is left alone and the game gets
 its own repo when published. After the repository is on GitHub,
 turning on Pages (Settings, Pages, Source: GitHub Actions) publishes the game
-on every push to `main`:
+on every push to `main`.
 
-```yaml
-name: Deploy to GitHub Pages
-
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v4
-      # Only the game folder is published. Stamp the service worker with this
-      # version and the list of files to cache.
-      - name: Stamp service worker
-        working-directory: GAME_DIR
-        run: |
-          files=$(find . -type f ! -name sw.js | sed 's|^\./||' | sort | sed 's/.*/"&"/' | paste -sd, -)
-          sed -i "s|'__BUILD__'|'${GITHUB_SHA::12}'|; s|/\*__FILES__\*/|$files|" sw.js
-          ! grep -q -e __BUILD__ -e __FILES__ sw.js
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: GAME_DIR
-      - id: deployment
-        uses: actions/deploy-pages@v4
-```

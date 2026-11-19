@@ -41,8 +41,10 @@ audiogen plugins for art and sound, and meshgen for 3D games.
   (github.com/zeveck/gh-feedback, the owner's) into each game from
   `templates/feedback/gh-feedback.js`, an unchanged copy of a release, named
   in `templates/feedback/SOURCE`. To update it: copy the new release, change
-  the version in `SOURCE`, and run the tests. `--gamepad` is in
-  references/gamepad.md.
+  the version in `SOURCE`, and run the tests. Beside it, `report.js` is
+  gamegen's own: the plumbing that connects the form to a game (the shortcut,
+  the screenshot, the details), copied into each game unchanged. `--gamepad`
+  is in references/gamepad.md.
 - `docs/` is the site at gamegen.synapticnoise.com (GitHub Pages, from
   `main`'s `/docs`): the home page and the Steam guide (`docs/steam-guide.md`).
   Everything in `docs/` is public.

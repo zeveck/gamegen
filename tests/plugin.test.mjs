@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (rel) => readFileSync(join(ROOT, rel), 'utf8');
@@ -476,11 +477,9 @@ test('publishing: "Report a bug" only for a public repo, set up once the repo ex
   const step3 = pub.slice(pub.indexOf('## 3. Get the repository ready'), pub.indexOf('## 4. Publish'));
   const step4 = pub.slice(pub.indexOf('## 4. Publish'), pub.indexOf('## 5.'));
   const updating = pub.slice(pub.indexOf('## Updating a published game'));
-  assert.doesNotMatch(step3, /gh label create/);
-  assert.doesNotMatch(step3, /--enable-issues/);
-  assert.match(step4, /gh repo create[\s\S]*gh label create player-report[\s\S]*--enable-issues[\s\S]*publish\.sh pages/);
-  assert.match(step4, /A new public repo has issues on\s+already, but still needs the labels/);
-  assert.match(step4, /gh label create bug -R <repo>/, 'both of the issue form\'s labels');
+  assert.doesNotMatch(step3, /publish\.sh labels/);
+  assert.match(step4, /gh repo create[\s\S]*publish\.sh labels <repo>[\s\S]*publish\.sh pages/);
+  assert.match(step4, /A new public repo\s+has issues on already, but still needs the labels/);
   assert.match(step4, /redo step 3, item 7\s+for it/, 'a private repo made public gets the button after all');
   assert.match(updating, /the labels and the\s+issues check[\s\S]*Push, and wait/);
 });
@@ -518,8 +517,18 @@ test('--gamepad: PlayStation-first controller support, play-tested with a preten
   const ref = read(`${REFS}/gamepad.md`);
   assert.match(skill, /references\/gamepad\.md/);
   assert.match(ref, /`Gamepad: yes`/, 'the setting is kept in STATUS.md');
-  assert.match(ref, /navigator\.getGamepads = \(\) =>/, 'the play-test replaces getGamepads');
-  assert.match(ref, /addInitScript/);
+  // The play-test's pretend controller, loaded from its file before the game.
+  assert.match(ref, /addInitScript\(\{ path: '\$\{CLAUDE_SKILL_DIR\}\/scripts\/fake-gamepad\.js' \}\)/);
+  const events = [], win = { dispatchEvent: (e) => events.push(e.type) };
+  const page = { window: win, navigator: {}, performance: { now: () => 5 },
+    Event: class { constructor(t) { this.type = t; } }, Object, Array };
+  vm.runInNewContext(read('skills/gamegen/scripts/fake-gamepad.js'), page);
+  assert.equal(page.navigator.getGamepads()[0], null, 'nothing until it connects');
+  win.__pad.connect(); win.__pad.button(0, true); win.__pad.stick(1, 0);
+  const pad = page.navigator.getGamepads()[0];
+  assert.ok(pad.buttons[0].pressed && pad.axes[0] === 1 && pad.mapping === 'standard');
+  win.__pad.disconnect();
+  assert.deepEqual(events, ['gamepadconnected', 'gamepaddisconnected']);
   assert.match(ref, /054c/, 'recognises Sony controllers by vendor id');
   assert.match(ref, /✕ \(cross\)/);
   assert.match(ref, /mapping === 'standard'/);
@@ -549,21 +558,16 @@ test('--feedback: bundles gh-feedback with link mode, and publishing sets up the
   const pub = read(`${REFS}/publish.md`);
   assert.match(pub, /feedback\.md/);
   assert.match(pub, /ISSUE_TEMPLATE\/bug\.yml/);
-  assert.match(pub, /gh repo edit <repo> --enable-issues/);
-  assert.match(ref, /if \(fb\?\.isOpen\) return;/, 'the game ignores its own input while the form is open');
-  assert.match(ref, /button 1\), which calls\s+`fb\?\.close\(\)`/, 'a controller player can close the form');
-  assert.match(ref, /const showReport = \(\) =>/, 'the menus ask each time they draw');
+  assert.match(ref, /return first thing while\s+`window\.gameReport\?\.isOpen\(\)`/, 'the game ignores its own input while the form is open');
+  assert.match(ref, /button 1\), which calls\s+`window\.gameReport\?\.close\(\)`/, 'a controller player can close the form');
+  assert.match(ref, /`window\.gameReport\?\.shown\(\)` \(checked each time they draw/, 'the menus ask each time they draw');
   assert.match(ref, /addInitScript/, 'the play-test sets the repo before every load');
-  assert.match(ref, /fb\.openLink/);
-  // Ctrl+Shift+F works even when the game is stuck, on non-Latin layouts too.
+  // Ctrl+Shift+F works even when the game is stuck; report.js's own test covers how.
   assert.match(ref, /\*\*Ctrl\+Shift\+F\*\* opens the report from anywhere/);
-  assert.match(ref, /e\.code !== 'KeyF'/);
-  assert.match(ref, /fb\.isOpen\) return;\n    e\.preventDefault\(\)/, 'the shortcut checks fb.isOpen');
-  assert.match(ref, /uses Ctrl and Shift together as controls/);
+  assert.match(ref, /uses\s+Ctrl and Shift together as controls/);
   assert.match(skill, /read `references\/feedback\.md` when you write the design/);
   assert.match(ref, /\*\*Adding the report never changes the game's existing controls\.\*\*/);
-  assert.match(ref, /e\.ctrlKey[^\n]*e\.shiftKey[\s\S]*\}, true\);/, 'its own listener, in the capture phase');
-  assert.match(ref, /\*\*before\*\* the game's code/);
+  assert.match(ref, /Load\s+`report\.js` in `<head>`/, 'loaded before the game, so its errors can\'t stop it');
   assert.match(ref, /__reports/, 'the play-test checks normal play never opens it');
 });
 
@@ -580,7 +584,7 @@ test('a GitHub preview image is made, and the person is asked to upload it (#26)
   const pub = read(`${REFS}/publish.md`);
   assert.match(web, /`media\/github-social\.png`, 1280x640/);
   assert.match(web, /GitHub's limit is 1 MB/);
-  assert.match(pub, /usesCustomOpenGraphImage/, 'publishing checks whether one is set');
+  assert.match(pub, /`publish\.sh preview <repo>` says `none`/, 'publishing checks whether one is set');
   assert.match(pub, /One thing only you can do:/);
   assert.match(pub, /GitHub preview image: to upload \(none set\)/);
   assert.match(pub, /GitHub preview image: to upload \(changed <date>\)/);
@@ -653,10 +657,47 @@ test('games handle the device they were not made for (#25)', () => {
   const web = read(`${REFS}/web-target.md`);
   assert.match(read(`${REFS}/design-template.md`), /\*\*On other devices\*\*/);
   assert.match(web, /^## On other devices$/m);
-  assert.match(web, /navigator\.maxTouchPoints > 0 && !matchMedia\('\(any-pointer: fine\)'\)\.matches/, 'detects touch-only devices, not narrow windows');
-  assert.match(web, /Any key or controller button dismisses it/);
-  assert.match(web, /&& !window\.desktop/, 'never in the desktop app');
-  assert.match(web, /navigator\.share\(\{ url \}\)/, 'offers the share sheet');
+  assert.match(web, /templates\/web\/other-devices\.js/);
+  // The template, in a stand-in page.
+  const page = ({ touch = 5, fine = false, desktop } = {}) => {
+    const keys = [], store = new Map(), mq = { matches: fine, fns: [],
+      addEventListener(t, f) { this.fns.push(f); }, removeEventListener() { this.fns = []; } };
+    const node = (tagName = 'DIV') => ({ tagName, kids: [], attrs: {}, fns: {}, parent: null,
+      setAttribute(k, v) { this.attrs[k] = v; }, append(...k) { k.forEach((c) => { c.parent = this; this.kids.push(c); }); },
+      remove() { if (this.parent) this.parent.kids = this.parent.kids.filter((c) => c !== this); this.parent = null; },
+      addEventListener(t, f) { this.fns[t] = f; }, focus() { doc.activeElement = this; }, select() {},
+      replaceChildren(...k) { this.kids = []; this.append(...k); },
+      contains(n) { return n === this || this.kids.some((c) => c.contains?.(n)); } });
+    const doc = { body: node('BODY'), head: node('HEAD'), activeElement: null,
+      createElement: (t) => node(t.toUpperCase()), querySelector: () => null };
+    doc.head.prepend = doc.head.append;
+    const w = { document: doc, navigator: { maxTouchPoints: touch }, desktop, location: { origin: 'https://g.example', pathname: '/' },
+      matchMedia: () => mq, localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) },
+      addEventListener: (t, f) => keys.push(f), removeEventListener: (t, f) => keys.splice(keys.indexOf(f), 1) };
+    w.window = w;
+    vm.runInNewContext(read('skills/gamegen/templates/web/other-devices.js'), w);
+    const press = (key) => { const e = { key, stopped: false, preventDefault() {}, stopImmediatePropagation() { this.stopped = true; } }; keys.slice().forEach((f) => f(e)); return e; };
+    return { w, doc, mq, store, press, api: w.otherDevices };
+  };
+  const opts = { kind: 'desktop-only', key: 'g', heading: 'Made for a computer', text: '…' };
+  assert.equal(page({ fine: true }).api.show(opts), false, 'never on a touchscreen laptop');
+  assert.equal(page({ desktop: {} }).api.show(opts), false, 'never in the desktop app');
+  assert.equal(page({ touch: 0 }).api.show({ ...opts, kind: 'mobile-only' }), true, 'a mobile-only game, on a computer');
+  let closed = 0;
+  const p = page();
+  assert.equal(p.api.show({ ...opts, onClose: () => closed++ }), true);
+  assert.equal(p.doc.body.kids[0].attrs.role, 'dialog');
+  assert.equal(p.doc.activeElement.className, 'od-main', 'focus on its main button');
+  assert.ok(!p.press('Tab').stopped && p.api.isOpen(), 'Tab moves between its buttons');
+  p.press('Enter'); assert.ok(p.api.isOpen(), 'Enter presses the focused button, not a dismissal');
+  assert.ok(p.press('ArrowLeft').stopped, 'the press that dismisses it never reaches the game');
+  assert.deepEqual([p.api.isOpen(), closed, p.store.get('g-other-devices')], [false, 1, '1']);
+  assert.equal(p.api.show(opts), false, 'shown once');
+  const esc = page(); esc.api.show(opts); esc.press('Escape'); assert.equal(esc.api.isOpen(), false);
+  assert.equal(page().api.show({ ...opts, kind: 'mobile-only' }), false, 'no notice for a mobile-only game on a phone');
+  // A mouse turning up hides it, without remembering.
+  const m = page(); m.api.show(opts); m.mq.matches = true; m.mq.fns.forEach((f) => f());
+  assert.deepEqual([m.api.isOpen(), m.store.has('g-other-devices')], [false, false]);
   const guide = read(`${REFS}/playtest-guide.md`);
   assert.match(guide, /\*\*The other kind of device\*\*/);
   assert.match(guide, /after a reload it stays gone/);
@@ -688,6 +729,97 @@ test('--bugcheck reports what clears the bar, and changes nothing until asked', 
   assert.match(roles, /^## The bar$/m);
   assert.match(roles, /\*\*Safety is always worth fixing\*\*/);
   assert.match(ref, /"The bar" in review-roles\.md/);
+});
+
+// report.js in a stand-in page: the plumbing feedback.md relies on.
+function reportPage({ search = '', repo = 'test/test', desktop } = {}) {
+  const listeners = {}, store = new Map(), opened = [];
+  const form = { attrs: { repo }, isOpen: false, dataset: {}, events: {},
+    getAttribute(k) { return this.attrs[k] ?? null; },
+    open() { opened.push('open'); this.isOpen = true; }, close() { this.isOpen = false; },
+    addEventListener(t, f) { this.events[t] = f; } };
+  const win = {
+    addEventListener: (t, f) => { (listeners[t] ||= []).push(f); },
+    location: { search, origin: 'https://g.example', pathname: '/' },
+    localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v), removeItem: (k) => store.delete(k) },
+    document: { getElementById: (id) => (id === 'report' ? form : null), lastModified: 'today',
+      createElement: () => ({}), head: { append() {} } },
+    navigator: { userAgent: 'test' }, innerWidth: 800, innerHeight: 600, devicePixelRatio: 2,
+    URLSearchParams, JSON, String, Promise, desktop, open: () => undefined,
+  };
+  win.window = win;
+  vm.runInNewContext(read('skills/gamegen/templates/feedback/report.js'), win);
+  const key = (code, mods = {}) => {
+    const e = { code, ctrlKey: true, shiftKey: true, altKey: false, metaKey: false, ...mods,
+      stopped: false, preventDefault() {}, stopImmediatePropagation() { this.stopped = true; } };
+    listeners.keydown.forEach((f) => f(e));
+    return e;
+  };
+  const fire = (t, e) => (listeners[t] || []).forEach((f) => f(e));
+  return { win, form, store, opened, key, fire, api: win.gameReport };
+}
+
+test('report.js: the shortcut, ?feedback, the snapshot and the details', () => {
+  // The shortcut opens the form (pausing first), and stops the F reaching the game.
+  let paused = 0;
+  const p = reportPage();
+  p.api.setup({ game: 'Test Game', key: 'tg', pause: () => paused++ });
+  assert.ok(p.key('KeyF').stopped);
+  assert.deepEqual([p.opened.length, paused], [1, 1]);
+  p.form.isOpen = false;
+  assert.ok(!p.key('KeyF', { ctrlKey: false }).stopped, 'Shift+F alone does nothing');
+  // Even if the game's pause throws (a stuck game), the form opens.
+  p.api.setup({ pause: () => { throw new Error('stuck'); } });
+  p.key('KeyF'); assert.equal(p.opened.length, 2);
+  // No repo: no shortcut and no button.
+  const none = reportPage({ repo: '' });
+  none.api.setup({});
+  assert.ok(!none.key('KeyF').stopped);
+  assert.equal(none.api.shown(), false);
+  // Another letter when the game uses Ctrl+Shift itself.
+  const l = reportPage(); l.api.setup({ letter: 'L' });
+  assert.ok(!l.key('KeyF').stopped); assert.ok(l.key('KeyL').stopped);
+  // hidden: shown after ?feedback (remembered), gone after ?feedback=off, never in the app.
+  assert.equal((() => { const h = reportPage(); h.api.setup({ key: 'tg', visibility: 'hidden' }); return h.api.shown(); })(), false);
+  const h = reportPage({ search: '?feedback' }); h.api.setup({ key: 'tg', visibility: 'hidden' });
+  assert.equal(h.api.shown(), true); assert.equal(h.store.get('tg-feedback'), '1');
+  h.win.location.search = '?feedback=off'; h.api.setup({ key: 'tg', visibility: 'hidden' });
+  assert.equal(h.api.shown(), false);
+  const app = reportPage({ search: '?feedback', desktop: { platform: 'win32' } });
+  app.api.setup({ key: 'tg', visibility: 'hidden' });
+  assert.equal(app.api.shown(), false);
+  assert.equal(app.form.openLink('x'), true, 'links count as opened in the app');
+  // The screenshot is the snapshot taken as it paused, until it resumes.
+  let shots = 0;
+  const s = reportPage(); s.api.setup({ grab: () => `shot${++shots}` });
+  s.api.snapshot(); assert.equal(s.form.getScreenshot(), 'shot1');
+  s.api.resumed(); assert.equal(s.form.getScreenshot(), 'shot2');
+  // Details: flat one-line values and the last five errors; releaseAll as it opens.
+  let released = 0;
+  const d = reportPage();
+  d.api.setup({ game: 'Test Game', state: () => ({ level: 2, input: 'left\nup' }), releaseAll: () => released++ });
+  for (let i = 0; i < 7; i++) d.fire('error', { message: `boom\n${i}` });
+  const c = d.form.getContext();
+  assert.equal(c.input, 'left up');
+  assert.equal(c.screen, '800x600 @2x');
+  assert.equal(c.errors, 'boom 2 | boom 3 | boom 4 | boom 5 | boom 6');
+  assert.ok(Object.values(c).every((v) => !/\n/.test(v)), 'no line breaks');
+  d.form.events['gh-feedback:open'](); assert.equal(released, 1);
+  d.api.setup({ pause() {} });
+  assert.equal(d.form.getContext().game, 'Test Game', 'a second setup keeps the first one\'s hooks');
+  // A game that starts before the element is in the page is wired once it is.
+  const early = reportPage({ search: '?feedback' });
+  const el = early.win.document.getElementById;
+  early.win.document.getElementById = () => null;
+  early.api.setup({ key: 'tg', visibility: 'hidden', grab: () => 'shot' });
+  early.win.document.getElementById = el;
+  early.fire('DOMContentLoaded');
+  assert.equal(early.form.getScreenshot(), 'shot');
+  assert.equal(early.api.shown(), true);
+  // feedback.md uses it, and copies it into the game.
+  const ref = read(`${REFS}/feedback.md`);
+  assert.match(ref, /templates\/feedback\/report\.js/);
+  assert.match(ref, /window\.gameReport\?\.setup\(/);
 });
 
 test('--art-sheet shows every accepted asset once the art is ready, and keeps one link', () => {
@@ -737,13 +869,21 @@ test('art-sheet.py builds the page from a manifest, and lists missing files', { 
   assert.ok(existsSync(join(dir, 'game/audio/keep.mp3')), "the game's files are untouched");
 });
 
-test('the service worker template and the Pages workflow agree on placeholders', () => {
-  const web = read(`${REFS}/web-target.md`);
-  for (const placeholder of ["'__BUILD__'", '/*__FILES__*/']) {
-    assert.ok(web.includes(`= ${placeholder}`) || web.includes(`[${placeholder}]`), `sw.js template has ${placeholder}`);
-  }
-  assert.match(web, /s\|'__BUILD__'\|/, 'workflow stamps the version');
-  assert.match(web, /s\|\/\\\*__FILES__\\\*\/\|/, 'workflow fills the file list');
+test('the Pages workflow stamps the service worker template', { skip: process.platform === 'darwin' && 'the workflow uses GNU sed' }, (t) => {
+  // Run the workflow's "Stamp service worker" step on a copy of the template.
+  const yml = read('skills/gamegen/templates/web/pages.yml');
+  const step = yml.match(/name: Stamp service worker[\s\S]*?run: \|\n([\s\S]*?)\n\s+- uses:/)[1]
+    .split('\n').map((l) => l.trim()).join('\n');
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, 'sw.js'), read('skills/gamegen/templates/web/sw.js'));
+  writeFileSync(join(dir, 'index.html'), '<!doctype html>');
+  const r = spawnSync('bash', ['-ec', step], { cwd: dir, encoding: 'utf8', env: { ...process.env, GITHUB_SHA: '0123456789abcdef' } });
+  assert.equal(r.status, 0, r.stderr);
+  const sw = readFileSync(join(dir, 'sw.js'), 'utf8');
+  assert.match(sw, /const VERSION = '0123456789ab';/);
+  assert.match(sw, /const FILES = \["index\.html"\];/);
+  new vm.Script(sw);  // still valid JavaScript
+  assert.match(read(`${REFS}/web-target.md`), /templates\/web\/sw\.js[\s\S]*templates\/web\/pages\.yml/);
 });
 
 test('the shell scripts run on the bash that comes with macOS (3.2)', () => {
@@ -774,12 +914,17 @@ echo "$*" >> "$GH_LOG"
 case "$*" in
   "api user --jq .login") [ "$SIGNED_IN" = 1 ] && echo zeveck || exit 1 ;;
   "api user --jq .name // .login") [ "$SIGNED_IN" = 1 ] && echo "Rich Conlan" || exit 1 ;;
+  "repo view me/frog --json visibility,hasIssuesEnabled"*) echo "public false" ;;
+  "repo view me/secret --json visibility,hasIssuesEnabled"*) echo "private true" ;;
   "repo view me/taken --json"*) printf 'me/taken\tpublic | A frog game | 2026-04-25\n' ;;
   "repo view me/renamed --json"*) printf 'me/renamed-old\tprivate | An old game | 2026-04-25\n' ;;
   "repo view me/offline"*) echo "error connecting to api.github.com" >&2; exit 1 ;;
   "repo view"*) echo "GraphQL: Could not resolve to a Repository with the name 'x'." >&2; exit 1 ;;
   "api -X POST repos/me/private/pages"*) echo "gh: Your current plan does not support GitHub Pages for this repository. (HTTP 422)" >&2; exit 1 ;;
   "api -X PUT repos/me/private/pages"*) echo "gh: Not Found (HTTP 404)" >&2; exit 1 ;;
+  "label list -R me/frog"*) printf 'Bug\ndocumentation\n' ;;
+  "label create"*|"repo edit"*) ;;
+  "api graphql"*) echo false ;;
   *"--jq .html_url") echo "https://frog.example.com/" ;;
   *"--jq .cname // \"\""*) echo "frog.example.com" ;;
   *"https_certificate"*)
@@ -818,6 +963,18 @@ test('publish: a taken repo name says what is there and offers the next free one
   const offline = publish(dir, ['repo', 'me/offline']);
   assert.equal(offline.status, 1);
   assert.match(offline.stdout, /couldn't check/);
+});
+
+test('publish: labels for "Report a bug" never change an existing one; preview says if a picture is set', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const r = publish(dir, ['labels', 'me/frog']);
+  assert.equal(r.stdout, 'visibility: public\nissues: turned on\nlabel: bug (already there)\nlabel: player-report (added)\n');
+  assert.ok(!r.calls.some((c) => /label (edit|delete)|label create bug/.test(c)), 'an existing label is left alone');
+  const dir2 = scratch(); t.after(() => rmSync(dir2, { recursive: true, force: true }));
+  const priv = publish(dir2, ['labels', 'me/secret']);
+  assert.equal(priv.stdout, 'visibility: private\nlabels: skipped (not a public repo)\n');
+  assert.ok(!priv.calls.some((c) => /label|repo edit/.test(c)));
+  assert.equal(publish(dir, ['preview', 'me/frog']).stdout, 'preview: none\n');
 });
 
 test('publish: turns on Pages at the custom address, then requires HTTPS', (t) => {

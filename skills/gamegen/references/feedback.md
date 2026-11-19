@@ -16,9 +16,8 @@ so `--change`, `--continue` and `--publish` keep it.
   `?feedback` on its address (`https://pp3.synapticnoise.com/?feedback`). The
   game remembers that for that player, in `localStorage`, until they open it
   with `?feedback=off`. For testers, without showing everyone a bug button.
-- **`off`**: take it out (the bundled file, the button, the shortcut
-  script, the `isOpen` checks, the `fb.*` hooks, and
-  `.github/ISSUE_TEMPLATE/bug.yml`).
+- **`off`**: take it out (both bundled files, the button, the `gameReport`
+  calls, and `.github/ISSUE_TEMPLATE/bug.yml`).
 
 Given alone on a finished game (`/gamegen --feedback hidden`), it's a small
 change: follow "Changing a finished game" in change.md, with no design
@@ -41,9 +40,12 @@ Reports are filed by the player, from their own GitHub account. That means:
 
 The form is gh-feedback (github.com/zeveck/gh-feedback), bundled with gamegen
 so games stay offline and every game gets the same tested copy. Copy
-`${CLAUDE_SKILL_DIR}/templates/feedback/gh-feedback.js` into
-`game/vendor/gh-feedback.js` unchanged (on `--change` too, so a game picks up
-the latest copy). Load it, and add the element once, at the end of `<body>`:
+`${CLAUDE_SKILL_DIR}/templates/feedback/gh-feedback.js` and
+`${CLAUDE_SKILL_DIR}/templates/feedback/report.js` into `game/vendor/`
+unchanged (on `--change` too, so a game picks up the latest copies). Load
+`report.js` in `<head>` (or before the game's first script), so it runs
+before the game and an error in the game can't stop it. Load the component
+and add the element once, at the end of `<body>`:
 
 ```html
 <script type="module" src="vendor/gh-feedback.js"></script>
@@ -53,39 +55,82 @@ the latest copy). Load it, and add the element once, at the end of `<body>`:
 
 - `trigger="none"`: there's no floating button. The game opens it.
 - `repo` stays empty until publishing fills it in (see publish.md). Empty
-  means no button anywhere.
+  means no button and no shortcut.
 - `theme` and `color` (and `popup-color`) match the game's UI: dark or light,
   and its accent color.
 - With no server set up, it runs in "link mode": no keys, no server.
+
+A game made before `report.js` has these pieces written into its own code.
+Leave that alone, or switch it over completely, never half: remove its
+shortcut script, `reportShortcut`, `showReport`, the `?feedback` block, the
+error listeners, `const fb`, `pauseShot` and the `fb.*` hooks, the
+`gh-feedback:open` listener and the CSS; replace `fb?.isOpen`, `fb.open()`
+and `fb?.close()` with the `window.gameReport?.` calls below; have pausing
+and resuming call `snapshot()` and `resumed()`; and pass its old key prefix
+as `key`, so testers keep their `?feedback`.
+
+### Connecting it to the game
+
+`report.js` does the plumbing: the shortcut, `?feedback` and remembering it,
+the screenshot, the details sent with the report (the game, its address,
+when this version went up, web or desktop app, browser, screen, the game's
+state and the last few errors), links in the desktop app, and the style that
+lets iPhones type in the form. The game calls it once as it starts (the
+calls below use `window.gameReport?.` so the game still runs if the file is
+missing):
+
+```js
+window.gameReport?.setup({ game: 'Pomegranate Panic 3', key: 'pp3', visibility: 'on',
+  state: () => window.__game.state(), pause, grab, releaseAll });
+```
+
+- `key`: the game's save-key prefix. `visibility`: `'on'` or `'hidden'`, from
+  the setting.
+- `state`: the debug hook's (web-target.md). Keep it short and useful:
+  screen, level, position, lives, score.
+- `pause`: pauses the game the usual way, and does nothing if it's already
+  paused (never a toggle). The shortcut calls it; if the game is stuck and it
+  fails, the form still opens.
+- `grab`: a Promise of the play canvas as a PNG, `() => new Promise((r) =>
+  canvas.toBlob(r, 'image/png'))`. In a WebGL (3D) game it calls `render()`
+  first, in the same call: the canvas is blank once a frame has been shown.
+- `releaseAll`: the input layer's "let go of everything", called as the form
+  opens, so nothing is stuck down when the game resumes.
+- `letter`: only when the shortcut isn't F (below).
+
+Then, in the game:
+
+- **The snapshot.** As the game pauses (from any cause), right after its last
+  frame is drawn and before the pause screen, it calls
+  `window.gameReport?.snapshot()`, and `window.gameReport?.resumed()` as it resumes. The form
+  then shows what the player saw, not the pause menu. HUD or menus made of
+  HTML elements aren't in the canvas; the state covers them.
+- **While the form is open, the game ignores its own input:** the player is
+  typing. Its key, pointer and touch handlers return first thing while
+  `window.gameReport?.isOpen()`, before any `preventDefault()` (a touch handler that
+  cancels every touch would stop phones from focusing the form's text
+  boxes). The form already keeps its own keys, clicks and touches from
+  reaching the page, lets go of pointer lock, leaves full screen, and closes
+  on Escape, leaving the game on its pause menu.
+- **With a controller** (when the game has controller support), its input
+  layer keeps tracking button states while the form is open, but skips every
+  action except the right face button (○ or B, button 1), which calls
+  `window.gameReport?.close()`, so a player with only a controller isn't stuck.
+  Because the states are tracked, the press that closes it does nothing else.
 
 ### The button
 
 "Report a bug" goes in the **pause menu** and the **settings** screen (or the
 title screen's menu, if there's no settings screen), drawn in the game's own
 style like the other buttons, and usable by mouse, touch, keyboard and
-controller. Never a floating button over the play area.
-
-Show it when `repo` is set and the setting allows it:
-
-```js
-const fb = document.getElementById('report');
-const KEY = 'GAME-SLUG-feedback';                 // the game's save key prefix
-const q = new URLSearchParams(location.search);
-if (q.has('feedback')) {
-  try {
-    if (q.get('feedback') === 'off') localStorage.removeItem(KEY);
-    else localStorage.setItem(KEY, '1');
-  } catch {}
-}
-const FEEDBACK = 'on';                            // 'on' or 'hidden' (from the setting)
-// the menus call this each time they draw, so a repo set later still shows it
-const showReport = () => !!fb?.getAttribute('repo') &&
-  (FEEDBACK === 'on' || (() => { try { return localStorage.getItem(KEY) === '1'; } catch { return false; } })());
-```
+controller. Never a floating button over the play area. The menus show it
+when `window.gameReport?.shown()` (checked each time they draw, so a repo set later
+still shows it), and picking it calls `window.gameReport?.open()`, leaving the game
+paused.
 
 In the desktop app (`window.desktop`), there's no address to add
 `?feedback` to, so `hidden` means no button there; `on` works as on the web.
-The shortcut below works in both.
+The shortcut works in both.
 
 ### The shortcut: Ctrl+Shift+F
 
@@ -100,137 +145,16 @@ game, never the other way round. If one of the game's own keys is Shift or
 Ctrl and it also fires as the player presses the shortcut, leave it; the
 game pauses a moment later anyway.
 
-It's F even when F is one of the game's keys: the shortcut's listener stops
-that F from reaching the game, and F alone never opens it. Only if the game
-itself uses Ctrl and Shift together as controls, use another letter the game
-doesn't use, from L, X or Z (browsers keep most others), and write it in the
-design next to the controls.
-
-Set it up in its own small script **before** the game's code, so an error in
-the game can't stop it:
-
-```html
-<script>
-  addEventListener('keydown', (e) => {
-    if (!e.ctrlKey || !e.shiftKey || e.altKey || e.metaKey || e.code !== 'KeyF') return;
-    const fb = document.getElementById('report');
-    if (!fb?.getAttribute('repo') || fb.isOpen) return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    try { window.reportShortcut?.(); } catch {}   // the game pauses, if it still can
-    fb.open();
-  }, true);
-</script>
-```
-
-`e.code` follows the key's position, not its character, so it works on
-non-Latin layouts too (`'KeyL'` and so on for another letter). The game sets
-`window.reportShortcut` to a function that pauses it the
-usual way (taking the snapshot below). If the game is stuck and that fails,
-the form still opens, with the canvas as it is.
+It's F even when F is one of the game's keys: the shortcut stops that F from
+reaching the game, and F alone never opens it. Only if the game itself uses
+Ctrl and Shift together as controls, use another letter the game doesn't
+use, from L, X or Z (browsers keep most others), pass it as `letter`, and
+write it in the design next to the controls.
 
 With `on`, the controls screen lists it ("Ctrl+Shift+F: report a bug", with
-the game's own letter if it isn't F). With
-`hidden`, it stays off-screen; gamegen's report to the person mentions it,
-with the `?feedback` link, for testers.
-
-### Opening it
-
-Picking "Report a bug" leaves the game paused and calls `fb.open()`. While
-the form is open, **the game ignores its own input**: the player is typing.
-The form already keeps its keys, clicks and touches from reaching the page,
-lets go of pointer lock and leaves full screen; the game's key, pointer and
-touch handlers just return first thing while `fb.isOpen`:
-
-```js
-if (fb?.isOpen) return;   // before anything else, preventDefault() included
-```
-
-As the form opens, the input layer forgets every held key, touch and
-button, so nothing is stuck down when the game resumes:
-
-```js
-fb?.addEventListener('gh-feedback:open', releaseAll);   // the game's own "let go of everything"
-```
-
-The `fb?.isOpen` guard covers Escape (the form closes itself) and the game's
-`preventDefault()` calls: a touch handler that cancels every touch would stop
-phones from focusing the form's text boxes. When the form closes, focus goes
-back where it was and the game is still on its pause menu.
-
-**With a controller** (when the game has controller support), its input
-layer keeps tracking button states while `fb?.isOpen`, but skips every
-action except the right face button (○ or B, button 1), which calls
-`fb?.close()`, so a player with only a controller isn't stuck. Because the
-states are tracked, the press that closes it does nothing else (such as
-picking on the pause menu).
-
-Make sure the page's no-select styles don't reach the form (iPhones won't
-type into a box that can't be selected):
-
-```css
-gh-feedback { -webkit-user-select: text; user-select: text; touch-action: auto; }
-```
-
-In the desktop app, links open in the player's browser, but `window.open`
-returns nothing there, which would read as "blocked". Tell the form it
-opened:
-
-```js
-if (window.desktop) fb.openLink = (url) => { window.open(url, '_blank'); return true; };
-```
-
-### The screenshot
-
-The form shows what the player saw, not the pause menu drawn over it. When
-the game pauses (from any cause), first take a snapshot of the play canvas,
-before drawing the pause screen:
-
-```js
-let pauseShot = null;
-const grab = () => new Promise((r) => canvas.toBlob(r, 'image/png'));
-function snapshot() { pauseShot = grab(); }
-// call snapshot() as the game pauses, right after the last game frame is drawn,
-// and set pauseShot = null when it resumes, so an old picture is never sent
-fb.getScreenshot = () => pauseShot ?? grab();
-```
-
-- In a WebGL (3D) game, `grab` calls the game's `render()` and then
-  `canvas.toBlob` in the same call (`() => { render(); return new Promise(…) }`):
-  the canvas is blank once a frame has been shown.
-- On the title or settings screen, with no game in progress, it's the canvas
-  as it is.
-- HUD or menus made of HTML elements aren't in the canvas. That's fine: the
-  game state in the report covers them.
-
-### The details sent with it
-
-`fb.getContext` returns a flat object of short, one-line values (no line
-breaks: they break the table GitHub shows). Keep the whole thing small:
-long values get cut to fit a GitHub link.
-
-```js
-const errors = [];                                  // the last few errors
-const keep = (m) => { errors.push(String(m).replace(/\s+/g, ' ').slice(0, 200)); errors.splice(0, errors.length - 5); };
-addEventListener('error', (e) => keep(e.message));
-addEventListener('unhandledrejection', (e) => keep(e.reason?.message ?? e.reason));
-const flat = (v) => String(v).replace(/\s+/g, ' ');
-fb.getContext = () => ({
-  game: 'Pomegranate Panic 3',
-  address: location.origin + location.pathname,
-  updated: document.lastModified,                   // when this version went up
-  build: window.desktop ? `desktop app (${window.desktop.platform})` : 'web',
-  browser: navigator.userAgent,
-  screen: `${innerWidth}x${innerHeight} @${devicePixelRatio}x`,
-  input: flat(window.__game?.state?.().input ?? ''),
-  state: flat(JSON.stringify(window.__game?.state?.() ?? {})),
-  errors: errors.join(' | ') || 'none',
-});
-```
-
-Name the fields in plain words; `state` comes from the debug hook (see
-web-target.md), so keep `__game.state()` short and useful: screen, level,
-position, lives, score.
+the game's own letter if it isn't F). With `hidden`, it stays off-screen;
+gamegen's report to the person mentions it, with the `?feedback` link, for
+testers.
 
 ## Publishing
 

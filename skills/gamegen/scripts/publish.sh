@@ -27,6 +27,13 @@
 #   publish.sh https <owner/name>          wait for the certificate, then make
 #                                          HTTPS required (PUBLISH_WAIT seconds,
 #                                          default 540, under a 10-minute call)
+#   publish.sh labels <owner/name>         for "Report a bug": prints the repo's
+#                                          visibility; for a public one, turns
+#                                          issues on and adds the bug and
+#                                          player-report labels if missing
+#                                          (never changes an existing label)
+#   publish.sh preview <owner/name>        has the repo a custom social preview
+#                                          picture? ("set" or "none")
 set -u
 
 die() { echo "$1"; exit 1; }
@@ -310,5 +317,40 @@ case "$cmd" in
     done
     ;;
 
-  *) die "usage: publish.sh settings | credit | check | repo <owner/name> | dns <host> <owner> | dns-provider [domain] | dns-add <host> <owner> | pages <owner/name> [host] | gallery-pages <owner/name> | https <owner/name>" ;;
+  labels)
+    full="${1:?labels needs owner/name}"
+    info="$(gh repo view "$full" --json visibility,hasIssuesEnabled \
+      --jq '"\(.visibility|ascii_downcase) \(.hasIssuesEnabled)"' 2>/dev/null)" \
+      || die "labels: couldn't read $full"
+    echo "visibility: ${info% *}"
+    [ "${info% *}" = public ] || { echo "labels: skipped (not a public repo)"; exit 0; }
+    if [ "${info#* }" = true ]; then echo "issues: on"
+    else
+      gh repo edit "$full" --enable-issues >/dev/null 2>&1 || die "issues: off, and couldn't turn them on"
+      echo "issues: turned on"
+    fi
+    have="$(gh label list -R "$full" --limit 500 --json name --jq '.[].name' 2>/dev/null)" \
+      || die "labels: couldn't list them"
+    add_label() { # name color description
+      if printf '%s\n' "$have" | grep -qixF -- "$1"; then echo "label: $1 (already there)"; return; fi
+      gh label create "$1" -R "$full" --color "$2" --description "$3" >/dev/null 2>&1 \
+        || die "label: couldn't add $1"
+      echo "label: $1 (added)"
+    }
+    add_label bug d73a4a "Something isn't working"
+    add_label player-report c5def5 "Reported from the game"
+    ;;
+
+  preview)
+    full="${1:?preview needs owner/name}"
+    custom="$(gh api graphql -f query="{repository(owner:\"${full%%/*}\",name:\"${full#*/}\"){usesCustomOpenGraphImage}}" \
+      --jq .data.repository.usesCustomOpenGraphImage 2>/dev/null)"
+    case "$custom" in
+      true) echo "preview: set" ;;
+      false) echo "preview: none" ;;
+      *) die "preview: couldn't check $full" ;;
+    esac
+    ;;
+
+  *) die "usage: publish.sh settings | credit | check | repo <owner/name> | dns <host> <owner> | dns-provider [domain] | dns-add <host> <owner> | pages <owner/name> [host] | gallery-pages <owner/name> | https <owner/name> | labels <owner/name> | preview <owner/name>" ;;
 esac
