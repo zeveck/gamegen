@@ -73,7 +73,8 @@ You are a player who loves games and has little patience. Read the design and
 imagine playing it on each targeted platform.
 
 - **The first minute.** Is it obvious what to do and why? Is the first thing
-  you do fun?
+  you do fun? When the opening teaches a move, does using it matter there?
+  A lesson where the move changes nothing teaches the opposite.
 - **The core mechanic.** Will it feel good in your hands? Is it the star?
 - **Controls.** Are they comfortable on a keyboard? On a phone, can you reach
   every control with your thumbs, and do they stay out of the way of the
@@ -103,6 +104,9 @@ expect things to go wrong. Find the places where they will.
   anim8gen makes short loops from a reference character), clean transparent
   edges, tiles that repeat without seams, text inside images (avoid it; draw
   text in code), and sizes.
+- **Soft-locks.** Where could a player get into a state the game can't go
+  on from? Look for the ways this kind of game does it (see "No soft-locks"
+  below), and fix them in the design: the level, the rules, an undo.
 - **Testability.** Can the play-test prove every level is completable? Does
   the design include the debug hook needed to check it?
 - **Scope and budget.** Is it realistic for this scope and budget? Is the cut
@@ -173,8 +177,11 @@ by the bar).
 You read the code and try to break the game.
 
 - Crashes and errors in the console, at any size.
-- Stuck states: softlocks, a level you can't finish, menus you can't leave,
-  input that stops responding after pausing or losing focus.
+- Soft-locks (see "No soft-locks" below): play it wrong on purpose and find
+  a state the game can't go on from. Also a level you can't finish, menus you
+  can't leave, input that stops responding after pausing or losing focus.
+- Buttons that don't do what they say, toggles included ("Click like a
+  person" in playtest-guide.md).
 - Phone problems: touch controls, rotating the phone, resizing, the page
   scrolling or zooming, the notch and home bar. For a desktop-only or
   mobile-only game, also the other device's notice ("On other devices" in
@@ -218,3 +225,29 @@ The polish checklist:
 Use the same finding format, with the screen, the size and a screenshot for
 each. What clears the bar is at least should-fix: these are what a player
 notices in the first minute.
+
+## No soft-locks
+
+**The game can always go on.** From anything the player can get into, they
+can still make progress, or reach a loss they saw coming and retry. A
+soft-lock is a state with neither: stuck, and nothing ends it. One a player
+can reach by a wrong turn is must-fix.
+
+- A pit that kills you is fine, and so is an enemy that reliably gets you
+  soon. A pit you can sit in, or an enemy you can dodge forever, is a
+  soft-lock. A hazard that only chips at health must end in a loss.
+- Fix it in the design (the level, the rules, a way back, an undo), not with
+  a surprise death or a hidden timer. A menu escape is a safety net, not a
+  fix: most stuck players never find it.
+
+How games get stuck, by kind:
+
+- **Platformers, adventures, RPGs:** a drop too high to climb out of, a
+  one-way path, a required item you can miss or use up in the wrong place.
+- **Puzzle games:** a box in a corner, or no moves left that isn't a loss.
+  These need an undo or a restart.
+- **Resource, turn-based and card games:** out of the money, ammo or moves
+  you need, with no way to get more and no game over.
+- **Any game:** a screen you can't leave, or a loss that never comes.
+
+To find them, play it wrong on purpose ("Play it wrong" in playtest-guide.md).
