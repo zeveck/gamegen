@@ -50,14 +50,16 @@ and add the element once, at the end of `<body>`:
 ```html
 <script type="module" src="vendor/gh-feedback.js"></script>
 <gh-feedback id="report" trigger="none" repo="" template="bug.yml"
-  types="bug,feature" theme="dark" color="#e0a030"></gh-feedback>
+  heading="Report a bug" types="bug,feature" theme="dark" color="#e0a030"></gh-feedback>
 ```
 
 - `trigger="none"`: there's no floating button. The game opens it.
 - `repo` stays empty until publishing fills it in (see publish.md). Empty
   means no button and no shortcut.
 - `theme` and `color` (and `popup-color`) match the game's UI: dark or light,
-  and its accent color.
+  and its accent color. `heading` matches the button's words.
+- The page's CSS gives it the game's font (`gh-feedback { font-family:
+  'Fredoka', sans-serif; }`), so the whole form, buttons included, matches.
 - With no server set up, it runs in "link mode": no keys, no server.
 
 A game made before `report.js` has these pieces written into its own code.
@@ -211,8 +213,7 @@ leaves `repo` empty: no button and no shortcut.
    init script in the new session too): no button,
    but the shortcut still opens the form. With `?feedback`: button. Again
    without: still there. `?feedback=off`: gone.
-9. Screenshot the form over the game, and look at it: readable, in the
-   game's colors.
+9. Screenshot the form over the game, and look at it: readable, in the game's colors and font.
 
 ## In the report and README
 

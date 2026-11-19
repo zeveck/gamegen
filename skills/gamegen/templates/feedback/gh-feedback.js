@@ -53,6 +53,9 @@ const STYLES = `
     line-height: 1.5;
   }
 
+  /* Browsers don't let buttons inherit the font: these follow the form's. */
+  button { font-family: inherit; }
+
   :host([theme="dark"]) {
     --_primary: var(--gh-feedback-primary, #238636);
     --_primary-hover: var(--gh-feedback-primary-hover, #2ea043);
@@ -507,7 +510,7 @@ function esc(str) {
 
 class GhFeedback extends HTMLElement {
   static get observedAttributes() {
-    return ['repo', 'endpoint', 'token', 'position', 'theme', 'labels', 'button-text', 'trigger', 'no-severity', 'no-type-icons', 'icon', 'size', 'color', 'popup-color', 'types', 'border-color', 'border-width', 'border-radius', 'mode', 'template', 'template-field'];
+    return ['repo', 'endpoint', 'token', 'position', 'theme', 'labels', 'button-text', 'trigger', 'no-severity', 'no-type-icons', 'icon', 'size', 'color', 'popup-color', 'types', 'border-color', 'border-width', 'border-radius', 'mode', 'template', 'template-field', 'heading'];
   }
 
   constructor() {
@@ -744,6 +747,7 @@ class GhFeedback extends HTMLElement {
 
     const pos = this._getPosition();
     const buttonText = this.getAttribute('button-text');
+    const heading = this.getAttribute('heading') || 'Send Feedback';
     const triggerType = this._getTriggerType();
     const showSeverity = !this.hasAttribute('no-severity');
     const text = buttonText || '';
@@ -843,10 +847,10 @@ class GhFeedback extends HTMLElement {
       <style>${STYLES}</style>
       ${triggerHtml}
       <div class="backdrop" part="backdrop"></div>
-      <div class="popup${popupPosClass}" role="dialog" aria-label="Send feedback" part="popup">
+      <div class="popup${popupPosClass}" role="dialog" aria-labelledby="ghf-heading" part="popup">
         <div class="form-view">
           <div class="header">
-            <h2>Send Feedback</h2>
+            <h2 id="ghf-heading">${esc(heading)}</h2>
             <button class="close-btn" aria-label="Close">&times;</button>
           </div>
           <div class="type-selector${types.length > 3 ? ' multi-row' : ''}">

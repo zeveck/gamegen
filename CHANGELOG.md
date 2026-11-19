@@ -4,6 +4,12 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.19.2
+
+- **"Report a bug" matches your game better:** the form's title says
+  "Report a bug", and every part of it, buttons included, uses the game's
+  font (gh-feedback 2026.11.19).
+
 ## v2026.11.19
 
 - **`--fix`: fix your game's GitHub issues,** such as players' reports from
