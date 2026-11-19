@@ -80,6 +80,11 @@ pressed?".
   where thumbs rest, semi-transparent, and never over the important action.
   Use pointer events and support several fingers at once.
 - **Menus:** clickable and tappable, not only keyboard-driven.
+- **Buttons that keep working:** never rebuild a clickable element every
+  frame (setting its `innerHTML`, or replacing its icon). If the element under
+  the pointer is replaced between press and release, the browser drops the
+  click and the button does nothing. Update a button only when its state
+  changes (keep the last state and compare).
 - **The device it isn't made for:** see "On other devices" below.
 - **Orientation:** if the game needs landscape (or portrait), show a friendly
   "turn your phone" overlay in the wrong orientation, and lock it in the
@@ -162,6 +167,15 @@ else. Aim for:
   and nothing cut off or spilling out of its box at any size.
 - **A first load that appears once and stays still:** the title shows up
   with its real fonts and art, and nothing jumps or changes after that.
+- **Art that's there when a scene starts:** load what each area draws before
+  the player gets there: the core art during the title, an area's key art
+  (its boss, its main props) on entering the area, and the next scenes in the
+  background. An image first requested when it's drawn shows up late, as a
+  gap or a stand-in shape. Hide any wait that's left inside a transition the
+  game already has.
+- **Every symbol in its font:** a bundled font subset often has no arrows
+  (← ↑ → ↓) or other symbols, and the browser's fallback can be unreadable
+  (a thin ↑ looks like a 1). Include them, or draw them as icons.
 - **Screens that hand over cleanly:** closing one screen never shows what's
   underneath unless that's meant to be the next view. When a full-screen
   screen (the title, a story picture, a chapter card) or an overlay in a

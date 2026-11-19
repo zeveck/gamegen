@@ -124,12 +124,15 @@ stages may add what the game turns out to need.
 
 ## Definition of done
 
-A checklist the play-test verifies, for example (always keep the line about
-every screen looking finished: it applies to every game):
+A checklist the play-test verifies, for example (always keep the lines about
+the game always going on and every screen looking finished: they apply to
+every game):
 
 - [ ] Starts with no errors at every targeted size.
 - [ ] Every level can be completed, and the game can be won.
-- [ ] Losing and retrying works, and nothing gets stuck.
+- [ ] Losing and retrying works.
+- [ ] The game can always go on: nothing the player does, even playing it
+      wrong, leaves them stuck (see "No soft-locks" in review-roles.md).
 - [ ] Every control works on every targeted platform.
 - [ ] Every screen looks finished at every targeted size, from the first load.
 - [ ] Music and sound play (after the first tap or key), and mute works.
