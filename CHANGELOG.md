@@ -4,6 +4,49 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.19
+
+- **`--fix`: fix your game's GitHub issues,** such as players' reports from
+  "Report a bug": `/gamegen --fix #12 #15`, or `--fix all`. gamegen sorts
+  them first and shows you a short plan: a small bug gets a plain fix that a
+  second helper checks, a design or art change goes the whole way. Issues
+  filed by someone else still wait for your OK.
+- **Changes are checked the way that fits them.** A new sound or picture no
+  longer means replaying every level; a rules change still does, once, at
+  the end. Saves from before a change must still load.
+- **`--controls`: players can change the controls,** on a Controls screen.
+  Every prompt follows their choice, and pausing and the menu keys always
+  stay put. Your game's own controls don't change.
+- **`--help` is shorter:** the common options first, and
+  `/gamegen --help --advanced` for the rest.
+- **`--report-issue`: tell gamegen's makers about a problem with gamegen
+  itself.** It writes it up with the version and settings (never your keys),
+  checks it isn't already reported, and shows it to you before filing.
+- **No more getting stuck.** gamegen plays every game wrong on purpose where
+  it matters (the first level, and anything that can't be undone) and makes
+  sure the game can always go on. Reviewers look for the ways your kind of
+  game gets stuck.
+- **Buttons that work, art on time, steady animation.** On-screen buttons are
+  clicked the way a person clicks them; each area's art loads before you get
+  there; arrows and symbols show in the game's font; animation frames keep
+  the same brightness, so characters don't flicker.
+- **Reviews judge what matters the same way every time:** how many players
+  meet a problem, how bad it is, and how big the fix is. A visual problem
+  most players see counts; a slow phone on a slow connection doesn't.
+  `--bugcheck` remembers what an earlier check found.
+- **Publishing on your own domain:** the gallery waits until HTTPS works, so
+  it never shows a broken picture or a certificate warning; the next
+  `--publish` adds the game.
+- **No server left running at the end.** Say "start it" for a link to play,
+  or serve the game yourself with the two commands gamegen gives you.
+- **Steadier long runs:** play-tests close every browser they open and only
+  run as many as the machine can hold, and gamegen notices a helper that has
+  gone quiet and gets it moving again.
+- Under the hood, code gamegen used to retype into every game (the "Report a
+  bug" plumbing, the notice for the device a game isn't made for, offline
+  play, the publishing workflow) now comes from tested templates. Games
+  you've already made are unchanged.
+
 ## v2026.11.14.9
 
 - **`--art-sheet`: a page showing all your game's art.** As soon as the art
