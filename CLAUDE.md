@@ -66,6 +66,8 @@ audiogen plugins for art and sound, and meshgen for 3D games.
 - User-facing text (README, the skill's report to the person) is friendly and
   plain, not technical.
 - Keep `skills/LICENSE` identical to `LICENSE`.
+- Never use the AskUserQuestion tool, when working on this repo. Ask
+  questions in plain text in the reply instead.
 
 ## Tests
 
