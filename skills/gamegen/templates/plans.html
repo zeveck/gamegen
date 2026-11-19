@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PLANS_TITLE</title>
+<meta name="description" content="Plans for games: read them, share them, or build one.">
+<meta property="og:title" content="PLANS_TITLE">
+<meta property="og:description" content="Plans for games: read them, share them, or build one.">
+<style>
+  :root { --bg: #14161f; --panel: #1f2230; --text: #f2f2f5; --muted: #a9adbd; --accent: #ffb238; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header, main { max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  header { padding-top: 48px; padding-bottom: 24px; }
+  h1 { margin: 0; font-size: clamp(28px, 5vw, 44px); }
+  header p { margin: 8px 0 0; color: var(--muted); }
+  main { padding-bottom: 48px; }
+  .games { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+  .game { display: flex; flex-direction: column; background: var(--panel); border-radius: 14px;
+          overflow: hidden; color: inherit; text-decoration: none;
+          transition: transform .15s ease, box-shadow .15s ease; }
+  .game:hover, .game:focus-visible { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,.4); }
+  .game img { display: block; width: 100%; aspect-ratio: 1200 / 630; object-fit: cover; }
+  .game div { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .game h2 { margin: 0; font-size: 21px; }
+  .game p { margin: 0; color: var(--muted); flex: 1; }
+  .game em { color: var(--accent); font-style: normal; font-size: 14px; font-weight: 600; }
+  .game span { align-self: flex-start; margin-top: 6px; padding: 6px 16px; border-radius: 999px;
+               background: var(--accent); color: #1a1205; font-weight: 700; }
+</style>
+</head>
+<body>
+<header>
+  <h1>PLANS_TITLE</h1>
+  <p>Plans for games: read one, share it, or download it and build it with
+  <a href="https://github.com/zeveck/gamegen" style="color: inherit">gamegen</a>.
+  <a href="../" style="color: inherit">Play the finished games</a>.</p>
+</header>
+<main class="games">
+  <!-- Newest first. Each plan is one <a class="game">, like this
+       (PLAN_STATUS: Planned, Built or Published): -->
+  <a class="game" href="PLAN_URL">
+    <img src="PLAN_IMAGE" alt="GAME_TITLE" loading="lazy">
+    <div>
+      <h2>GAME_TITLE</h2>
+      <em>PLAN_STATUS</em>
+      <p>GAME_DESCRIPTION</p>
+      <span>Read the plan</span>
+    </div>
+  </a>
+</main>
+</body>
+</html>

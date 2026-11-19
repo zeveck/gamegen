@@ -4,6 +4,16 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.19.4
+
+- **A page of all your game plans.** With `GAMEGEN_PLANS=on` in your `.env`
+  (and a gallery), every game you plan gets a card on a plans page next to
+  your gallery: a picture, where it stands (planned, built, published), and
+  its plan to read. Prices and anything private stay out, and gamegen asks
+  before putting a game's plan up. `--plans none` leaves one game off.
+- **Build someone's plan:** `/gamegen --continue <a plan's address>` fetches
+  it into a new folder and builds it, with your own budget and credit.
+
 ## v2026.11.19.3
 
 - **Art that fits together:** parts of a picture are in proportion (a lid

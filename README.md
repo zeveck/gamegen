@@ -95,6 +95,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--art-sheet` | A page on claude.ai showing everything made for the game, once the art is ready: the cast, places, animations, models, colours, music and sounds. Run it on its own for a game you've already made; later changes update the same page. | off |
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games, a page in a GitHub repository of yours. gamegen offers to start it the first time. | none |
 | `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |
+| `--plans none` | Leave this game off your plans page. With `GAMEGEN_PLANS=on` in your `.env` (and a gallery), every game you plan gets a card on a page next to your gallery: a picture, where it stands, and its plan as files anyone can read, or build with `/gamegen --continue <the plan's address>`. gamegen asks before putting a plan up. | on with `GAMEGEN_PLANS` |
 | `--package [steam, windows or linux]` | Turn a finished game into apps for Windows and Linux that run without a browser, such as a Windows `.exe`. `steam` (the default) also makes the store images and upload files for Steam, plus a checklist of what's left to do in Steamworks; see the [Steam guide](https://gamegen.synapticnoise.com/steam-guide/). | off |
 | `--finish <folder or repo>` | Finish a game you started some other way that stalled: in a copy that becomes its own repo, so your original stays as it is. gamegen shows its plan and asks first. | off |
 | `--remake <folder or repo>` | Make a game you started again, as a new game in a new repo, keeping your art, levels and ideas. | off |
@@ -142,6 +143,7 @@ To use the same settings every time, put them in your `.env`:
 ```
 GAMEGEN_DOMAIN=example.com
 GAMEGEN_GALLERY=you/my-games
+GAMEGEN_PLANS=on
 GAMEGEN_MAKING_OF=on
 GAMEGEN_CREDIT=Your Name
 GAMEGEN_DNS=godaddy

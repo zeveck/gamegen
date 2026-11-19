@@ -147,6 +147,7 @@ value) is the game description. Flags and defaults:
 | `--making-of` | the README also tells how the game was made; publishing includes `design/` | off |
 | `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game (`references/package.md`) | off (`steam` alone) |
 | `--bugcheck` | check a finished game for bugs worth fixing; report first, change nothing (`references/bugcheck.md`) | off |
+| `--plans` | `none`: leave this game off the plans page that `GAMEGEN_PLANS` keeps (`references/plans.md`) | on when `GAMEGEN_PLANS` is set |
 | `--report-issue` | file an issue about gamegen itself: the words after it say what happened (`references/report-issue.md`) | off |
 | `--finish` | a folder or repo of a game they started: finish it, in a copy (`references/finish-or-remake.md`) | off |
 | `--remake` | a folder or repo of a game they started: make it again, keeping their assets and ideas | off |
@@ -156,8 +157,8 @@ value) is the game description. Flags and defaults:
 | `--out` | folder for the game | see below |
 | `--advanced` | with `--help`: list the options the short help leaves out (`references/help.md`) | off |
 
-`--publish`, `--gallery` and `--making-of` can also be set as defaults in the
-nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_MAKING_OF=on`);
+`--publish`, `--gallery`, `--plans` and `--making-of` can also be set as defaults in the
+nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_PLANS=on`, `GAMEGEN_MAKING_OF=on`);
 read them with `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" settings`, never
 by opening `.env` (it holds the keys). Flags win over these.
 
@@ -369,6 +370,11 @@ the design says what serves its purpose instead.
 **With `--share-design`**, share the design now, with a few mock pictures
 (`--mockups`, $5 unless set): follow `references/share-design.md`. If the design was shared before (its link is
 in `design/STATUS.md`), keep that copy up to date instead.
+
+**The plans page.** When `publish.sh settings` shows `GAMEGEN_PLANS: on`, add or
+update the game's card as `references/plans.md` says: here (with
+`--plan-only` or `--share-design`), at the end of Phase 9, and after
+`--continue`, `--change` or `--publish`.
 
 **With `--plan-only`, stop here.** Report the game in a few friendly lines
 (the pitch, how it plays, the look and sound, the estimated cost) and tell

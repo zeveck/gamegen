@@ -127,7 +127,7 @@ dns_zone() { # host -> sets domain and name, or exits
 cmd="${1:-}"; shift || true
 case "$cmd" in
   settings)
-    for name in GAMEGEN_DOMAIN GAMEGEN_GALLERY GAMEGEN_MAKING_OF GAMEGEN_CREDIT GAMEGEN_DNS; do
+    for name in GAMEGEN_DOMAIN GAMEGEN_GALLERY GAMEGEN_PLANS GAMEGEN_MAKING_OF GAMEGEN_CREDIT GAMEGEN_DNS; do
       value="$(setting "$name")"
       echo "$name: ${value:-not set}"
     done

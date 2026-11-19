@@ -944,6 +944,19 @@ test('art fits: parts in proportion, and an object is the same everywhere it app
   assert.match(read(`${REFS}/review-roles.md`), /\*\*Made once\.\*\*/);
 });
 
+test('the plans page: asks first, never STATUS.md, cards from the template (#47)', (t) => {
+  const ref = read(`${REFS}/plans.md`);
+  assert.match(skill, /references\/plans\.md/);
+  assert.match(ref, /## Asking first/);
+  assert.match(ref, /Never `design\/STATUS\.md`/);
+  const page = read('skills/gamegen/templates/plans.html');
+  for (const p of ['PLANS_TITLE', 'PLAN_URL', 'PLAN_IMAGE', 'PLAN_STATUS', 'GAME_TITLE', 'GAME_DESCRIPTION']) assert.ok(page.includes(p), p);
+  // publish.sh settings reports it.
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  writeFileSync(join(dir, '.env'), 'GAMEGEN_PLANS=on\n');
+  assert.match(publish(dir, ['settings']).stdout, /^GAMEGEN_PLANS: on$/m);
+});
+
 test('browsers.sh finds browsers left behind and says whether there is room for another (#28)', (t) => {
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
   const bin = join(dir, 'bin'); mkdirSync(bin);
@@ -1115,7 +1128,7 @@ test('publish: settings come from the environment or the .env, and never the key
   writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_DOMAIN="example.com"  # mine\n# GAMEGEN_GALLERY=me/old-games\n');
   const deep = join(dir, 'frog'); mkdirSync(deep);
   const r = publish(deep, ['settings'], { env: { GAMEGEN_MAKING_OF: 'on' } });
-  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\nGAMEGEN_DNS: not set\n');
+  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_PLANS: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\nGAMEGEN_DNS: not set\n');
   // A .env saved with Windows line endings reads the same.
   writeFileSync(join(dir, '.env'), 'GAMEGEN_DOMAIN=example.com\r\nGAMEGEN_DNS=godaddy\r\n');
   const crlf = publish(deep, ['settings'], {});

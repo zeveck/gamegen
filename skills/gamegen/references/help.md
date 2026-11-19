@@ -68,6 +68,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--art-sheet` | A page showing all the game's art, animation and music, to see and share |
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games |
 | `--making-of` | Show in the README how the game was made |
+| `--plans none` | Leave this game off your plans page (`GAMEGEN_PLANS`) |
 | `--package [steam\|windows\|linux]` | Make Windows and Linux apps of a game, ready for Steam |
 
 **A game you already started**
@@ -396,6 +397,20 @@ To use it every time, put `GAMEGEN_GALLERY=you/my-games` in your `.env`;
 Each game's title screen also gets a small link to the gallery in its
 lower-left corner. Either way, every publish ends with the game's link, title, description and
 picture, for adding it to any other site yourself.
+
+## --plans
+
+**A page of all your game plans,** next to your gallery of finished games.
+Put `GAMEGEN_PLANS=on` in your `.env` (with `GAMEGEN_GALLERY` set), and each
+game you plan gets a card there: its name, a picture, where it stands
+(planned, built, published) and its plan as files anyone can read or
+download. Someone else (or you, on another computer) can build one with
+`/gamegen --continue <the plan's address>`. gamegen asks before putting a
+game's plan up. `--plans none` leaves one game off.
+
+```
+/gamegen a frog who hops between lily pads --plan-only --plans none
+```
 
 ## --making-of
 
