@@ -438,8 +438,10 @@ Dispatch two agents in parallel, with instructions from
 - **Bug hunter:** reads the code and pokes at the game for crashes, stuck
   states, phone problems, audio problems and lost saves.
 
-Fix what they find, then re-run the play-test for anything you changed. If
-they found any must-fix problem, run a second round once it's fixed.
+Check each finding yourself and set its severity by "The bar" in
+review-roles.md; don't pass reviewers' labels on as given. Fix what clears
+the bar, most important first, then re-run the play-test for anything you
+changed. If any must-fix was found, run a second round once it's fixed.
 
 From here to the end (and in the play-test before it), make new art or sound
 whenever it clearly improves the game: a missing portrait, a scene the

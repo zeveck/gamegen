@@ -143,6 +143,14 @@ playwright-cli -s=phone run-code "async page => {
 Read the controls' real positions from the page (`eval` on their bounding
 boxes) rather than guessing coordinates.
 
+**Clicks like a person's.** A person holds a click for about a tenth of a
+second; Playwright's default click is near-instant, so it can pass where a
+real one fails (when the game redraws the button between press and release).
+Click on-screen buttons with a real press: `page.mouse.move(x, y)`,
+`page.mouse.down()`, wait about 120 ms, `page.mouse.up()`. On a phone, the
+same with `touchStart` and `touchEnd`, as above. Never `el.click()` from
+`eval`: it skips the pointer.
+
 ## Long runs
 
 A replay of every solution, or a whole-game run, can take a long time, and a
@@ -219,8 +227,8 @@ Work through the design's definition of done. At minimum:
    Then play it wrong (below).
 5. **Controls.** Every action on the keyboard; on the phone, every on-screen
    control, holding a button, and two at once. Click every on-screen button
-   (pause, mute, map, settings) with a real press ("Click like a person"
-   below), and check it does what it says.
+   (pause, mute, map, settings) with a real press ("Clicks like a
+   person's" above), and check it does what it says.
 6. **Audio.** After the first input, `eval "JSON.stringify(window.__game.audioState())"`
    shows the audio context `running`, and it shows muted after the M key and
    after clicking the mute button on screen (each one, on its own).
@@ -256,23 +264,14 @@ can run off a phone held sideways.
 ## Play it wrong
 
 A recorded solution proves the right path works, not that a player who goes
-the wrong way can't get stuck. In every level, and above all the first one
-(a curious player's first move is often the wrong way), play it wrong on
-purpose: go the wrong way first, use things in the wrong order, waste what
+the wrong way can't get stuck. Play it wrong on purpose in the first level
+(a curious player's first move is often the wrong way) and wherever a move
+can't be taken back (one-way drops, doors that lock, things used up): go the
+wrong way first, use things in the wrong order, waste what
 can be wasted, fall into the pits. Then check the game can still go on, by
 playing. The rule is "No soft-locks" in review-roles.md. If the game has a tool that
 proves levels can be finished, have it also prove the reverse: every place
 the player can reach can still get to an exit, a checkpoint or the goal.
-
-## Click like a person
-
-A person's click holds the button down for about a tenth of a second.
-Playwright's default click is near-instant, so it can pass where a person's
-click fails, for example when the game redraws the button between press and
-release. Click on-screen buttons with a real press: `mousedown`, wait about
-120 ms, `mouseup` (in a script: `page.mouse.down()`, a short wait,
-`page.mouse.up()`). On phones, tap them too. Never `el.click()` from `eval`:
-it skips the pointer entirely.
 
 ## The first load
 

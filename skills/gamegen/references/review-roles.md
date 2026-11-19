@@ -1,14 +1,16 @@
 # Review roles
 
-Give each agent its role text below, plus the brief, the current design, the
-settings and the list of available tools. Each agent works independently;
+Give each agent this file's shared parts (the finding format, the rules,
+"The bar" and "No soft-locks") and its own role, plus the brief, the current
+design, the settings and the list of available tools. Each agent works independently;
 don't show one reviewer another's findings.
 
 Every reviewer returns a list of findings in this form:
 
 ```
 ### <short title>
-Severity: must-fix | should-fix | nice (who meets it, how bad: "The bar")
+Severity: must-fix | should-fix | nice
+Who meets it: most | some | few. How bad: breaks | looks broken | a little off. Fix: small | medium | large
 What's wrong: <specific; quote the design where you can>
 Why it matters: <the effect on the player or the build>
 Suggestion: <a concrete change>
@@ -168,9 +170,7 @@ screenshots in `design/screenshots/`.
   thin anywhere?
 - What one change would make it most fun?
 
-Use the same finding format. Mark anything that stops a player from finishing
-as must-fix, unless only a rare, precise sequence triggers it (then judge it
-by the bar).
+Use the same finding format.
 
 ## Bug hunter (final review)
 
@@ -180,8 +180,8 @@ You read the code and try to break the game.
 - Soft-locks (see "No soft-locks" below): play it wrong on purpose and find
   a state the game can't go on from. Also a level you can't finish, menus you
   can't leave, input that stops responding after pausing or losing focus.
-- Buttons that don't do what they say, toggles included ("Click like a
-  person" in playtest-guide.md).
+- Buttons that don't do what they say, toggles included ("Clicks like a
+  person's" in playtest-guide.md).
 - Phone problems: touch controls, rotating the phone, resizing, the page
   scrolling or zooming, the notch and home bar. For a desktop-only or
   mobile-only game, also the other device's notice ("On other devices" in
@@ -223,8 +223,7 @@ The polish checklist:
 - **Anything else that looks unfinished.**
 
 Use the same finding format, with the screen, the size and a screenshot for
-each. What clears the bar is at least should-fix: these are what a player
-notices in the first minute.
+each.
 
 ## No soft-locks
 
@@ -233,9 +232,10 @@ can still make progress, or reach a loss they saw coming and retry. A
 soft-lock is a state with neither: stuck, and nothing ends it. One a player
 can reach by a wrong turn is must-fix.
 
-- A pit that kills you is fine, and so is an enemy that reliably gets you
-  soon. A pit you can sit in, or an enemy you can dodge forever, is a
-  soft-lock. A hazard that only chips at health must end in a loss.
+- A pit that kills you is fine. A pit you can sit in alive with no way out
+  is a soft-lock, and so is one where a hazard only chips at health or an
+  enemy can be dodged forever: being stuck must end in a loss the player
+  sees coming.
 - Fix it in the design (the level, the rules, a way back, an undo), not with
   a surprise death or a hidden timer. A menu escape is a safety net, not a
   fix: most stuck players never find it.
