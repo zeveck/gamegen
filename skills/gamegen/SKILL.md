@@ -146,6 +146,7 @@ value) is the game description. Flags and defaults:
 | `--making-of` | the README also tells how the game was made; publishing includes `design/` | off |
 | `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game (`references/package.md`) | off (`steam` alone) |
 | `--bugcheck` | check a finished game for bugs worth fixing; report first, change nothing (`references/bugcheck.md`) | off |
+| `--report-issue` | file an issue about gamegen itself: the words after it say what happened (`references/report-issue.md`) | off |
 | `--finish` | a folder or repo of a game they started: finish it, in a copy (`references/finish-or-remake.md`) | off |
 | `--remake` | a folder or repo of a game they started: make it again, keeping their assets and ideas | off |
 | `--in-place` | with `--finish`: work in the original, on a new branch | off: a copy |
@@ -196,7 +197,7 @@ such as `hoard-hopper`). Never overwrite someone's files: an existing
 `design/GAME_DESIGN.md`, when `--continue` wasn't given) means a new folder.
 Say which folder you chose in your first update.
 
-**Finding an existing game** (for `--continue`, `--change`, `--fix`, `--publish` and `--bugcheck`): use `--out`
+**Finding an existing game** (for `--continue`, `--change`, `--fix`, `--publish`, `--bugcheck` and `--report-issue`): use `--out`
 if given. Otherwise the current folder, if it holds a game (a
 `design/STATUS.md`). Otherwise the game folders directly below it: if there's
 one, use it; if there are several, use the one changed most recently and say
@@ -240,6 +241,12 @@ fresh reviewers and reports what's worth fixing: follow
 generated). It changes nothing until the person picks what to fix. It only
 runs alone: with a description or any other option, say so and ask which to
 do first.
+
+**Reporting a problem with gamegen.** `--report-issue <what happened>`
+files an issue about gamegen itself: everything after the flag is the
+report, not a game description, so no 3D question, setup check or new game
+folder. Other options given with it are only context for the report. Follow
+`references/report-issue.md`, and do nothing else.
 
 **Packaging.** `--package` on its own (with `steam`, `windows` or `linux`)
 turns the finished game into desktop apps: follow `references/package.md`,

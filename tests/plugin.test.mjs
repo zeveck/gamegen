@@ -895,6 +895,14 @@ test('--fix sorts issues first, and every change gets the proof that fits it (#4
   assert.match(ref, /play-test what changed, and prove nothing else broke/);
 });
 
+test('--report-issue files a self-contained issue, asking first (#45)', () => {
+  const ref = read(`${REFS}/report-issue.md`);
+  assert.match(skill, /Follow\s+`references\/report-issue\.md`, and do nothing else/);
+  assert.match(ref, /Never\s+point to work that only exists on this machine/);
+  assert.match(ref, /\*\*Show it to the person and ask before filing,\*\* even with\s+`--no-confirm`/);
+  assert.match(ref, /no `\.env` values\s+or keys, no names or emails/);
+});
+
 test('browsers.sh finds browsers left behind and says whether there is room for another (#28)', (t) => {
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
   const bin = join(dir, 'bin'); mkdirSync(bin);

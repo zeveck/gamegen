@@ -56,6 +56,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--rounds <1 to 4>` | Rounds of design review (default: 2) |
 | `--no-confirm` | Don't stop to ask for approvals (publishing, a finish or remake plan) |
 | `--out <folder>` | Where to put the game |
+| `--report-issue <what happened>` | Tell gamegen's makers about a problem with gamegen itself |
 
 **Sharing and showing**
 
@@ -78,6 +79,18 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--leeway little\|some\|lots` | With `--finish` or `--remake`: how freely to change it |
 
 `/gamegen help <option>` explains one, for example `/gamegen help gamepad`.
+
+## --report-issue
+
+**Tell gamegen's makers about a problem with gamegen itself,** not with your
+game: something that went wrong in a run, or could work better. gamegen
+writes it up with what happened, what you expected, and its version and
+settings (never your keys), checks it hasn't been reported already, and
+shows it to you before filing it on GitHub.
+
+```
+/gamegen --report-issue the play-test said every level passed, but level 3 can't be finished
+```
 
 ## --platform
 

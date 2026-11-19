@@ -88,6 +88,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
 | `--no-confirm` | Don't stop to ask for approvals you'd give anyway: publishing's "Go ahead?", and the plan before finishing or remaking a game you started. gamegen still says what it's doing, and still stops if anything looks wrong. | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
+| `--report-issue <what happened>` | Tell gamegen's makers about a problem with gamegen itself. It writes it up with the version and settings (never your keys), checks it isn't already reported, and shows it to you before filing it on GitHub. | off |
 | `--share-design [page, doc or both]` | Share the reviewed design on claude.ai, with a few mock pictures of the main characters and places, so others can weigh in before the real work starts: a web page (the default), a Claude Doc people can comment on, or both to compare. Later runs read the comments and keep it up to date. | off |
 | `--mockups <dollars>` | With `--share-design`: how much to spend on the mock pictures, out of your budget. `0` for none. | `5` |
 | `--art-sheet` | A page on claude.ai showing everything made for the game, once the art is ready: the cast, places, animations, models, colours, music and sounds. Run it on its own for a game you've already made; later changes update the same page. | off |
