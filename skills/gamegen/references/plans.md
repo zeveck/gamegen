@@ -1,11 +1,20 @@
 # The plans page (`GAMEGEN_PLANS`)
 
-Read this when `publish.sh settings` shows `GAMEGEN_PLANS: on` and the run
-doesn't say `--plans none`. It keeps one page of every game's plans in the
-gallery repo (`GAMEGEN_GALLERY`), next to the published games: a card per
-game, linking to its plan as files anyone can read or download, so a plan
-can be shared, discussed, or picked up on another machine. Without a gallery
-set, say the plans page needs one (`GAMEGEN_GALLERY`) and carry on.
+Read this when `publish.sh settings` shows an address for `GAMEGEN_PLANS`
+(such as `example.com/plans`) and the run doesn't say `--plans none`. It
+keeps one page of every game's plans at that address: a card per game,
+linking to its plan as files anyone can read or download, so a plan can be
+shared, discussed, or picked up on another machine.
+
+The page lives in the gallery repo (`GAMEGEN_GALLERY`), in the folder the
+address adds to the gallery's own address (`gh api repos/<gallery>/pages
+--jq .html_url`, ignoring `https://` and a trailing `/`): `plans/` for
+`example.com/plans` with the gallery at `example.com`, and for
+`you.github.io/my-games/plans` with it at `you.github.io/my-games`. If the
+address isn't on the gallery's site, is the gallery's own address, or no
+gallery is set, say so and carry on. It's a page of its
+own: the gallery page doesn't link to it, and it doesn't link to the
+gallery.
 
 ## When
 
@@ -38,7 +47,7 @@ with access.
 
 ## What goes up
 
-In `plans/<game-slug>/`:
+In `<plans folder>/<game-slug>/`:
 
 - Copies of `BRIEF.md`, `GAME_DESIGN.md` and `REVIEW_LOG.md`, cleaned as
   share-design.md's "What goes in" says (no prices or dollar figures, the
@@ -53,17 +62,17 @@ Never `design/STATUS.md` (it holds costs and settings), `.env`, prices, or
 paths on this machine. The credit name only if the person allowed it for
 publishing (`publish.sh credit`).
 
-`plans/index.html` is the page of cards, from
-`${CLAUDE_SKILL_DIR}/templates/plans.html` the first time (its title from
-the gallery's, plus " plans"). Each card: the mock picture (or the game's
-social card, once there is one), name, one line, status, and a link to
-`https://github.com/<gallery repo>/tree/main/plans/<game-slug>` (GitHub shows
-the README and lets anyone download the files, however the gallery site is
-built). Newest first; a game already there gets its card updated, not a
-second one. Add a "Plans" link to the gallery page once, if it has room for
-one, and ask first if it isn't clear where.
+`<plans folder>/index.html` is the page of cards, from
+`${CLAUDE_SKILL_DIR}/templates/plans.html` the first time ("<their name>'s
+game plans", the credit as for a new gallery). Each card: the mock picture
+(or the game's social card, once there is one), name, one line, status, and
+a link to `https://github.com/<gallery repo>/tree/main/<plans folder>/<game-slug>`
+(GitHub shows the README and lets anyone download the files, however the
+gallery site is built). Newest first; a game already there gets its card
+updated, not a second one. Never change the gallery's own page.
 
-If the gallery is a Jekyll site (it has a `_config.yml`), add `plans/*/` to
-its `exclude:` list once, so the plan files are left to GitHub's own view.
+If the gallery is a Jekyll site (it has a `_config.yml`), add
+`<plans folder>/*/` to its `exclude:` list once, so the plan files are left
+to GitHub's own view.
 Commit ("Plans: add Bloom Hop", "Plans: Bloom Hop is published"), push, and
 give the plans page's address in the report.

@@ -158,7 +158,7 @@ value) is the game description. Flags and defaults:
 | `--advanced` | with `--help`: list the options the short help leaves out (`references/help.md`) | off |
 
 `--publish`, `--gallery`, `--plans` and `--making-of` can also be set as defaults in the
-nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_PLANS=on`, `GAMEGEN_MAKING_OF=on`);
+nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_PLANS=example.com/plans`, `GAMEGEN_MAKING_OF=on`);
 read them with `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" settings`, never
 by opening `.env` (it holds the keys). Flags win over these.
 
@@ -371,7 +371,7 @@ the design says what serves its purpose instead.
 (`--mockups`, $5 unless set): follow `references/share-design.md`. If the design was shared before (its link is
 in `design/STATUS.md`), keep that copy up to date instead.
 
-**The plans page.** When `publish.sh settings` shows `GAMEGEN_PLANS: on`, add or
+**The plans page.** When `publish.sh settings` shows an address for `GAMEGEN_PLANS`, add or
 update the game's card as `references/plans.md` says: here (with
 `--plan-only` or `--share-design`), at the end of Phase 9, and after
 `--continue`, `--change` or `--publish`.

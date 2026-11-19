@@ -953,8 +953,10 @@ test('the plans page: asks first, never STATUS.md, cards from the template (#47)
   for (const p of ['PLANS_TITLE', 'PLAN_URL', 'PLAN_IMAGE', 'PLAN_STATUS', 'GAME_TITLE', 'GAME_DESCRIPTION']) assert.ok(page.includes(p), p);
   // publish.sh settings reports it.
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
-  writeFileSync(join(dir, '.env'), 'GAMEGEN_PLANS=on\n');
-  assert.match(publish(dir, ['settings']).stdout, /^GAMEGEN_PLANS: on$/m);
+  writeFileSync(join(dir, '.env'), 'GAMEGEN_PLANS=example.com/plans\n');
+  assert.match(publish(dir, ['settings']).stdout, /^GAMEGEN_PLANS: example\.com\/plans$/m);
+  assert.match(ref, /Never change the gallery's own page/);
+  assert.match(ref, /is the gallery's own address, or no\s+gallery is set, say so/);
 });
 
 test('browsers.sh finds browsers left behind and says whether there is room for another (#28)', (t) => {

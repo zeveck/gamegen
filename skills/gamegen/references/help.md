@@ -400,9 +400,10 @@ picture, for adding it to any other site yourself.
 
 ## --plans
 
-**A page of all your game plans,** next to your gallery of finished games.
-Put `GAMEGEN_PLANS=on` in your `.env` (with `GAMEGEN_GALLERY` set), and each
-game you plan gets a card there: its name, a picture, where it stands
+**A page of all your game plans,** at an address of your choosing on your
+gallery's site, kept apart from the gallery itself. Put
+`GAMEGEN_PLANS=example.com/plans` in your `.env` (with `GAMEGEN_GALLERY`
+set), and each game you plan gets a card there: its name, a picture, where it stands
 (planned, built, published) and its plan as files anyone can read or
 download. Someone else (or you, on another computer) can build one with
 `/gamegen --continue <the plan's address>`. gamegen asks before putting a

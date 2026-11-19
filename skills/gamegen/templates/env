@@ -25,7 +25,7 @@ MESHY_API_KEY=
 # # to use one. The --publish, --gallery, --plans and --making-of flags override these.
 # GAMEGEN_DOMAIN=example.com     # games go to <game>.example.com (or github.io)
 # GAMEGEN_GALLERY=you/my-games   # a GitHub repo showing all your games together
-# GAMEGEN_PLANS=on               # every game's plan on a page in that repo too
+# GAMEGEN_PLANS=example.com/plans  # a page of every game's plan (in the gallery repo)
 # GAMEGEN_MAKING_OF=on           # READMEs show the prompts and how it was made
 # GAMEGEN_CREDIT=Your Name       # who games credit (else your GitHub or git name)
 

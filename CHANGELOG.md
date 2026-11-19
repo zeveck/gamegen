@@ -4,6 +4,14 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.19.5
+
+- **The plans page goes where you say,** apart from your gallery:
+  `GAMEGEN_PLANS=example.com/plans` puts it at that address on your
+  gallery's site, kept in the gallery repo. The gallery page stays as it
+  was and doesn't link to it. (v2026.11.19.4 used `GAMEGEN_PLANS=on` and
+  linked the two; set the address instead.)
+
 ## v2026.11.19.4
 
 - **A page of all your game plans.** With `GAMEGEN_PLANS=on` in your `.env`
