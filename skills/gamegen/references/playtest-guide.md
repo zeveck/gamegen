@@ -233,7 +233,9 @@ Work through the design's definition of done. At minimum:
 9. **The first load and screen changes** (see "The first load" and "Screen
    changes, frame by frame" below): the title appears once, in its real
    fonts and art, and nothing jumps afterwards; and no screen flashes
-   between two others, from New Game on.
+   between two others, from New Game on. Entering each area for the first
+   time shows its art (characters, bosses, props) from the first frame, with
+   nothing popping in.
 10. **The words on screen** pass the text scanner at every screenshot (see
     "Screenshots").
 11. **Offline** (web games that install): in a fresh session, open the game

@@ -80,7 +80,9 @@ poses, or animate them in code (bobbing, squash and stretch, rotation).
   before using them.
 - **Animations.** Keep them short: 2 to 8 frames (anim8gen's sweet spot), 4
   for most actions. One animation per action. Check the character stays the
-  same character in every frame, and that loops loop.
+  same character in every frame, that loops loop, and that every frame has
+  the same brightness and colours: generated frames drift, and one lighter
+  frame in a loop flickers. Match them to the first frame if they differ.
 - **Music.** audiogen makes 30-second clips unless told otherwise; ask for 60
   to 120 seconds (`--length-ms 60000` to `120000`) and no vocals
   (`--force-instrumental`). Loop it in the game; music has no seamless-loop

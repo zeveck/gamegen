@@ -167,6 +167,15 @@ else. Aim for:
   and nothing cut off or spilling out of its box at any size.
 - **A first load that appears once and stays still:** the title shows up
   with its real fonts and art, and nothing jumps or changes after that.
+- **Art that's there when a scene starts:** load what each area draws before
+  the player gets there: the core art during the title, an area's key art
+  (its boss, its main props) on entering the area, and the next scenes in the
+  background. An image first requested when it's drawn shows up late, as a
+  gap or a stand-in shape. Hide any wait that's left inside a transition the
+  game already has.
+- **Every symbol in its font:** a bundled font subset often has no arrows
+  (← ↑ → ↓) or other symbols, and the browser's fallback can be unreadable
+  (a thin ↑ looks like a 1). Include them, or draw them as icons.
 - **Screens that hand over cleanly:** closing one screen never shows what's
   underneath unless that's meant to be the next view. When a full-screen
   screen (the title, a story picture, a chapter card) or an overlay in a
