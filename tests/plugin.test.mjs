@@ -105,7 +105,7 @@ test('SKILL.md has the frontmatter Claude Code needs', () => {
 
 test('every flag is documented in the skill and the README; the hint stays short', () => {
   // The argument hint shows only the common ones, short enough to read in
-  // full; /gamegen help lists them all.
+  // full; /gamegen help lists more, and help advanced the rest.
   const hint = skill.match(/^argument-hint: "(.*)"$/m)[1];
   assert.ok(hint.length <= 110, `argument-hint is ${hint.length} characters`);
   assert.match(hint, /\bhelp\b/, 'argument-hint points to help');
@@ -117,7 +117,7 @@ test('every flag is documented in the skill and the README; the hint stays short
   // And nothing documents a flag the skill doesn't know.
   const documented = new Set([...readme.matchAll(/`(--[a-z-]+)/g)].map((m) => m[1]));
   for (const flag of documented) {
-    if (['--marketplace', '--network'].includes(flag)) continue; // plugin install, dc forward
+    if (['--marketplace', '--network', '--help'].includes(flag)) continue; // plugin install, dc forward, help
     assert.ok(FLAGS.includes(flag), `README mentions unknown flag ${flag}`);
   }
 });
@@ -126,8 +126,16 @@ test('help covers every option', () => {
   const help = read(`${REFS}/help.md`);
   for (const flag of FLAGS) {
     assert.match(help, new RegExp(`^## ${flag}$`, 'm'), `help has a section for ${flag}`);
-    assert.ok(help.includes(`| \`${flag}`), `help's overview table lists ${flag}`);
   }
+  // Each option is in exactly one list: the short overview or `--advanced`.
+  const listed = (part) => [...part.matchAll(/^\| `(--[a-z0-9-]+)/gm)].map((m) => m[1]);
+  const overview = listed(help.split(/^## Overview$/m)[1].split(/^## /m)[0]);
+  const advanced = listed(help.split(/^## --advanced$/m)[1].split(/^## /m)[0]);
+  for (const flag of FLAGS) {
+    const n = overview.filter((f) => f === flag).length + advanced.filter((f) => f === flag).length;
+    assert.equal(n, 1, `${flag} is in exactly one help list`);
+  }
+  assert.ok(overview.includes('--advanced') && overview.length <= 12, 'the short list stays short');
 });
 
 test('SKILL.md\'s flag table has the options everything else documents', () => {

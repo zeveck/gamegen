@@ -61,36 +61,42 @@ The [examples](#examples) below show full requests and the games they became. Yo
 
 ### Options
 
-All optional. Unless you say otherwise, gamegen makes a web game that plays in any browser on desktop and phones, with nothing to install. You can also just say these things in your description ("for phones", "keep it tiny", "in Godot"). `/gamegen help` lists them, and `/gamegen help <option>` explains one, such as `/gamegen help style`.
+All optional. Unless you say otherwise, gamegen makes a web game that plays in any browser on desktop and phones, with nothing to install. You can also just say these things in your description ("for phones", "keep it tiny", "in Godot"). `/gamegen help` lists the common ones, `/gamegen help advanced` the rest, and `/gamegen help <option>` explains one, such as `/gamegen help style`.
 
 | Option | What it does | Default |
 |---|---|---|
 | `--platform desktop`, `mobile` or `both` | Where it'll be played. Phones get touch controls. | `both` |
-| `--gamepad` | Play the whole game with a controller, such as a PS5 controller plugged into your computer (USB or Bluetooth). Xbox and other controllers work too, and the game shows the right buttons for each. Works best in Chrome or Edge. | off |
-| `--feedback [on, hidden or off]` | A "Report a bug" button in the game's pause menu and settings, plus Ctrl+Shift+F to report from anywhere, even when the game is stuck (if the game already uses Ctrl and Shift together, it picks another letter and tells you). Players' reports open as GitHub issues in the game's repo, with the game's details and a screenshot to paste, ready for `--change #12`. `hidden` shows the button only to people who open the game with `?feedback` on its address (the shortcut works for testers either way). Players need a GitHub account, and the game's repo has to be public (in a private one, the button is left out). | off (`on` if given alone) |
 | `--style <description or link>` | The look and feel to aim for: a description, a game's name, or a link to a game, store page or screenshot. Use it more than once to mix influences. | gamegen picks a look that suits your idea |
-| `--target <web or an engine>` | What to build it in: `web`, or an engine such as `godot` or `pygame`. Engines are experimental: gamegen makes the project and all its art and sound, but it can only play-test what it can run, and editors like Unity and Unreal usually can't run here. | `web` |
 | `--scope small`, `medium` or `large` | How big a game: one strong idea in a few minutes of play, several levels in twenty to thirty minutes, or a full game with a world or story to work through. | sized from your idea |
+| `--3d` | Make a 3D game, with 3D characters and models from meshgen. Saying "3D" in your idea works too; otherwise every game is 2D, and if your idea sounds like 3D without saying so, gamegen asks first. Needs a Meshy key. | off |
 | `--budget <dollars>` | The most to spend on generated art and audio. `0` makes a free game with everything drawn in code. | `20` |
-| `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
-| `--share-design [page, doc or both]` | Share the reviewed design on claude.ai, with a few mock pictures of the main characters and places, so others can weigh in before the real work starts: a web page (the default), a Claude Doc people can comment on, or both to compare. Later runs read the comments and keep it up to date. | off |
-| `--mockups <dollars>` | With `--share-design`: how much to spend on the mock pictures, out of your budget. `0` for none. | `5` |
-| `--art-sheet` | A page on claude.ai showing everything made for the game, once the art is ready: the cast, places, animations, models, colours, music and sounds. Run it on its own for a game you've already made; later changes update the same page. | off |
 | `--plan-only` | Stop after the design, before spending anything (apart from `--share-design`'s mock pictures), so you can read it and suggest changes. | off |
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
 | `--change <what to change>` | Change something in a finished game, keeping everything else. Or name GitHub issues to fix, such as `--change #12`; they close when you next publish. | off |
 | `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |
+| `--bugcheck` | Check a finished game for bugs worth fixing: fresh reviewers play it and read its code, and you get a short list, most important first. Nothing changes until you pick what to fix; for a published game they can become GitHub issues instead. | off |
+| `--advanced` | With `--help`: lists the more options, below, instead. | off |
+
+#### More options
+
+| Option | What it does | Default |
+|---|---|---|
+| `--target <web or an engine>` | What to build it in: `web`, or an engine such as `godot` or `pygame`. Engines are experimental: gamegen makes the project and all its art and sound, but it can only play-test what it can run, and editors like Unity and Unreal usually can't run here. | `web` |
+| `--gamepad` | Play the whole game with a controller, such as a PS5 controller plugged into your computer (USB or Bluetooth). Xbox and other controllers work too, and the game shows the right buttons for each. Works best in Chrome or Edge. | off |
+| `--feedback [on, hidden or off]` | A "Report a bug" button in the game's pause menu and settings, plus Ctrl+Shift+F to report from anywhere, even when the game is stuck (if the game already uses Ctrl and Shift together, it picks another letter and tells you). Players' reports open as GitHub issues in the game's repo, with the game's details and a screenshot to paste, ready for `--change #12`. `hidden` shows the button only to people who open the game with `?feedback` on its address (the shortcut works for testers either way). Players need a GitHub account, and the game's repo has to be public (in a private one, the button is left out). | off (`on` if given alone) |
+| `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
+| `--no-confirm` | Don't stop to ask for approvals you'd give anyway: publishing's "Go ahead?", and the plan before finishing or remaking a game you started. gamegen still says what it's doing, and still stops if anything looks wrong. | off |
+| `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
+| `--share-design [page, doc or both]` | Share the reviewed design on claude.ai, with a few mock pictures of the main characters and places, so others can weigh in before the real work starts: a web page (the default), a Claude Doc people can comment on, or both to compare. Later runs read the comments and keep it up to date. | off |
+| `--mockups <dollars>` | With `--share-design`: how much to spend on the mock pictures, out of your budget. `0` for none. | `5` |
+| `--art-sheet` | A page on claude.ai showing everything made for the game, once the art is ready: the cast, places, animations, models, colours, music and sounds. Run it on its own for a game you've already made; later changes update the same page. | off |
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games, a page in a GitHub repository of yours. gamegen offers to start it the first time. | none |
 | `--making-of` | The README also shows how the game was made: every request you typed, and what gamegen and each plugin did. | off |
-| `--3d` | Make a 3D game, with 3D characters and models from meshgen. Saying "3D" in your idea works too; otherwise every game is 2D, and if your idea sounds like 3D without saying so, gamegen asks first. Needs a Meshy key. | off |
-| `--no-confirm` | Don't stop to ask for approvals you'd give anyway: publishing's "Go ahead?", and the plan before finishing or remaking a game you started. gamegen still says what it's doing, and still stops if anything looks wrong. | off |
+| `--package [steam, windows or linux]` | Turn a finished game into apps for Windows and Linux that run without a browser, such as a Windows `.exe`. `steam` (the default) also makes the store images and upload files for Steam, plus a checklist of what's left to do in Steamworks; see the [Steam guide](https://gamegen.synapticnoise.com/steam-guide/). | off |
 | `--finish <folder or repo>` | Finish a game you started some other way that stalled: in a copy that becomes its own repo, so your original stays as it is. gamegen shows its plan and asks first. | off |
 | `--remake <folder or repo>` | Make a game you started again, as a new game in a new repo, keeping your art, levels and ideas. | off |
 | `--in-place` | With `--finish`: work in your original project, on a new branch, instead of a copy. | off |
 | `--leeway little`, `some` or `lots` | With `--finish` or `--remake`: how freely gamegen may change your game. | picked from your game |
-| `--bugcheck` | Check a finished game for bugs worth fixing: fresh reviewers play it and read its code, and you get a short list, most important first. Nothing changes until you pick what to fix; for a published game they can become GitHub issues instead. | off |
-| `--package [steam, windows or linux]` | Turn a finished game into apps for Windows and Linux that run without a browser, such as a Windows `.exe`. `steam` (the default) also makes the store images and upload files for Steam, plus a checklist of what's left to do in Steamworks; see the [Steam guide](https://gamegen.synapticnoise.com/steam-guide/). | off |
-| `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
 
 ### Change your game
 

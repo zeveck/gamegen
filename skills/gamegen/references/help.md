@@ -28,33 +28,55 @@ idea ("for phones", "keep it tiny", "in Godot").
 | Option | What it does |
 |---|---|
 | `--platform desktop`, `mobile` or `both` | Where it'll be played (default: both) |
-| `--gamepad` | Play with a controller, such as a PS5 controller plugged into your computer |
-| `--feedback [on\|hidden\|off]` | A "Report a bug" button that turns players' reports into GitHub issues |
 | `--style <description or link>` | The look and feel to aim for |
-| `--target <web or an engine>` | What to build it in (default: web) |
 | `--scope small`, `medium` or `large` | How big a game (default: sized from your idea) |
+| `--3d` | Make a 3D game |
 | `--budget <dollars>` | The most to spend on art and sound (default: 20) |
-| `--rounds <1 to 4>` | Rounds of design review (default: 2) |
-| `--share-design [page\|doc\|both]` | Share the design, with mock pictures, so others can weigh in |
-| `--mockups <dollars>` | With `--share-design`: how much to spend on mock pictures (default: 5) |
-| `--art-sheet` | A page showing all the game's art, animation and music, to see and share |
 | `--plan-only` | Stop after the design, before spending anything |
 | `--continue` | Build a saved design, or finish an interrupted game |
 | `--change <what>` | Change something in a finished game, keeping the rest |
 | `--publish [address]` | Put a finished game online, free, with GitHub Pages |
+| `--bugcheck` | Check a finished game for bugs worth fixing, and report them first |
+| `--advanced` | With `--help`: show all the other options |
+
+`/gamegen help <option>` explains one, for example `/gamegen help style`.
+
+## --advanced
+
+**All the other options,** for `/gamegen --help --advanced` (or `/gamegen help advanced`).
+
+**Building**
+
+| Option | What it does |
+|---|---|
+| `--target <web or an engine>` | What to build it in (default: web) |
+| `--gamepad` | Play with a controller, such as a PS5 controller plugged into your computer |
+| `--feedback [on\|hidden\|off]` | A "Report a bug" button that turns players' reports into GitHub issues |
+| `--rounds <1 to 4>` | Rounds of design review (default: 2) |
+| `--no-confirm` | Don't stop to ask for approvals (publishing, a finish or remake plan) |
+| `--out <folder>` | Where to put the game |
+
+**Sharing and showing**
+
+| Option | What it does |
+|---|---|
+| `--share-design [page\|doc\|both]` | Share the design, with mock pictures, so others can weigh in |
+| `--mockups <dollars>` | With `--share-design`: how much to spend on mock pictures (default: 5) |
+| `--art-sheet` | A page showing all the game's art, animation and music, to see and share |
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games |
 | `--making-of` | Show in the README how the game was made |
-| `--3d` | Make a 3D game |
-| `--no-confirm` | Don't stop to ask for approvals (publishing, a finish or remake plan) |
+| `--package [steam\|windows\|linux]` | Make Windows and Linux apps of a game, ready for Steam |
+
+**A game you already started**
+
+| Option | What it does |
+|---|---|
 | `--finish <folder or repo>` | Finish a game you started (in a copy; your original stays as it is) |
 | `--remake <folder or repo>` | Make a game you started again, keeping your art and ideas |
 | `--in-place` | With `--finish`: work in your original project, on a new branch |
 | `--leeway little\|some\|lots` | With `--finish` or `--remake`: how freely to change it |
-| `--package [steam\|windows\|linux]` | Make Windows and Linux apps of a game, ready for Steam |
-| `--bugcheck` | Check a finished game for bugs worth fixing, and report them first |
-| `--out <folder>` | Where to put the game |
 
-`/gamegen help <option>` explains one, for example `/gamegen help style`.
+`/gamegen help <option>` explains one, for example `/gamegen help gamepad`.
 
 ## --platform
 

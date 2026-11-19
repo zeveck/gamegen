@@ -89,10 +89,11 @@ looking at the work at once. Check that your tool list includes `Agent` (or
 ### 2. Read the request
 
 **Help.** If the arguments are exactly `help` (or `--help`), show the
-overview from `references/help.md` and stop. If they're exactly `help` and one
-option name and nothing else (with or without the dashes, such as
-`help style`), show that option's section and stop. Do nothing else in either
-case. Anything longer is a game idea: "help a lost robot find its way home" or
+overview from `references/help.md` and stop. If they're exactly `help` (or
+`--help`) and one option name and nothing else (with or without the dashes,
+such as `help style` or `--help --advanced`), show that option's section and
+stop. `--advanced` on its own is the same as `help advanced`; given with a
+game idea, it changes nothing. Do nothing else in any of these cases. Anything longer is a game idea: "help a lost robot find its way home" or
 "help scope out a haunted house".
 
 Arguments can come in any order. Everything that isn't a flag (or a flag's
@@ -126,6 +127,7 @@ value) is the game description. Flags and defaults:
 | `--leeway` | with `--finish`/`--remake`: `little`, `some` or `lots` freedom to change it | chosen from the original |
 | `--no-confirm` | don't stop for approvals (see below); safety stops still stop | off: ask first |
 | `--out` | folder for the game | see below |
+| `--advanced` | with `--help`: list the options the short help leaves out (`references/help.md`) | off |
 
 `--publish`, `--gallery` and `--making-of` can also be set as defaults in the
 nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_MAKING_OF=on`);
