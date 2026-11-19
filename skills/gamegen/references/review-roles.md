@@ -8,7 +8,7 @@ Every reviewer returns a list of findings in this form:
 
 ```
 ### <short title>
-Severity: must-fix | should-fix | nice
+Severity: must-fix | should-fix | nice (who meets it, how bad: "The bar")
 What's wrong: <specific; quote the design where you can>
 Why it matters: <the effect on the player or the build>
 Suggestion: <a concrete change>
@@ -23,12 +23,49 @@ Rules for every reviewer:
   quit there" is useful.
 - At most 10 findings, most important first. Fewer, better findings beat a
   long list.
-- Report what's real: a problem players or the build would plausibly hit,
-  or a safety one (anything unsafe, lost progress, a broken game or publish). Weigh how
-  likely it is, how bad it is and how big the fix would be; skip exotic edge
-  cases, and a rare, mild problem whose fix would be large. When it's close,
-  say which way you leaned.
+- Report what clears the bar (below), with its severity from there;
+  anything below it gets a line at most, as nice.
 - Don't rewrite the design; that's the refiner's job.
+
+## The bar
+
+Judge each finding on three things:
+
+- **Who meets it.** *Most players*: the first level, every win, every phone
+  player, a screen everyone passes. *Some*: one targeted size, players on
+  keyboard only, one browser. *Few*: it needs a precise sequence or timing,
+  an unusual setup, a slow connection, or deliberate misuse.
+- **How bad it is.** *Breaks*: can't go on, lost progress, no sound, a crash,
+  a publish that fails. *Looks broken or misleads*: overlapping text, a
+  hidden pad, the wrong control named. *Looks a little off*: a lone word on a
+  line, an element slightly over the art.
+- **How big the fix is:** small, medium or large.
+
+A suggested improvement is weighed the same way: how many players gain, and
+how much. In a design review, judge the game the design would produce: a
+plan that can't be built, or would ship one of these problems, counts as
+that problem. Then:
+
+- **Safety is always worth fixing** (anything unsafe, or lost progress),
+  whatever else it scores.
+- **Breaks** is worth fixing for most or some players, even with a large
+  fix.
+- **Most players** is worth fixing unless the fix is large, **including
+  cosmetic problems**: a game that looks wrong to everyone is a real
+  problem, and those fixes are usually cheap.
+- **Some players**, and it looks broken or misleads: worth fixing if the fix
+  is small or medium.
+- **Everything else is below the bar:** few players (short of safety), or
+  something that only looks a little off for some. ("Wrong in one language
+  on one phone" is fiddly and rare.)
+- **Performance** counts on an ordinary phone or computer (stutter, a long
+  load). Only on a slow phone or a slow connection, it's few players.
+
+The line is fuzzy: when it's close, say which way you leaned and why.
+
+Severity follows from it: **must-fix** is a safety problem, or one that
+breaks the game for most or some players; **should-fix** is anything else
+that clears the bar; **nice** is below it.
 
 ## Player
 
@@ -128,7 +165,8 @@ screenshots in `design/screenshots/`.
 - What one change would make it most fun?
 
 Use the same finding format. Mark anything that stops a player from finishing
-as must-fix.
+as must-fix, unless only a rare, precise sequence triggers it (then judge it
+by the bar).
 
 ## Bug hunter (final review)
 
@@ -178,5 +216,5 @@ The polish checklist:
 - **Anything else that looks unfinished.**
 
 Use the same finding format, with the screen, the size and a screenshot for
-each. Every finding here is at least should-fix: these are what a player
+each. What clears the bar is at least should-fix: these are what a player
 notices in the first minute.

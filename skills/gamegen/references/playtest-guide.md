@@ -263,7 +263,9 @@ It saves a filmstrip of about 20 frames and prints when the fonts finished
 loading and when the picture changed. Look at the filmstrip. The title should
 appear once, in its real fonts and with its art, and then stay put: every
 change after it appears is a flicker or a jump to fix (see "Looking finished"
-in web-target.md). A fade-in as the title appears is fine.
+in web-target.md). A fade-in as the title appears is fine. The connection is
+slowed to make those changes easy to see; how long the load takes on it
+isn't a problem in itself.
 
 ## Screen changes, frame by frame
 

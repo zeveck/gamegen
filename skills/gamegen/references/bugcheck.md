@@ -10,22 +10,15 @@ reviews it, from the code, and the report says so.
 
 ## The bar
 
-What makes a finding worth reporting is the same for every reviewer:
-
-- **It's real:** players (or the person) would plausibly hit it in normal
-  play, or it's a safety problem (anything unsafe, lost progress, a game or
-  publish that breaks). An exotic edge case that needs an unusual setup or a
-  deliberate misuse isn't worth reporting.
-- **Weigh it:** how likely it is, how bad it is when it happens, and how big
-  the fix would be. A rare, mild problem with a big fix isn't worth it; a
-  serious one is, even with a bigger fix. The line is fuzzy: when it's close,
-  say which way you leaned and why.
-- **Fewer, better findings.** Ten small nits bury the one thing that matters.
+The bar is the one every review uses: "The bar" in review-roles.md. It
+counts here most of all: only what clears it is reported as worth fixing.
 
 ## How
 
 1. **Record it:** add the request to `design/STATUS.md`'s requests, exactly
-   as typed.
+   as typed. Keep a list, for yourself, of what's already known: earlier
+   "Bug check" sections there still open, and the game repo's open `bug`
+   issues.
 2. **Serve the game** as the play-test does (playtest-guide.md), and keep it
    running for the check.
 3. **Dispatch fresh reviewers,** with instructions from review-roles.md: the
@@ -33,7 +26,7 @@ What makes a finding worth reporting is the same for every reviewer:
    didn't build the game and don't see each other's findings. Give each the
    address, the game folder, `design/GAME_DESIGN.md`, the settings from
    `design/STATUS.md`, the targeted sizes, the play-test guide, the skill
-   folder and the bar above, plus `references/3d.md` for a 3D game, and
+   folder and the bar, plus `references/3d.md` for a 3D game, and
    `references/gamepad.md` or `references/feedback.md` when the settings
    say the game has a controller or "Report a bug". They take fresh
    screenshots into `design/bugcheck/` (not `design/screenshots/`, which
@@ -42,7 +35,10 @@ What makes a finding worth reporting is the same for every reviewer:
    browser.
 4. **Check each finding yourself** before reporting it: reproduce it (or
    confirm it in the code), merge duplicates, and drop anything that doesn't
-   reproduce or doesn't clear the bar.
+   reproduce or doesn't clear the bar. The reviewers don't see what's
+   already known (fresh eyes); you match their findings against it. A known
+   one is reported as still open, not as new, and one judged below the bar
+   before stays there unless the game changed.
 5. **Stop the server.**
 
 ## The report
@@ -57,9 +53,10 @@ Short and plain, in words a player would use:
   person might care about, or nothing.
 - **What was checked:** the sizes, and the screens and levels played.
 
-Write the findings into `design/STATUS.md` too, so a later `--change` can
-pick them up. Then end by asking which to fix ("all", some by number, or
-none), and stop. Always stop here, even with `--no-confirm`: picking what to
+Write the findings into `design/STATUS.md` too, under "Bug check (<date>)",
+so a later `--change` or `--bugcheck` can pick them up, and mark each one
+"fixed" there as it's fixed. Then end by asking which to fix ("all", some by
+number, or none), and stop. Always stop here, even with `--no-confirm`: picking what to
 fix isn't an approval.
 
 ## Afterwards

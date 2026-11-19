@@ -670,7 +670,10 @@ test('--bugcheck reports what clears the bar, and changes nothing until asked', 
   assert.match(skill, /follow\s+`references\/bugcheck\.md`, and do nothing else/);
   assert.match(ref, /Never file a\s+safety finding as an issue/);
   // The same bar guides every reviewer, in ordinary builds too.
-  assert.match(read(`${REFS}/review-roles.md`), /Report what's real:/);
+  const roles = read(`${REFS}/review-roles.md`);
+  assert.match(roles, /^## The bar$/m);
+  assert.match(roles, /\*\*Safety is always worth fixing\*\*/);
+  assert.match(ref, /"The bar" in review-roles\.md/);
 });
 
 test('--art-sheet shows every accepted asset once the art is ready, and keeps one link', () => {
