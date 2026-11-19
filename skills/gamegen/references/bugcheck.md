@@ -62,7 +62,8 @@ fix isn't an approval.
 ## Afterwards
 
 - **Fixing:** what the person picks is a change: follow "Changing a finished
-  game" in change.md, one finding at a time, each with its own commit. If the
+  game" in change.md, one finding at a time, each with its own commit, and
+  the proof sized to what each touched (its step 4). If the
   game is published, end with "Run `/gamegen --publish` to put this version
   online", as usual; never publish without being asked.
 - **Filing as issues** (only when the person asks, in the game's own repo,
@@ -70,5 +71,5 @@ fix isn't an approval.
   label if it's missing), with the steps and what goes wrong. Check the
   repo's open issues first and skip anything already reported. Never file a
   safety finding as an issue (in a public repo it tells everyone): tell the
-  person, and offer to fix it now. `/gamegen --change #12` then fixes them,
+  person, and offer to fix it now. `/gamegen --fix #12` (or `--fix all`) then fixes them,
   alongside players' reports.

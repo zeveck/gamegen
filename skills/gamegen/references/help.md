@@ -35,6 +35,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--plan-only` | Stop after the design, before spending anything |
 | `--continue` | Build a saved design, or finish an interrupted game |
 | `--change <what>` | Change something in a finished game, keeping the rest |
+| `--fix #12` or `all` | Fix a finished game's GitHub issues, each as big a job as it needs |
 | `--publish [address]` | Put a finished game online, free, with GitHub Pages |
 | `--bugcheck` | Check a finished game for bugs worth fixing, and report them first |
 | `--advanced` | With `--help`: show all the other options |
@@ -113,7 +114,7 @@ On a game you've already made, `/gamegen --gamepad` adds it.
 Players say what went wrong, and GitHub opens with an issue already filled
 in: what they wrote, plus where they were in the game, their browser and
 any errors. A screenshot of the moment is copied, ready to paste. Then
-`/gamegen --change #12` fixes it.
+`/gamegen --fix #12` fixes it.
 
 - `--feedback` or `--feedback on`: everyone sees the button.
 - `--feedback hidden`: only people you give a special link to see it: the
@@ -292,19 +293,25 @@ gamegen changes what you asked for and follows it through (a new name also
 updates the logo, the link preview and the README), makes any new art in the
 game's existing style, and plays the game again to make sure nothing broke.
 
-**Fix GitHub issues** by naming them, with your own notes if you like:
+To fix GitHub issues, use `--fix` (below); `--change #12` still works, with
+your own notes after it.
+
+## --fix
+
+**Fix a finished game's GitHub issues,** such as the ones players send with
+"Report a bug": `/gamegen --fix #12 #15`, or `/gamegen --fix all` for every
+open one. gamegen reads each issue (and looks at its screenshots), checks
+it's really something to change (it asks about a question, a duplicate, or
+something that works as intended), and shows you a short plan: a small bug
+gets a plain fix that a second helper checks, while a new look or a design
+change goes the whole way, with a review and matching art. For an issue
+someone else filed, it tells you what it plans to change and asks first. Each fix is checked in the way that suits it,
+and every level is replayed once at the end if anything needs it. The
+issues close when you next publish.
 
 ```
-/gamegen --change #12
-/gamegen --change #12 #15 keep the last level hard, just make the jump fairer
+/gamegen --fix all
 ```
-
-gamegen reads each issue (and looks at its screenshots), checks it's
-really something to change (it asks about a question, a duplicate, or
-something that works as intended), and fixes it. For an issue someone
-else filed, it tells you what it plans to change and asks first. The issues
-close by
-themselves when you next publish (`/gamegen --publish`).
 
 ## --publish
 
@@ -485,7 +492,7 @@ get one line, not a page.
 
 Nothing changes until you say which to fix. Then gamegen fixes them as a
 change, or, for a published game, can file them as GitHub issues for later
-(`/gamegen --change #12` fixes one). It costs nothing: nothing is generated.
+(`/gamegen --fix #12` fixes one). It costs nothing: nothing is generated.
 
 ## --package
 

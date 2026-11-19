@@ -1,6 +1,6 @@
 # Continuing a game, and changing a finished one
 
-Read this for `--continue` and `--change`. Find the game first (see "Finding
+Read this for `--continue`, `--change` and `--fix`. Find the game first (see "Finding
 an existing game" in SKILL.md).
 
 ## Continuing
@@ -31,21 +31,39 @@ starting one; if the game isn't finished yet, suggest `--continue`. Then:
 3. Make only the assets the change needs (and if the game has an art sheet,
    update it once they're accepted: art-sheet.md). Each change gets its own budget:
    `--budget` if given now, otherwise the default $20.
-4. Build it, play-test what changed (with the text scanner on every screen
-   it touched, at every size), and replay every level's solution to make
-   sure nothing else broke.
-5. Wrap up as usual: update the README and screenshots, and report what
-   changed and how to play it. If the game is published, end
+4. Build it, play-test what changed, and prove nothing else broke the way
+   that fits what it touched (say in the report which proof each change
+   got; a new level gets its solution recorded):
+
+   | What changed | Proof |
+   |---|---|
+   | Sound only | Play it where it's triggered; check volume and mute. No replays. |
+   | Art only | Every scene that draws it (search the code and data for its file name), at every size. No replays. |
+   | Text or menus | The screens that show it, with the text scanner, at every size; click their buttons like a person. |
+   | Rules within one level or room | Replay the solutions that pass through it. |
+   | Anything shared: movement, routes, items, saves, progression, the engine | Replay every level's solution, and the whole-game run if the game has one. |
+
+   A change that fits more than one row gets each row's proof; when unsure,
+   take the lower row. Art whose size or hitbox changes, or a sound
+   something waits on (a cutscene, a rhythm), is a rules change too. A
+   change to saves also checks that a save from before it still loads.
+
+   With several changes, the targeted checks follow each one, and the
+   replays (when any change needs them) run once at the end, plus right
+   after any last-row change that later ones build on. If the final replay
+   fails, find the commit that broke it (each change has its own).
+5. Wrap up as usual: update the README and screenshots where they show what
+   changed, and report what changed and how to play it. If the game is published, end
    with "Run `/gamegen --publish` to put this version online." Never publish
    without being asked.
 
-## Changes from GitHub issues
+## Fixing GitHub issues (`--fix`)
 
-`--change` can name issues instead of (or as well as) describing the change:
-`#12`, several (`#12 #15`), or an issue's address
-(`https://github.com/owner/repo/issues/12`). `#12` means the game's own
+`--fix` names issues: `#12`, several (`#12 #15`), an issue's address
+(`https://github.com/owner/repo/issues/12`), or `all` (every open issue).
+`--change` can name them too, with a description, and works the same way. `#12` means the game's own
 repo: its `origin` (or `github`, a remote an earlier publish added) on
-GitHub. If the game has no GitHub repo yet, say an issue number needs one,
+GitHub. If the game has no GitHub repo yet, say fixing issues needs one,
 and stop.
 
 1. **Read each issue** with
@@ -75,14 +93,29 @@ and stop.
    author isn't the person (`gh api user --jq .login`), describe the change
    you plan to make for it, in plain words, and ask before changing
    anything. This is a safety stop: it stops even with `--no-confirm`.
-3. **Record it:** add `#12: <its title> (<its address>)` to the requests
+3. **Sort them first.** For each issue, decide its path and show a short
+   table (issue, what you'll do, size, path, and any art or sound cost):
+   - **A small bug** (in the code, or the tooling): fix it, check what it
+     touched (the proof table in "Changing a finished game"), and have a
+     fresh agent review the fix, given
+     the code and the issue, not your conclusion.
+   - **A design or art change:** the full path above (a design review round
+     for anything that changes how it plays, matching art, the README).
+   - **Not something to do** (step 2): say so and leave it.
+
+   Then go on, unless it's `all` with more than a handful, or anything
+   spends art or sound budget: then ask first, together with any of step
+   2's questions, in one stop. With `--no-confirm`, go on, except for step
+   2's safety stop.
+4. **Record it:** add `#12: <its title> (<its address>)` to the requests
    list in `design/STATUS.md`, plus anything typed with it, exactly as
    typed.
-4. **Make the change** as above (steps 1 to 5 of "Changing a finished
-   game"), one issue at a time when there are several, each with its own
-   commit whose message ends `Fixes #12`. The play-test at the end covers
-   them all.
-5. **Never touch the issue itself** (no comments, labels or closing).
+5. **Make the changes,** one issue at a time, issues that touch the same
+   files one after another, each with its own commit whose message ends
+   `Fixes #12`, and the replays once at the end (step 4 of "Changing a
+   finished game").
+6. **Never touch the issue itself** (no comments, labels or closing).
    GitHub closes it when the commit reaches the repo, which happens when the
-   person publishes (`/gamegen --publish`). The report lists each issue and
-   what changed for it, and says they'll close on the next publish.
+   person publishes (`/gamegen --publish`). The report lists each issue,
+   what changed for it, how it was checked, and anything skipped, and says
+   they'll close on the next publish.

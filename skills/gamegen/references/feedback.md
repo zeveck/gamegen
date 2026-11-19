@@ -4,7 +4,7 @@ Read this for `--feedback` (`on`, `hidden` or `off`). It puts a **"Report a
 bug"** button in the game. A player picks it, writes what went wrong, and
 lands on a GitHub issue in the game's repo, already filled in with the
 game's details. A screenshot of the moment is on their clipboard, ready to
-paste. Those issues are what `--change #12` fixes.
+paste. Those issues are what `--fix #12` fixes.
 
 It's for web games and web exports only, not engine targets.
 
@@ -221,4 +221,4 @@ The README's "How to play" gets one line: "Found a bug? Pause and pick
 the game's own letter, if it isn't F). For
 `hidden`, the README says nothing; the report to the person gives the
 `?feedback` address and the shortcut to hand to testers. Either way, the report says that reports arrive as issues in the
-game's repo, and `/gamegen --change #12` fixes one.
+game's repo, and `/gamegen --fix #12` fixes one.

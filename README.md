@@ -72,7 +72,8 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--budget <dollars>` | The most to spend on generated art and audio. `0` makes a free game with everything drawn in code. | `20` |
 | `--plan-only` | Stop after the design, before spending anything (apart from `--share-design`'s mock pictures), so you can read it and suggest changes. | off |
 | `--continue` | Build a `--plan-only` design, or finish a game that was interrupted. | off |
-| `--change <what to change>` | Change something in a finished game, keeping everything else. Or name GitHub issues to fix, such as `--change #12`; they close when you next publish. | off |
+| `--change <what to change>` | Change something in a finished game, keeping everything else. Or name GitHub issues to fix along with it, such as `--change #12`; they close when you next publish. | off |
+| `--fix #12 #15` or `all` | Fix a finished game's GitHub issues, such as players' reports from "Report a bug". gamegen sorts them first: a small bug gets a plain fix that a second helper checks, a design or art change goes the whole way. Issues filed by someone else wait for your OK, and they close when you next publish. | off |
 | `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |
 | `--bugcheck` | Check a finished game for bugs worth fixing: fresh reviewers play it and read its code, and you get a short list, most important first. Nothing changes until you pick what to fix; for a published game they can become GitHub issues instead. | off |
 | `--advanced` | With `--help`: lists the more options, below, instead. | off |
@@ -83,7 +84,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 |---|---|---|
 | `--target <web or an engine>` | What to build it in: `web`, or an engine such as `godot` or `pygame`. Engines are experimental: gamegen makes the project and all its art and sound, but it can only play-test what it can run, and editors like Unity and Unreal usually can't run here. | `web` |
 | `--gamepad` | Play the whole game with a controller, such as a PS5 controller plugged into your computer (USB or Bluetooth). Xbox and other controllers work too, and the game shows the right buttons for each. Works best in Chrome or Edge. | off |
-| `--feedback [on, hidden or off]` | A "Report a bug" button in the game's pause menu and settings, plus Ctrl+Shift+F to report from anywhere, even when the game is stuck (if the game already uses Ctrl and Shift together, it picks another letter and tells you). Players' reports open as GitHub issues in the game's repo, with the game's details and a screenshot to paste, ready for `--change #12`. `hidden` shows the button only to people who open the game with `?feedback` on its address (the shortcut works for testers either way). Players need a GitHub account, and the game's repo has to be public (in a private one, the button is left out). | off (`on` if given alone) |
+| `--feedback [on, hidden or off]` | A "Report a bug" button in the game's pause menu and settings, plus Ctrl+Shift+F to report from anywhere, even when the game is stuck (if the game already uses Ctrl and Shift together, it picks another letter and tells you). Players' reports open as GitHub issues in the game's repo, with the game's details and a screenshot to paste, ready for `--fix #12`. `hidden` shows the button only to people who open the game with `?feedback` on its address (the shortcut works for testers either way). Players need a GitHub account, and the game's repo has to be public (in a private one, the button is left out). | off (`on` if given alone) |
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
 | `--no-confirm` | Don't stop to ask for approvals you'd give anyway: publishing's "Go ahead?", and the plan before finishing or remaking a game you started. gamegen still says what it's doing, and still stops if anything looks wrong. | off |
 | `--out <folder>` | Where to put the game. | here, or a new folder if this one isn't empty |
@@ -111,6 +112,8 @@ Like your game but want something different? Say what to change, and gamegen kee
 ```
 
 It follows each change through (a new name also updates the logo, the link preview and the README), makes any new art in the game's existing style, and plays the game again to make sure nothing broke.
+
+Players reported bugs as GitHub issues? `/gamegen --fix all` fixes them, each as big a job as it needs.
 
 Want a say before anything's made? Run with `--plan-only`, read `design/GAME_DESIGN.md`, then build it with any changes:
 

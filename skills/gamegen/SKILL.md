@@ -6,7 +6,7 @@ description: >-
   sound effects with imagegen2, nanogen, anim8gen and audiogen, builds it (a
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
-argument-hint: "<your game idea> [--scope small|medium|large] [--3d] | --change <what> | --continue | --publish | help"
+argument-hint: "<your game idea> [--scope small|medium|large] [--3d] | --change <what> | --continue | --fix | --publish | help"
 allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/package.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/browsers.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/browsers.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/watch-progress.sh *), Bash(python3 -m http.server *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/serve.py *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/art-sheet.py *), Bash(playwright-cli *)"
 ---
 
@@ -139,6 +139,7 @@ value) is the game description. Flags and defaults:
 | `--art-sheet` | a page showing all the game's art and audio, once it's ready (`references/art-sheet.md`) | off |
 | `--continue` | pick up an unfinished game (`references/change.md`) | off |
 | `--change` | change a finished game: the words after it say what, or GitHub issues (`#12`) (`references/change.md`) | off |
+| `--fix` | fix a finished game's GitHub issues: `#12 #15`, or `all` open ones, each sized to the issue (`references/change.md`) | off |
 | `--3d` | a 3D game, with models from meshgen | off: 2D |
 | `--publish` | put a finished web game online: optionally the address (`example.com`, a full host, or `github.io`) (`references/publish.md`) | off |
 | `--gallery` | with `--publish`: the GitHub repo of a gallery of their games, or `none` | none |
@@ -195,7 +196,7 @@ such as `hoard-hopper`). Never overwrite someone's files: an existing
 `design/GAME_DESIGN.md`, when `--continue` wasn't given) means a new folder.
 Say which folder you chose in your first update.
 
-**Finding an existing game** (for `--continue`, `--change`, `--publish` and `--bugcheck`): use `--out`
+**Finding an existing game** (for `--continue`, `--change`, `--fix`, `--publish` and `--bugcheck`): use `--out`
 if given. Otherwise the current folder, if it holds a game (a
 `design/STATUS.md`). Otherwise the game folders directly below it: if there's
 one, use it; if there are several, use the one changed most recently and say
@@ -203,8 +204,8 @@ which in your first update (they can pick another with `--out`).
 
 **Continuing and changing.** `--continue` picks up an unfinished game;
 `--change <what>` changes a finished one, keeping everything not mentioned
-(`--continue` with notes on a finished game counts as a change). Follow
-`references/change.md`.
+(`--continue` with notes on a finished game counts as a change); `--fix`
+fixes its GitHub issues. Follow `references/change.md`.
 
 **Publishing.** `--publish` on its own (or with `--gallery`, `--out`) publishes
 the finished game: follow `references/publish.md`, and do nothing else. With a
