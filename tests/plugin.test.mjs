@@ -719,7 +719,7 @@ test('--bugcheck reports what clears the bar, and changes nothing until asked', 
   assert.match(ref, /\*\*Check each finding yourself\*\*/);
   assert.match(ref, /end by asking which to fix/);
   assert.match(ref, /only when the person asks/);
-  assert.match(ref, /Run two at a time\s+at\s+most/);
+  assert.match(ref, /start them as\s+`browsers\.sh` allows/);
   assert.match(ref, /Always stop here, even with `--no-confirm`/);
   assert.match(skill, /`--bugcheck`'s "which should I fix\?"\s+isn't an approval/);
   assert.match(skill, /follow\s+`references\/bugcheck\.md`, and do nothing else/);
@@ -884,6 +884,44 @@ test('the Pages workflow stamps the service worker template', { skip: process.pl
   assert.match(sw, /const FILES = \["index\.html"\];/);
   new vm.Script(sw);  // still valid JavaScript
   assert.match(read(`${REFS}/web-target.md`), /templates\/web\/sw\.js[\s\S]*templates\/web\/pages\.yml/);
+});
+
+test('browsers.sh finds browsers left behind and says whether there is room for another (#28)', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const bin = join(dir, 'bin'); mkdirSync(bin);
+  // Two headless browsers with helpers; the second one's starter has gone (parent 1).
+  writeFileSync(join(bin, 'ps'), `#!/bin/sh
+cat <<'X'
+  100     1  2000 node playwright-cli
+  200   100 500000 /opt/chrome-headless-shell --headless --no-sandbox
+  201   200 300000 /opt/chrome-headless-shell --type=renderer
+  300     1 900000 /root/.cache/ms-playwright/chromium/chrome-headless-shell --headless=new
+  301   300 100000 /opt/chrome-headless-shell --type=gpu-process
+  500     1 400000 /usr/bin/chromium --headless --remote-debugging-port=9222
+X
+`);
+  writeFileSync(join(bin, 'kill'), '#!/bin/sh\necho "$@" >> "$KILL_LOG"\n');
+  chmodSync(join(bin, 'ps'), 0o755); chmodSync(join(bin, 'kill'), 0o755);
+  const script = join(ROOT, 'skills/gamegen/scripts/browsers.sh');
+  const env = { PATH: `${bin}:/usr/bin:/bin`, KILL_LOG: join(dir, 'kill.log'), BROWSERS_KILL: join(bin, 'kill') };
+  const r = spawnSync('bash', [script], { encoding: 'utf8', env });
+  assert.match(r.stdout, /^browser: 200, 781 MB\nbrowser: 300, 976 MB \(left behind\)\nbrowser: 500, 390 MB \(left behind\)\nbrowsers: 3\n/);
+  assert.match(r.stdout, /room for another: (yes|no)/);
+  // Only Playwright's browser left behind is closed, by its own process ID: never another tool's.
+  const c = spawnSync('bash', [script, 'close-left-behind'], { encoding: 'utf8', env });
+  assert.equal(c.stdout, 'closed: 300\n');
+  assert.equal(readFileSync(join(dir, 'kill.log'), 'utf8'), '300\n');
+});
+
+test('watch-progress.sh speaks up when a helper stops moving (#32)', (t) => {
+  const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const script = join(ROOT, 'skills/gamegen/scripts/watch-progress.sh');
+  const env = { ...process.env, WATCH_POLL: '0' };
+  writeFileSync(join(dir, 'p.md'), 'doing: level 3\n');
+  assert.equal(spawnSync('bash', [script, join(dir, 'p.md'), '0'], { encoding: 'utf8', env }).stdout,
+    `stalled: ${join(dir, 'p.md')} unchanged for 0 minutes\n`);
+  assert.match(spawnSync('bash', [script, join(dir, 'none.md'), '0'], { encoding: 'utf8', env }).stdout, /^missing: /);
+  assert.match(skill, /watch-progress\.sh/);
 });
 
 test('the shell scripts run on the bash that comes with macOS (3.2)', () => {

@@ -7,7 +7,7 @@ that option's section below. Show it as written; don't add commentary.
 
 **/gamegen** makes a whole game from your idea: it plans it, has it reviewed,
 makes the art, animation, music and sound, builds it, plays every level, and
-gives you a link to play it.
+tells you how to play it.
 
 ```
 /gamegen <your game idea>
@@ -290,8 +290,7 @@ big or small:
 
 gamegen changes what you asked for and follows it through (a new name also
 updates the logo, the link preview and the README), makes any new art in the
-game's existing style, plays the game again to make sure nothing broke, and
-gives you a fresh link.
+game's existing style, and plays the game again to make sure nothing broke.
 
 **Fix GitHub issues** by naming them, with your own notes if you like:
 

@@ -41,6 +41,14 @@ Stop it with the background task controls when you're done. Never use
 `kill -9`, `pkill` or `killall`: they can take down other things in the
 container.
 
+**Close every browser you open,** on the way out of a failure too:
+`playwright-cli -s=<name> close` for each session. Each one costs 1 to 3 GB,
+and one left running can take the machine down hours later. Open a second
+session alongside a running one only when
+`bash "${CLAUDE_SKILL_DIR}/scripts/browsers.sh"` says `room for another: yes`;
+before you report, run it again: nothing of yours should be left. Use your
+own session names, port and folders, never another helper's.
+
 **The service worker stays off while testing.** The game registers its
 offline service worker only when it isn't on `localhost`/`127.0.0.1`, or when
 the address has `?sw=1` (see web-target.md). Otherwise a cached copy would

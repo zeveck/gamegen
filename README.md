@@ -2,7 +2,7 @@
 
 *Describe your game. Play it.*
 
-You have a game in mind. [gamegen](https://github.com/zeveck/gamegen) is a [Claude Code](https://claude.com/claude-code) plugin that makes it: describe what you play, how it works, and how it should look and feel, and gamegen works out what you're after, plans the game, has a team of review agents poke holes in the design and polish it, makes all the art, animation, music and sound effects, builds it, plays every level to make sure it works, and hands you a link to play it.
+You have a game in mind. [gamegen](https://github.com/zeveck/gamegen) is a [Claude Code](https://claude.com/claude-code) plugin that makes it: describe what you play, how it works, and how it should look and feel, and gamegen works out what you're after, plans the game, has a team of review agents poke holes in the design and polish it, makes all the art, animation, music and sound effects, builds it, and plays every level to make sure it works.
 
 ```
 /gamegen <describe your game>
@@ -47,7 +47,7 @@ Once it's [installed](#install), describe your game:
 
 Then walk away. A game takes a good while to make: planning and review, art and sound, building, and play-testing every level. gamegen first checks that your [API keys](#your-api-keys) work, posts a short update after each step, and tells you the estimated cost before it spends anything. Press Esc to stop it at any time.
 
-When it's done, you get a link to play your game, plus what's in it and what it cost.
+When it's done, it tells you how to play your game, plus what's in it and what it cost.
 
 Think of it as a great first version. gamegen tells you plainly about anything that didn't work out, and you can [change anything you like](#change-your-game) afterwards.
 
@@ -110,7 +110,7 @@ Like your game but want something different? Say what to change, and gamegen kee
 /gamegen --change make the first level easier
 ```
 
-It follows each change through (a new name also updates the logo, the link preview and the README), makes any new art in the game's existing style, plays the game again to make sure nothing broke, and gives you a fresh link.
+It follows each change through (a new name also updates the logo, the link preview and the README), makes any new art in the game's existing style, and plays the game again to make sure nothing broke.
 
 Want a say before anything's made? Run with `--plan-only`, read `design/GAME_DESIGN.md`, then build it with any changes:
 
@@ -166,9 +166,9 @@ Web games save your progress, come with link-preview images for sharing (for the
 
 ### Playing it
 
-When gamegen finishes a web game, it starts it and gives you a link like `http://localhost:8000`. Just click it. (For a game made in an engine, it tells you how to open it there instead.)
+When gamegen finishes a web game, say "start it" and it gives you a link like `http://localhost:8000` to click. (For a game made in an engine, it tells you how to open it there instead.)
 
-To play again another time, start it yourself. Browsers won't run a game you open by double-clicking the file, so it needs a tiny local web server:
+Or start it yourself, any time. Browsers won't run a game you open by double-clicking the file, so it needs a tiny local web server:
 
 ```
 cd your-game/game
@@ -249,7 +249,7 @@ gamegen does the planning, building and testing itself, and uses companion plugi
 7. **Play-test.** It plays the game in a real browser at desktop and phone sizes: every screen and every level, start to finish, checking for errors, sound, saving and offline play. It opens everything every button opens, reads the words on every screen, and films the game loading to catch anything that flickers.
 8. **Final review.** A **playtester** and a **bug hunter** go over the finished game, and gamegen fixes what they find.
 9. **Polish pass.** A fresh reviewer who didn't build the game goes over every screen at every size with a checklist of what players notice first: stray code showing as text, a word left alone on a line, text that's cut off, messages covering the action, a title that flickers as it loads. gamegen fixes all of it.
-10. **Wrap up.** It makes the link-preview images (one for the game, one for its GitHub page), writes your game's README, starts the game and gives you the link.
+10. **Wrap up.** It makes the link-preview images (one for the game, one for its GitHub page), writes your game's README, and tells you how to play it.
 
 ## Costs
 

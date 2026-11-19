@@ -34,8 +34,8 @@ starting one; if the game isn't finished yet, suggest `--continue`. Then:
 4. Build it, play-test what changed (with the text scanner on every screen
    it touched, at every size), and replay every level's solution to make
    sure nothing else broke.
-5. Wrap up as usual: update the README and screenshots, start the game, and
-   report with a fresh link and what changed. If the game is published, end
+5. Wrap up as usual: update the README and screenshots, and report what
+   changed and how to play it. If the game is published, end
    with "Run `/gamegen --publish` to put this version online." Never publish
    without being asked.
 

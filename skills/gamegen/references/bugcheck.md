@@ -31,8 +31,8 @@ counts here most of all: only what clears it is reported as worth fixing.
    say the game has a controller or "Report a bug". They take fresh
    screenshots into `design/bugcheck/` (not `design/screenshots/`, which
    may be out of date), and ideas for making it more fun go under "Also
-   noticed", not as bugs. Run two at a time at most; each one runs a
-   browser.
+   noticed", not as bugs. Each runs a browser: start them as
+   `browsers.sh` allows ("Running helpers" in SKILL.md).
 4. **Check each finding yourself** before reporting it: reproduce it (or
    confirm it in the code), merge duplicates, and drop anything that doesn't
    reproduce or doesn't clear the bar. The reviewers don't see what's

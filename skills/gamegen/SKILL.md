@@ -7,7 +7,7 @@ description: >-
   web game for desktop and phones unless asked otherwise), play-tests every
   part of it, and reports when it's ready to play.
 argument-hint: "<your game idea> [--scope small|medium|large] [--3d] | --change <what> | --continue | --publish | help"
-allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/package.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(python3 -m http.server *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/serve.py *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/art-sheet.py *), Bash(playwright-cli *)"
+allowed-tools: "Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/check-setup.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/prepare-env.sh --3d), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/publish.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/package.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/first-load.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/browsers.sh), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/browsers.sh *), Bash(bash ${CLAUDE_SKILL_DIR}/scripts/watch-progress.sh *), Bash(python3 -m http.server *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/serve.py *), Bash(python3 ${CLAUDE_SKILL_DIR}/scripts/art-sheet.py *), Bash(playwright-cli *)"
 ---
 
 # /gamegen — make a game from a description
@@ -85,6 +85,30 @@ looking at the work at once. Check that your tool list includes `Agent` (or
 > Please type `/gamegen ...` directly in the main chat. It brings in its own
 > team of helpers to review the design, so it can't be started from inside
 > another task.
+
+**Running helpers.** A helper that plays the game runs a browser (1 to 3 GB),
+and a helper that stalls sends no word. So, for every helper:
+
+- Start one that drives a browser only when
+  `bash "${CLAUDE_SKILL_DIR}/scripts/browsers.sh"` says `room for another:
+  yes` (one is always fine); otherwise wait for one to finish.
+- If its work takes more than a few minutes, run it in the background, and
+  ask it to keep `<game folder>/.gamegen/progress/<name>.md` up to date
+  (done, doing, next) at least every 10 minutes, even if only "still
+  waiting on X"; to wait on long jobs in the foreground in chunks of 10
+  minutes at most; and never to end its turn waiting on a background job.
+- Watch it: start `bash "${CLAUDE_SKILL_DIR}/scripts/watch-progress.sh"
+  <game folder>/.gamegen/progress/<name>.md 30` in the background. If it
+  says stalled, read the progress file and message the helper ("quiet for 30
+  minutes: update your progress file and carry on, or say what's stuck"),
+  and start the watch again. If it's still stalled, stop it and give that
+  step to a fresh helper, with the progress file. Stop the watch when the
+  helper reports, and ignore a late "stalled" from one that already has.
+- When the person asks how it's going, say what moved since the last check
+  and how long each helper has been quiet ("21 of 37 replays; the art helper
+  quiet for 40 minutes"), with times as "N minutes ago".
+- When it finishes, run `browsers.sh`: if anything is marked `left behind`,
+  `browsers.sh close-left-behind` closes it.
 
 ### 2. Read the request
 
@@ -491,8 +515,10 @@ fixed spot.
    the game gets its own repo when published. If it isn't in a repository,
    put it at the game folder's root, which becomes the repository's root
    when they push it.
-4. **Start the game for them** (web games). Serve the game folder and leave it
-   running, so the report ends with a link they can click:
+4. **Leave no server running** unless the person asked for one (web games):
+   a server left in the background uses memory, and its link dies with the
+   session. Stop the play-test's server. If they ask to play it now ("start
+   it"), serve it then:
    - Pick a free port: try 8000, then 8001 and up, checking each with
      `python3 -c "import socket; socket.socket().bind(('127.0.0.1', PORT))"`.
      If an earlier run in this session already serves this game, reuse it.
@@ -500,21 +526,20 @@ fixed spot.
      with the Bash tool's `run_in_background` option (not `&` or `nohup`),
      so it keeps running after you finish.
    - Fetch the address once (`curl -s -o /dev/null -w '%{http_code}'`) to make
-     sure it loads.
+     sure it loads, and give them `http://localhost:<port>`. If you're in a
+     dev container: VS Code forwards it to their computer (if the link
+     doesn't open, the Ports tab shows where it went); with `dc`, they first
+     run `dc forward <port>` in the project folder on their computer (and
+     `dc forward <port> --network` to try it on a phone on the same Wi-Fi).
 5. **Tick off `design/STATUS.md`.**
 6. **Report to the person,** briefly and in plain language (no talk of
    phases, agents, service workers or other machinery):
    - The game's name, one line about it, and the folder it's in.
-   - **For web games, the link to play it now,** first and on its own line:
-     `http://localhost:<port>`. If you're in a dev container: VS Code forwards
-     it to their computer (if the link doesn't open, the Ports tab shows where
-     it went); with `dc`, they first run `dc forward <port>` in the project
-     folder on their computer (and `dc forward <port> --network` to try it on
-     a phone on the same Wi-Fi). It keeps running while Claude Code is open.
-   - How to start it again another time: the two commands to serve the game
-     folder (`cd <game folder>/game`, then `python3 -m http.server 8000`),
-     with a word on why (browsers won't run a game opened by double-clicking
-     the file).
+   - **For web games, how to play it,** first: "Say *start it* and I'll give
+     you a link to play it now", and the two commands to serve the game
+     folder themselves (`cd <game folder>/game`, then `python3 -m http.server
+     8000`, and open `http://localhost:8000`), with a word on why (browsers
+     won't run a game opened by double-clicking the file).
    - **For other targets,** instead: how to open and run the project in its
      engine, and clearly what couldn't be play-tested here.
    - What's in it (levels, characters, music) and the controls.
