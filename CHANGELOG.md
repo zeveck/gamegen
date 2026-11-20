@@ -4,6 +4,26 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.20
+
+- **`--repo`: put a game on GitHub before it's finished,** so its plan and
+  work are safe and reachable from another computer. `public` or `private`
+  (or `GAMEGEN_REPO` in your `.env`; otherwise gamegen asks). No website
+  yet: `--publish` does that later, in the same repo. Running it again sends
+  up later work. A game inside a bigger repo becomes its own repo first,
+  never pushing the bigger one.
+- **Every repo gamegen makes keeps line endings the same on every
+  computer** (a `.gitattributes`), so a Windows clone doesn't break the
+  game's tools. Your `.env` is never included.
+- **With a plans page, the design page and art sheet live there too,**
+  instead of on claude.ai, and point at the game's own pictures and sound
+  rather than copying them (House Cricket's art sheet: 1 MB instead of 63).
+  A private, unpublished game gets small picture copies and links to its
+  sounds that open for people with access. `--share-design doc` is still a
+  Claude Doc, for comments.
+- Plan cards link the plan, the design page, the art sheet and the game,
+  whichever it has.
+
 ## v2026.11.19.6
 
 - **`/gamegen --plans`** puts a game you've already made (or planned) on your

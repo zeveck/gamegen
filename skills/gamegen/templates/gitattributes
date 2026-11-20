@@ -1,0 +1,4 @@
+# Line endings stay as they are in the repo (LF) on every computer, so the
+# game's shell tools still run after a Windows clone. Pictures and sound are
+# found to be binary and left alone.
+* text=auto eol=lf

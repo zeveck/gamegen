@@ -147,6 +147,7 @@ value) is the game description. Flags and defaults:
 | `--making-of` | the README also tells how the game was made; publishing includes `design/` | off |
 | `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game (`references/package.md`) | off (`steam` alone) |
 | `--bugcheck` | check a finished game for bugs worth fixing; report first, change nothing (`references/bugcheck.md`) | off |
+| `--repo` | `public` or `private`: put a game on GitHub now, before it's finished, with no website yet (`references/repo.md`) | off |
 | `--plans` | on its own: put this game's plan on the plans page that `GAMEGEN_PLANS` keeps; `none`: leave it off (`references/plans.md`) | on when `GAMEGEN_PLANS` is set |
 | `--report-issue` | file an issue about gamegen itself: the words after it say what happened (`references/report-issue.md`) | off |
 | `--finish` | a folder or repo of a game they started: finish it, in a copy (`references/finish-or-remake.md`) | off |
@@ -157,8 +158,8 @@ value) is the game description. Flags and defaults:
 | `--out` | folder for the game | see below |
 | `--advanced` | with `--help`: list the options the short help leaves out (`references/help.md`) | off |
 
-`--publish`, `--gallery`, `--plans` and `--making-of` can also be set as defaults in the
-nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_PLANS=example.com/plans`, `GAMEGEN_MAKING_OF=on`);
+`--publish`, `--gallery`, `--plans`, `--repo` and `--making-of` can also be set as defaults in the
+nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_PLANS=example.com/plans`, `GAMEGEN_REPO=public`, `GAMEGEN_MAKING_OF=on`);
 read them with `bash "${CLAUDE_SKILL_DIR}/scripts/publish.sh" settings`, never
 by opening `.env` (it holds the keys). Flags win over these.
 
@@ -199,7 +200,7 @@ such as `hoard-hopper`). Never overwrite someone's files: an existing
 `design/GAME_DESIGN.md`, when `--continue` wasn't given) means a new folder.
 Say which folder you chose in your first update.
 
-**Finding an existing game** (for `--continue`, `--change`, `--fix`, `--publish`, `--plans`, `--bugcheck` and `--report-issue`): use `--out`
+**Finding an existing game** (for `--continue`, `--change`, `--fix`, `--publish`, `--plans`, `--repo`, `--bugcheck` and `--report-issue`): use `--out`
 if given. Otherwise the current folder, if it holds a game (a
 `design/STATUS.md`). Otherwise the game folders directly below it: if there's
 one, use it; if there are several, use the one changed most recently and say
@@ -250,6 +251,9 @@ has (finished, or planned with `--plan-only`) on the plans page: follow
 `references/plans.md`, and do nothing else (no setup check: nothing is
 generated). A game with no `design/GAME_DESIGN.md` gets "there's no plan
 for this game".
+
+**A repo early.** `--repo` on its own (or with `public`/`private`) puts the
+game on GitHub as it is: follow `references/repo.md`, and do nothing else.
 
 **Reporting a problem with gamegen.** `--report-issue <what happened>`
 files an issue about gamegen itself: everything after the flag is the
@@ -454,8 +458,10 @@ Record a solution for each level as you build it (see
 If the game folder is in a git repository, commit after each milestone with a
 plain description of what now works. Before the first commit, make sure
 `.gitignore` keeps out `.env`, `.gamegen/`, `.anim8gen/`, `assets/anim8gen/`,
-`.playwright/` and the generators' history files (`.*-history.jsonl`). Stage
-only the game's own files, never someone else's changes. Never push.
+`.playwright/` and the generators' history files (`.*-history.jsonl`), and
+that `.gitattributes` (from `${CLAUDE_SKILL_DIR}/templates/gitattributes`)
+keeps line endings the same on every computer. Stage only the game's own
+files, never someone else's changes. Never push.
 
 ## Phase 6 — Play-test
 

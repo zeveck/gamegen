@@ -17,7 +17,9 @@ means a page. Use what this session has, and follow that tool's own
 instructions (load its skill, or read its guide, first):
 
 1. **An artifact page** (`page`, the default): a published page on
-   claude.ai, laid out like a site, with the mock pictures in it.
+   claude.ai, laid out like a site, with the mock pictures in it. With the
+   plans page on for the game (`GAMEGEN_PLANS`), the same page goes there
+   instead ("Design and art pages" in plans.md).
 2. **A Claude Doc** (`doc`), if the session has the Claude Docs tools: a
    document on claude.ai that people can comment on part by part (and edit,
    if the person lets them).

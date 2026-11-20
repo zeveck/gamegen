@@ -25,11 +25,23 @@ Manifest:
     sheets), "audio" (items: file, name, caption), "colors" (items: color,
     name). In cards, gallery and wide, an item can give "frames": [files]
     and "ms" (per frame) instead of "file", to show an animation.
-  ]
+  ],
+  "links": {                                                 (optional)
+    "base": "https://bloomhop.example.com/", "strip": "game/",
+    "pictures": "link", "audio": "players"
+  }
 }
+
+With "links", files are linked where the game already serves them instead
+of copied: a file's address is base + its path without "strip" (files
+elsewhere are copied). "pictures": "link" or "copy" (web-sized copies, for
+a game nobody can reach yet); "audio": "players" (on the page) or "links"
+(a link to each sound, for a private repo: only people with access can
+open them). Animations made from frames are always built here.
 """
 import html
 import json
+import urllib.parse
 import os
 import re
 import shutil
@@ -76,6 +88,21 @@ def main():
         os.makedirs(os.path.join(out, sub))
 
     missing, unreadable, used = [], [], set()
+    links = m.get("links") or {}
+    base = str(links.get("base", "")).rstrip("/")
+    strip = str(links.get("strip", "")).replace("\\", "/").strip("/")
+    strip = strip + "/" if strip else ""
+    if base and not base.startswith("https://"):
+        fail(f"links.base must be an https:// address, not {base}")
+
+    def linked(src):
+        """The address a file is served at, or None to copy it."""
+        if not base or os.path.isabs(src):
+            return None
+        rel = os.path.relpath(src).replace(os.sep, "/")
+        if rel.startswith("../") or not rel.startswith(strip):
+            return None
+        return base + "/" + urllib.parse.quote(rel[len(strip):])
 
     def name_for(src, ext):
         base = re.sub(r"[^a-z0-9_-]+", "-", os.path.splitext(os.path.basename(src))[0].lower()).strip("-") or "file"
@@ -89,6 +116,9 @@ def main():
         if not src or not os.path.isfile(src):
             missing.append(src or "(an item with no file)")
             return None, 0, 0
+        url = linked(src) if links.get("pictures") == "link" else None
+        if url and src.lower().endswith(".svg"):
+            return url, size, size
         if src.lower().endswith(".svg"):  # copied as it is
             dest = name_for(src, ".svg")
             shutil.copyfile(src, os.path.join(out, "img", dest))
@@ -98,6 +128,10 @@ def main():
         except Exception:
             unreadable.append(src)
             return None, 0, 0
+        if url:  # shown at the same size a copy would be
+            w, h = im.size
+            k = min(1, size / max(w, h))
+            return url, round(w * k), round(h * k)
         if getattr(im, "is_animated", False):  # keep animations as they are
             dest = name_for(src, os.path.splitext(src)[1].lower())
             shutil.copyfile(src, os.path.join(out, "img", dest))
@@ -148,7 +182,7 @@ def main():
     if hero:
         src, w, h = picture(hero.get("file", ""), SIZES["hero"])
         if src:
-            body.append(f'<header class="hero"><img src="{src}" alt="{e(hero.get("alt", ""))}" width="{w}" height="{h}">')
+            body.append(f'<header class="hero"><img src="{e(src)}" alt="{e(hero.get("alt", ""))}" width="{w}" height="{h}">')
         else:
             body.append('<header class="hero">')
     else:
@@ -171,15 +205,26 @@ def main():
                     continue  # only real colours, never CSS
                 parts.append(f'<figure><div style="background:{hexv}"></div><figcaption><b>{e(it.get("name", ""))}</b><span>{hexv}</span></figcaption></figure>')
         elif kind == "audio":
+            note = len(parts)
             parts.append('<div class="tracks">')
             for it in s.get("items", []):
                 f = it.get("file", "")
                 if not os.path.isfile(f):
                     missing.append(f)
                     continue
-                dest = name_for(f, os.path.splitext(f)[1].lower())
-                shutil.copyfile(f, os.path.join(out, "audio", dest))
-                parts.append(f'<div class="track"><b>{e(it.get("name", ""))}</b><span>{e(it.get("caption", ""))}</span><audio controls preload="none" aria-label="{e(it.get("name", ""))}" src="audio/{dest}"></audio></div>')
+                url = linked(f) if links.get("audio") in ("players", "links") else None
+                if not url:
+                    dest = name_for(f, os.path.splitext(f)[1].lower())
+                    shutil.copyfile(f, os.path.join(out, "audio", dest))
+                    url = f"audio/{dest}"
+                head = f'<div class="track"><b>{e(it.get("name", ""))}</b><span>{e(it.get("caption", ""))}</span>'
+                if links.get("audio") == "links" and not url.startswith("audio/"):
+                    if note is not None:
+                        parts.insert(note, '<p class="lede">These open for people with access to the game\'s repo.</p>')
+                        note = None
+                    parts.append(head + f'<a href="{e(url)}" target="_blank" rel="noopener">Listen ↗</a></div>')
+                else:
+                    parts.append(head + f'<audio controls preload="none" aria-label="{e(it.get("name", ""))}" src="{e(url)}"></audio></div>')
         else:
             size = SIZES.get(kind, SIZES["gallery"])
             parts.append(f'<div class="grid {kind}">')
@@ -193,7 +238,7 @@ def main():
                 cap = f'<b>{e(it.get("name", ""))}</b>' + (f'<span>{e(it["caption"])}</span>' if it.get("caption") else "")
                 mark = ' class="mark"' if it.get("mark") else ""
                 alt = it.get("alt") or it.get("name", "")
-                parts.append(f'<figure{mark}><img src="{src}" alt="{e(alt)}" width="{w}" height="{h}" loading="lazy"><figcaption>{cap}</figcaption></figure>')
+                parts.append(f'<figure{mark}><img src="{e(src)}" alt="{e(alt)}" width="{w}" height="{h}" loading="lazy"><figcaption>{cap}</figcaption></figure>')
         parts.append("</div></section>")
         sections.append("".join(parts))
 

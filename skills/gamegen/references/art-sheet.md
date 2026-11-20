@@ -40,7 +40,9 @@ the manifest's format.
 
 ## Publishing it
 
-On claude.ai, with the session's artifact tools: read the tool's own guide
+With the plans page on for the game (`GAMEGEN_PLANS`), it goes there
+instead, linking to the game's own files: "Design and art pages" in
+plans.md. Otherwise, on claude.ai, with the session's artifact tools: read the tool's own guide
 first, and publish the folder's files (index.html, `img/`, `audio/`,
 `fonts/`) as a new artifact titled "<Game>: The Art". If the script lists
 batches (in `batches.json`), send them in that order to the same artifact, each with the

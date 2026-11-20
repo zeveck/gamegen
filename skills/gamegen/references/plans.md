@@ -56,8 +56,8 @@ with access.
 
 ## What goes up
 
-**A game whose public repo already has its `design/` folder** (published
-with `--making-of`) shows its plan there: its card links to that folder
+**A game whose public repo already has its `design/` folder** (made with
+`--repo public`, or published with `--making-of`) shows its plan there: its card links to that folder
 (`https://github.com/<owner>/<repo>/tree/main/design`, or where the game
 folder is), and nothing is copied. Its `STATUS.md` is already public there;
 that's the only exception to the rule below.
@@ -69,8 +69,8 @@ that's the only exception to the rule below.
   effort instead; no paths, keys or `.env` values; the person's words
   kept), and the mock pictures, if any (`--share-design`'s).
 - A short `README.md`: the name, one line, the mock picture, the status, the
-  links (the shared design on claude.ai, which opens only for people it's
-  shared with; the art sheet, likewise; the game, once published), and how
+  links (the design and art pages below, or their claude.ai links if
+  that's where they are; the game, once published), and how
   to build it: "Run `/gamegen --continue <this page's address>`."
 
 Never copy `design/STATUS.md` (it holds costs and settings), `.env`, prices, or
@@ -80,12 +80,40 @@ publishing (`publish.sh credit`).
 `<plans folder>/index.html` is the page of cards, from
 `${CLAUDE_SKILL_DIR}/templates/plans.html` the first time ("<their name>'s
 game plans", the credit as for a new gallery; `GALLERY_URL` the gallery's
-address). Each card: the mock picture
-(or the game's social card, once there is one), name, one line, status, and
-a link to the plan (the game repo's `design/` folder, or
-`https://github.com/<gallery repo>/tree/main/<plans folder>/<game-slug>`; GitHub shows the README and lets anyone download the files, however the
-gallery site is built). Newest first; a game already there gets its card
+address). Each card: the mock picture (or the game's social card, once
+there is one), name, one line, status, and its links: **Plan** (the game
+repo's `design/` folder, or
+`https://github.com/<gallery repo>/tree/main/<plans folder>/<game-slug>`;
+GitHub shows the README and lets anyone download the files, however the
+gallery site is built), **Design** and **Art** when it has those pages
+(below, or their claude.ai links if they're shared there), and **Play**
+once it's published. Check each link whenever the card is updated (a
+`--publish` without `--making-of` takes `design/` out of the game's repo:
+then the plan is copied as above). Newest first; a game already there gets its card
 updated, not a second one. Never change the gallery's own page.
+
+## Design and art pages
+
+With the plans page on for a game, `--share-design page` and `--art-sheet`
+make their pages here instead of on claude.ai, in
+`<plans folder>/<game-slug>/design/` and `.../art/`, and its card links
+them. (`--share-design doc` is still a Claude Doc: that's where people
+comment.) Their pictures and sound link to the game's own files wherever
+someone can reach them, so nothing big is copied:
+
+| The game | Pictures and sound come from |
+|---|---|
+| Published (its site is public, even from a private repo) | Its site: base `https://<its address>/`, without the game folder's path |
+| A public repo, not yet published | `https://raw.githubusercontent.com/<owner>/<repo>/main/` |
+| A private repo, not yet published | Pictures: small copies here. Sound: links to `https://github.com/<owner>/<repo>/raw/main/…`, which open for people with access |
+
+For the art sheet, give art-sheet.md's manifest a `links` entry saying so
+(`"pictures": "copy"` and `"audio": "links"` for a private repo), build it
+as usual, and copy its folder here. The design page's mock pictures are its
+web-sized copies, not the full-size originals in `design/mockups/`: linked
+from the repo when it's public, otherwise copied. When a game
+is published later, rebuild its pages to use its site and remove the
+copies.
 
 If the gallery is a Jekyll site (it has a `_config.yml`), add
 `<plans folder>/*/` to its `exclude:` list once, so the plan files are left

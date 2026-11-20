@@ -186,7 +186,9 @@ correction: adjust, show the line again, and ask again.
 ## 3. Get the repository ready
 
 1. **What goes in:** the game (`game/`), `README.md`, `media/`, `LICENSE` if
-   there is one, `.gitignore`, `.github/workflows/pages.yml`, and
+   there is one, `.gitignore`, `.gitattributes` (add it from
+   `${CLAUDE_SKILL_DIR}/templates/gitattributes` if it's missing),
+   `.github/workflows/pages.yml`, and
    `.github/ISSUE_TEMPLATE/bug.yml` for a game with "Report a bug" (public
    repo). With
    `--making-of` (or `GAMEGEN_MAKING_OF=on`), also `design/`, and the README

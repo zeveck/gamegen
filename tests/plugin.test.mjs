@@ -867,6 +867,25 @@ test('art-sheet.py builds the page from a manifest, and lists missing files', { 
   assert.notEqual(wrong.status, 0);
   assert.match(wrong.stderr, /must be in a \.gamegen folder/);
   assert.ok(existsSync(join(dir, 'game/audio/keep.mp3')), "the game's files are untouched");
+  // Linked: the game's own files are pointed at, not copied (animations from frames are still built).
+  py("from PIL import Image\nimport os\nImage.new('RGBA',(800,400),'red').save('game/hero one.png')\nos.makedirs('design',exist_ok=True); os.makedirs('gameplay',exist_ok=True)\nImage.new('RGB',(64,64),'blue').save('design/mock.png')\nImage.new('RGB',(64,64),'blue').save('gameplay/shot.png')");
+  const linked = (audio) => {
+    writeFileSync(join(dir, '.gamegen/art-sheet/manifest.json'), JSON.stringify({ links: { base: 'https://g.example/', strip: 'game', pictures: 'link', audio },
+      sections: [{ title: 'Cast', kind: 'cards', items: [{ file: 'game/hero one.png', name: 'Hero' }, { frames: ['f0.png', 'f1.png'], name: 'Blink' },
+        { file: 'design/mock.png', name: 'Mock' }, { file: 'gameplay/shot.png', name: 'Shot' }] },
+        { title: 'Music', kind: 'audio', items: [{ file: 'game/audio/keep.mp3', name: 'Theme' }] }] }));
+    const l = spawnSync('python3', [script, '.gamegen/art-sheet/manifest.json'], { cwd: dir, encoding: 'utf8' });
+    assert.equal(l.status, 0, l.stderr);
+    return readFileSync(join(dir, '.gamegen/art-sheet/index.html'), 'utf8');
+  };
+  const pub = linked('players');
+  assert.match(pub, /<img src="https:\/\/g\.example\/hero%20one\.png" alt="Hero" width="512" height="256"/);
+  assert.match(pub, /img\/f0[-0-9]*\.gif/);
+  assert.match(pub, /src="img\/mock[-0-9]*\.jpg"/, 'a file outside the game folder is copied');
+  assert.match(pub, /src="img\/shot[-0-9]*\.jpg"/, "'game' never matches 'gameplay'");
+  assert.match(pub, /<audio [^>]*src="https:\/\/g\.example\/audio\/keep\.mp3">/);
+  assert.equal(readdirSync(join(dir, '.gamegen/art-sheet/audio')).length, 0, 'no sound copied');
+  assert.match(linked('links'), /<a href="https:\/\/g\.example\/audio\/keep\.mp3"[^>]*>Listen ↗<\/a>/, 'a private repo gets links, not players');
 });
 
 test('the Pages workflow stamps the service worker template', { skip: process.platform === 'darwin' && 'the workflow uses GNU sed' }, (t) => {
@@ -950,7 +969,7 @@ test('the plans page: asks first, never STATUS.md, cards from the template (#47)
   assert.match(ref, /## Asking first/);
   assert.match(ref, /Never copy `design\/STATUS\.md`/);
   const page = read('skills/gamegen/templates/plans.html');
-  for (const p of ['PLANS_TITLE', 'GALLERY_URL', 'PLAN_URL', 'PLAN_IMAGE', 'PLAN_STATUS', 'GAME_TITLE', 'GAME_DESCRIPTION']) assert.ok(page.includes(p), p);
+  for (const p of ['PLANS_TITLE', 'GALLERY_URL', 'DESIGN_URL', 'ART_URL', 'GAME_URL', 'PLAN_URL', 'PLAN_IMAGE', 'PLAN_STATUS', 'GAME_TITLE', 'GAME_DESCRIPTION']) assert.ok(page.includes(p), p);
   // publish.sh settings reports it.
   const dir = scratch(); t.after(() => rmSync(dir, { recursive: true, force: true }));
   writeFileSync(join(dir, '.env'), 'GAMEGEN_PLANS=example.com/plans\n');
@@ -958,6 +977,16 @@ test('the plans page: asks first, never STATUS.md, cards from the template (#47)
   assert.match(ref, /the gallery page never links to it/);
   assert.match(ref, /never writes one/);
   assert.match(ref, /is the gallery's own address, or no\s+gallery is set, say so/);
+});
+
+test('--repo makes the repo early; .gitattributes and never .env', () => {
+  const ref = read(`${REFS}/repo.md`);
+  assert.match(skill, /follow `references\/repo\.md`, and do nothing else/);
+  assert.match(ref, /always `\.env`/);
+  assert.match(read('skills/gamegen/templates/gitattributes'), /^\* text=auto eol=lf$/m);
+  assert.match(skill, /templates\/gitattributes/);
+  assert.match(read(`${REFS}/publish.md`), /`\.gitattributes` \(add it from/);
+  assert.match(read(`${REFS}/plans.md`), /## Design and art pages/);
 });
 
 test('browsers.sh finds browsers left behind and says whether there is room for another (#28)', (t) => {
@@ -1131,7 +1160,7 @@ test('publish: settings come from the environment or the .env, and never the key
   writeFileSync(join(dir, '.env'), 'OPENAI_API_KEY=sk-SECRET\nGAMEGEN_DOMAIN="example.com"  # mine\n# GAMEGEN_GALLERY=me/old-games\n');
   const deep = join(dir, 'frog'); mkdirSync(deep);
   const r = publish(deep, ['settings'], { env: { GAMEGEN_MAKING_OF: 'on' } });
-  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_PLANS: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\nGAMEGEN_DNS: not set\n');
+  assert.equal(r.stdout, 'GAMEGEN_DOMAIN: example.com\nGAMEGEN_GALLERY: not set\nGAMEGEN_PLANS: not set\nGAMEGEN_REPO: not set\nGAMEGEN_MAKING_OF: on\nGAMEGEN_CREDIT: not set\nGAMEGEN_DNS: not set\n');
   // A .env saved with Windows line endings reads the same.
   writeFileSync(join(dir, '.env'), 'GAMEGEN_DOMAIN=example.com\r\nGAMEGEN_DNS=godaddy\r\n');
   const crlf = publish(deep, ['settings'], {});
