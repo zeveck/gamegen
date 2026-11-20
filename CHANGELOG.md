@@ -4,6 +4,18 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.20.2
+
+- **`--repo` for a game you're only planning:** `/gamegen --repo private
+  <your idea> --plan-only` makes the game's repo at the end of the design,
+  and `--repo you/<name>` names it (an existing repo only if it's empty).
+  Repos `--publish` makes follow `GAMEGEN_REPO` too.
+- **Every plan card links its plan in the game's own repo,** public or
+  private (a private one opens for people with access), so planned and
+  published games link the same way. Publishing keeps a `--repo` game's
+  plan in its repo.
+- **The art sheet shows its key art whole,** never cropped.
+
 ## v2026.11.20
 
 - **`--repo`: put a game on GitHub before it's finished,** so its plan and

@@ -147,7 +147,7 @@ value) is the game description. Flags and defaults:
 | `--making-of` | the README also tells how the game was made; publishing includes `design/` | off |
 | `--package` | `steam`, `windows` or `linux`: desktop apps of a finished web game (`references/package.md`) | off (`steam` alone) |
 | `--bugcheck` | check a finished game for bugs worth fixing; report first, change nothing (`references/bugcheck.md`) | off |
-| `--repo` | `public` or `private`: put a game on GitHub now, before it's finished, with no website yet (`references/repo.md`) | off |
+| `--repo` | `public`, `private` or a repo name (`<name>`, `<owner>/<name>`): put a game on GitHub now, before it's finished, with no website yet; with a game idea, at the end of the design (`references/repo.md`) | off |
 | `--plans` | on its own: put this game's plan on the plans page that `GAMEGEN_PLANS` keeps; `none`: leave it off (`references/plans.md`) | on when `GAMEGEN_PLANS` is set |
 | `--report-issue` | file an issue about gamegen itself: the words after it say what happened (`references/report-issue.md`) | off |
 | `--finish` | a folder or repo of a game they started: finish it, in a copy (`references/finish-or-remake.md`) | off |
@@ -252,8 +252,10 @@ has (finished, or planned with `--plan-only`) on the plans page: follow
 generated). A game with no `design/GAME_DESIGN.md` gets "there's no plan
 for this game".
 
-**A repo early.** `--repo` on its own (or with `public`/`private`) puts the
-game on GitHub as it is: follow `references/repo.md`, and do nothing else.
+**A repo early.** `--repo` on its own (or with `public`/`private` or a
+name) puts the game on GitHub as it is: follow `references/repo.md`, and do
+nothing else. With a game idea (or `--plan-only`), make the game as usual
+and follow it at the end of the design, before any build.
 
 **Reporting a problem with gamegen.** `--report-issue <what happened>`
 files an issue about gamegen itself: everything after the flag is the

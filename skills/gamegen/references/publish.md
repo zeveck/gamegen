@@ -106,7 +106,9 @@ stop publishing before anything else:
    <account>/<name>`: if it's taken, use the free name it suggests and say
    what's already there. If it says it couldn't check, try again; never
    guess. Never reuse an existing repo unless the person says so, and then
-   ask once more, because pushing replaces what's there.
+   ask once more, because pushing replaces what's there. A new repo is
+   public, or private when `GAMEGEN_REPO` says `private`: say which in the
+   confirmation.
 6. **Inside a bigger repository?** If the game folder is part of a bigger git
    repository (not its root), it's published as its own repo: the game folder
    becomes its own repository, and the bigger one's `.gitignore` gets the
@@ -194,7 +196,9 @@ correction: adjust, show the line again, and ask again.
    `--making-of` (or `GAMEGEN_MAKING_OF=on`), also `design/`, and the README
    has its "How it was made" section. Without it, the README says nothing
    about how it was made, and `.gitignore` keeps `design/` out (if `design/`
-   was published before, also `git rm -r --cached design`). The replay tools
+   was published before, also `git rm -r --cached design`). A repo made
+   with `--repo` (`design/STATUS.md` says "Repo: …") keeps `design/` either
+   way: it's there already, and in its history anyway. The replay tools
    (`tools/`) go in only with the solutions below, so without `--making-of`
    they stay out too.
    **Recorded solutions go with the tools that replay them.** When
@@ -217,7 +221,8 @@ correction: adjust, show the line again, and ask again.
    settings, and only shows it for a public repo, so decide now whether to
    ask them, and record it in `design/STATUS.md` before the commit:
    - **A private repo:** don't ask, and remove any such line.
-   - **A repo step 4.1 will create** (it's public, with no picture yet), or
+   - **A repo step 4.1 will create** (public, with no picture yet; a
+     private one is as above), or
      an existing public one where `publish.sh preview <repo>` says `none`:
      write "GitHub preview image: to upload (none set)". Once it says
      `set`, remove it.
@@ -264,8 +269,10 @@ correction: adjust, show the line again, and ask again.
 
 ## 4. Publish
 
-1. Unless the repo already exists (step 1.2):
-   `gh repo create <account>/<repo> --public --description "<tagline>"`
+1. Unless the repo already exists (step 1.2, or made earlier with
+   `--repo`): `gh repo create <account>/<repo> --public --description "<tagline>"`
+   (`--private` when step 1.5 chose private; if the plan can't then serve
+   Pages, step 4.3 asks)
    (no `--push` yet: Pages must be on before the first push, or the first
    deploy fails). Add it as `origin` (or as `github`, when step 1.2 left
    another `origin` alone).

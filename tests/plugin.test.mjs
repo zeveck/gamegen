@@ -981,7 +981,9 @@ test('the plans page: asks first, never STATUS.md, cards from the template (#47)
 
 test('--repo makes the repo early; .gitattributes and never .env', () => {
   const ref = read(`${REFS}/repo.md`);
-  assert.match(skill, /follow `references\/repo\.md`, and do nothing else/);
+  assert.match(skill, /follow `references\/repo\.md`, and do\s+nothing else/);
+  assert.match(read(`${REFS}/plans.md`), /public or private, shows its\s+plan there/);
+  assert.doesNotMatch(read("skills/gamegen/scripts/art-sheet.py"), /object-fit:cover/, "the key art is never cropped");
   assert.match(ref, /always `\.env`/);
   assert.match(read('skills/gamegen/templates/gitattributes'), /^\* text=auto eol=lf$/m);
   assert.match(skill, /templates\/gitattributes/);

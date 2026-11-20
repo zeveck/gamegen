@@ -253,7 +253,7 @@ def main():
     css = f"""{font_css}
 *{{box-sizing:border-box}}body{{margin:0;background:{bg};color:{fg};font:16px/1.5 {family}}}
 img{{max-width:100%;height:auto;display:block}}a{{color:{accent}}}
-.hero{{position:relative}}.hero img{{width:100%;max-height:70vh;object-fit:cover}}
+.hero{{position:relative}}.hero img{{width:100%;height:auto}}
 .hero div{{padding:24px 5vw}}h1{{margin:0 0 8px;font-size:clamp(28px,5vw,48px)}}
 nav{{position:sticky;top:0;z-index:1;display:flex;flex-wrap:wrap;gap:6px 18px;padding:10px 5vw;background:{bg}ee;border-bottom:1px solid {accent}55}}
 main{{padding:0 5vw 64px}}section{{padding-top:32px;scroll-margin-top:48px}}h2{{color:{accent};margin:0 0 6px}}.lede{{opacity:.8;margin:0 0 16px;max-width:70ch}}

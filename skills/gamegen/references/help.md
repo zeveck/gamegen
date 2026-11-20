@@ -69,7 +69,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--gallery <repo>` or `none` | With `--publish`: add the game to a gallery of your games |
 | `--making-of` | Show in the README how the game was made |
 | `--plans` or `--plans none` | Put this game's plan on your plans page (`GAMEGEN_PLANS`), or leave it off |
-| `--repo public` or `private` | Put a game on GitHub now, before it's finished (no website yet) |
+| `--repo public`, `private` or a name | Put a game on GitHub now, before it's finished (no website yet) |
 | `--package [steam\|windows\|linux]` | Make Windows and Linux apps of a game, ready for Steam |
 
 **A game you already started**
@@ -427,7 +427,11 @@ same repo. Your `.env` is never included.
 
 ```
 /gamegen --repo private
+/gamegen --repo private a frog that collects stars --plan-only
 ```
+
+A name works too: `--repo you/bloom-hop` (or `--repo bloom-hop private`
+on its own).
 
 ## --making-of
 

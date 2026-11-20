@@ -38,6 +38,10 @@ the manifest's format.
    player works. It's built outside the game's repo, so hundreds of pictures
    don't go online with the game.
 
+Change the page only through the manifest (or, for something the script
+gets wrong, the script): a rebuild writes `index.html` afresh, so a fix
+made by hand in it is lost.
+
 ## Publishing it
 
 With the plans page on for the game (`GAMEGEN_PLANS`), it goes there

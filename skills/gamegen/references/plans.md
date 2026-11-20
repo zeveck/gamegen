@@ -22,7 +22,8 @@ never writes one. A game without one gets "there's no plan for this game".
 ## When
 
 - At the end of the design, with `--plan-only` or `--share-design`: add the
-  game's card (status "Planned").
+  game's card (status "Planned"). With `--repo` too, after the repo is made
+  (repo.md's last step adds the card).
 - At the end of a build (Phase 9): "Built". After `--publish`: "Published",
   with a link to play. After `--continue` or `--change` that changed the
   design: update its plan files.
@@ -56,13 +57,16 @@ with access.
 
 ## What goes up
 
-**A game whose public repo already has its `design/` folder** (made with
-`--repo public`, or published with `--making-of`) shows its plan there: its card links to that folder
+**A game with its own repo holding its `design/` folder** (made with
+`--repo`, or published with `--making-of`), public or private, shows its
+plan there: its card's Plan links to that folder
 (`https://github.com/<owner>/<repo>/tree/main/design`, or where the game
-folder is), and nothing is copied. Its `STATUS.md` is already public there;
-that's the only exception to the rule below.
+folder is), and nothing is copied. A private repo's link opens only for
+people with access, and its readable Design page (below) stays here. Its
+`STATUS.md` is in that repo already; that's the only exception to the rule
+below.
 
-**Any other game's plan** goes in `<plans folder>/<game-slug>/`:
+**A game with no repo yet** has its plan in `<plans folder>/<game-slug>/`:
 
 - Copies of `BRIEF.md`, `GAME_DESIGN.md` and `REVIEW_LOG.md`, cleaned as
   share-design.md's "What goes in" says (no prices or dollar figures, the
@@ -88,8 +92,8 @@ GitHub shows the README and lets anyone download the files, however the
 gallery site is built), **Design** and **Art** when it has those pages
 (below, or their claude.ai links if they're shared there), and **Play**
 once it's published. Check each link whenever the card is updated (a
-`--publish` without `--making-of` takes `design/` out of the game's repo:
-then the plan is copied as above). Newest first; a game already there gets its card
+`--publish` without `--making-of` takes `design/` out of a game repo not
+made with `--repo`: then the plan is copied as above). Newest first; a game already there gets its card
 updated, not a second one. Never change the gallery's own page.
 
 ## Design and art pages
