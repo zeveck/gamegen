@@ -128,15 +128,18 @@ test('help covers every option', () => {
   for (const flag of FLAGS) {
     assert.match(help, new RegExp(`^## ${flag}$`, 'm'), `help has a section for ${flag}`);
   }
-  // Each option is in exactly one list: the short overview or `--advanced`.
-  const listed = (part) => [...part.matchAll(/^\| `(--[a-z0-9-]+)/gm)].map((m) => m[1]);
-  const overview = listed(help.split(/^## Overview$/m)[1].split(/^## /m)[0]);
-  const advanced = listed(help.split(/^## --advanced$/m)[1].split(/^## /m)[0]);
-  for (const flag of FLAGS) {
-    const n = overview.filter((f) => f === flag).length + advanced.filter((f) => f === flag).length;
-    assert.equal(n, 1, `${flag} is in exactly one help list`);
+  // `--advanced` lists every option once (#50); the short overview is a
+  // short pick of them, with the same wording.
+  const rows = (part) => [...part.matchAll(/^\| `(--[a-z0-9-]+)[^\n]*$/gm)];
+  const overview = rows(help.split(/^## Overview$/m)[1].split(/^## /m)[0]);
+  const advanced = rows(help.split(/^## --advanced$/m)[1].split(/^## /m)[0]);
+  for (const flag of FLAGS.filter((f) => f !== '--advanced')) {
+    assert.equal(advanced.filter((m) => m[1] === flag).length, 1, `${flag} is in the advanced help once`);
   }
-  assert.ok(overview.includes('--advanced') && overview.length <= 12, 'the short list stays short');
+  for (const [row, flag] of overview) {
+    if (flag !== '--advanced') assert.ok(advanced.some((m) => m[0] === row), `${flag}'s short help row is in the advanced help too`);
+  }
+  assert.ok(overview.some((m) => m[1] === '--advanced') && overview.length <= 12, 'the short list stays short');
 });
 
 test('SKILL.md\'s flag table has the options everything else documents', () => {
@@ -956,6 +959,90 @@ test('--controls: players change keys and buttons; menus can never be locked out
   assert.deepEqual(load().keys('fire'), ['KeyX']);
   assert.deepEqual([c.label('Space'), c.label('KeyZ'), c.label('ArrowUp')], ['Space', 'Z', '↑']);
   assert.match(read(`${REFS}/controls.md`), /\*\*The game's default\s+controls stay exactly as they are:\*\*/);
+});
+
+test('--saves: save slots, an old single save moved into slot 1, nothing lost (#51)', () => {
+  const store = new Map();
+  const page = { window: {}, JSON, Object, Array, Number, Math, Date,
+    localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v), removeItem: (k) => store.delete(k) } };
+  const load = (opts) => {
+    vm.runInNewContext(read('skills/gamegen/templates/web/saves.js'), page);
+    return page.window.gameSaves.setup({ key: 'g', ...opts });
+  };
+  // A game that had one save: it moves into slot 1, and the old key goes only once it's there.
+  store.set('g-save', JSON.stringify({ level: 4, volume: 0.5 }));
+  let s = load({ slots: 3, oldKey: 'g-save', fromOld: (old) => ({ data: { level: old.level }, summary: { level: old.level } }) });
+  assert.deepEqual(s.load(1), { level: 4 });
+  assert.equal(store.has('g-save'), false);
+  assert.equal(s.list().length, 3);
+  assert.deepEqual(s.list().map((r) => !!r.empty), [false, true, true]);
+  // Slots keep their own games; Continue is the one played last.
+  assert.equal(s.create(), 2);
+  assert.ok(s.save(2, { level: 1 }, { level: 1 }));
+  s = load({ slots: 3, oldKey: 'g-save' });
+  assert.equal(s.last(), 2);
+  assert.deepEqual([s.load(1), s.load(2)], [{ level: 4 }, { level: 1 }]);
+  assert.equal(s.last(), 2);
+  s.save(3, { level: 9 });
+  assert.equal(s.create(), null, 'every slot taken: the game asks which to replace');
+  assert.equal(s.save(4, {}), false, 'no fourth slot');
+  // An unreadable slot is shown as one, never a crash, and can be deleted.
+  store.set('g-slot-2', '{');
+  s = load({ slots: 3 });
+  assert.equal(s.list()[1].broken, true);
+  assert.equal(s.load(2), null);
+  s.remove(2);
+  assert.equal(s.list()[1].empty, true);
+  // A later old save never overwrites slots already in use.
+  store.set('g-save', JSON.stringify({ level: 7 }));
+  s = load({ slots: 3, oldKey: 'g-save' });
+  assert.deepEqual(s.load(1), { level: 4 });
+  // The browser refusing to save (full) says so, and loses nothing.
+  const set = page.localStorage.setItem;
+  page.localStorage.setItem = () => { throw new Error('full'); };
+  assert.equal(s.save(1, { level: 5 }), false);
+  page.localStorage.setItem = set;
+  assert.deepEqual(s.load(1), { level: 4 });
+  // many: as many as players make, newest first.
+  store.clear();
+  s = load({ slots: Infinity });
+  assert.equal(s.slots, Infinity);
+  const a = s.create(); s.save(a, { n: 'a' });
+  const b = s.create(); s.save(b, { n: 'b' });
+  assert.notEqual(a, b);
+  s = load({ slots: Infinity });
+  assert.equal(s.list().length, 2);
+  s.remove(a);
+  assert.deepEqual(load({ slots: Infinity }).list().map((r) => r.id), [b]);
+  // An old save with nothing fromOld can use stays where it is.
+  store.clear();
+  store.set('g-save', JSON.stringify({ level: 4 }));
+  s = load({ slots: 3, oldKey: 'g-save', fromOld: (old) => ({ data: old.progress }) });
+  assert.equal(store.has('g-save'), true);
+  assert.equal(s.list()[0].empty, true);
+  // Ids from a Load screen's buttons come as text.
+  assert.ok(s.save('2', { level: 2 }));
+  assert.deepEqual(s.load('2'), { level: 2 });
+  // An old key the slots would use is refused, before anything is lost.
+  assert.throws(() => load({ oldKey: 'g-saves' }));
+  // many in two tabs: each new game gets its own slot, and neither tab drops the other's.
+  store.clear();
+  const tabA = load({ slots: Infinity }); const tabB = load({ slots: Infinity });
+  const ia = tabA.create(); tabA.save(ia, { tab: 'a' });
+  const ib = tabB.create(); tabB.save(ib, { tab: 'b' });
+  assert.notEqual(ia, ib);
+  assert.equal(load({ slots: Infinity }).list().length, 2);
+  // A new save the slot list couldn't take is undone, not left invisible.
+  const put = page.localStorage.setItem;
+  page.localStorage.setItem = (k, v) => { if (k === 'g-saves') throw new Error('full'); put(k, v); };
+  const ic = tabA.create();
+  assert.equal(tabA.save(ic, { tab: 'c' }), false);
+  page.localStorage.setItem = put;
+  assert.equal(store.has(`g-slot-${ic}`), false);
+  const ref = read(`${REFS}/saves.md`);
+  assert.match(ref, /\*\*The flag decides it; never weigh whether the game needs slots\.\*\*/);
+  assert.match(ref, /\*\*Nobody loses their\s+progress:\*\*/);
+  assert.match(skill, /references\/saves\.md/);
 });
 
 test('art fits: parts in proportion, and an object is the same everywhere it appears (#46)', () => {

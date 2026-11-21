@@ -4,8 +4,9 @@ The game isn't done until it's been played: every screen, every level, at
 every targeted size, with no errors. This guide is for web games; for other
 targets, see other-targets.md.
 
-Games with a controller or a "Report a bug" button get extra checks: the
-"Play-testing it" sections of gamepad.md and feedback.md.
+Games with a controller, a "Report a bug" button or save slots get extra
+checks: the "Play-testing it" sections of gamepad.md, feedback.md and
+saves.md.
 
 ## Set up once
 

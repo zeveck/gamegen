@@ -128,6 +128,7 @@ value) is the game description. Flags and defaults:
 | `--platform` | `desktop`, `mobile`, `both` | `both` |
 | `--gamepad` | play with a controller: a PS5 controller (USB or Bluetooth) or the like (`references/gamepad.md`) | off |
 | `--controls` | players can change which keys (and buttons) do what, on a Controls screen (`references/controls.md`) | off |
+| `--saves` | save slots with a Load screen: a number (2 to 20), or `many` (`infinite`) for no limit (`references/saves.md`) | off: one save (`3` alone) |
 | `--feedback` | `on`, `hidden` or `off`: a "Report a bug" button that files GitHub issues (`references/feedback.md`) | off (`on` alone) |
 | `--style` | a description, or a URL (a game, store page, screenshot, video); repeatable | a look that suits the idea |
 | `--target` | `web`, or an engine or language (`godot`, `unity`, `unreal`, `pygame`, `love2d`…) | `web` |
@@ -156,7 +157,7 @@ value) is the game description. Flags and defaults:
 | `--leeway` | with `--finish`/`--remake`: `little`, `some` or `lots` freedom to change it | chosen from the original |
 | `--no-confirm` | don't stop for approvals (see below); safety stops still stop | off: ask first |
 | `--out` | folder for the game | see below |
-| `--advanced` | with `--help`: list the options the short help leaves out (`references/help.md`) | off |
+| `--advanced` | with `--help`: list every option (`references/help.md`) | off |
 
 `--publish`, `--gallery`, `--plans`, `--repo` and `--making-of` can also be set as defaults in the
 nearest `.env` (`GAMEGEN_DOMAIN`, `GAMEGEN_GALLERY`, `GAMEGEN_PLANS=example.com/plans`, `GAMEGEN_REPO=public`, `GAMEGEN_MAKING_OF=on`);
@@ -225,13 +226,14 @@ other way and makes it whole without losing what they put in: follow
 it's never guessed from wording, and their original is never changed
 (except on a new branch, with `--in-place`).
 
-**Controllers and bug reports.** With `--gamepad` (or a request for
+**Controllers, saves and bug reports.** With `--gamepad` (or a request for
 controller play in words), read `references/gamepad.md` when you write the
 design: it covers the design, the build and the play-test. So does
-`references/controls.md`, with `--controls`. With
+`references/controls.md`, with `--controls`, and `references/saves.md`,
+with `--saves`. With
 `--feedback` (for web games and web exports only, not engine targets),
 read `references/feedback.md` when you write the design: the design places
-the button, and the shortcut's letter if it isn't F. Either one alone
+the button, and the shortcut's letter if it isn't F. Any of these alone
 on a finished game is a change: add it (or, for `--feedback hidden` or
 `off`, switch it) as change.md says.
 

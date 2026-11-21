@@ -38,13 +38,29 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--fix #12` or `all` | Fix a finished game's GitHub issues, each as big a job as it needs |
 | `--publish [address]` | Put a finished game online, free, with GitHub Pages |
 | `--bugcheck` | Check a finished game for bugs worth fixing, and report them first |
-| `--advanced` | With `--help`: show all the other options |
+| `--advanced` | With `--help`: show every option |
 
 `/gamegen help <option>` explains one, for example `/gamegen help style`.
 
 ## --advanced
 
-**All the other options,** for `/gamegen --help --advanced` (or `/gamegen help advanced`).
+**Every option,** for `/gamegen --help --advanced` (or `/gamegen help advanced`).
+
+**Everyday**
+
+| Option | What it does |
+|---|---|
+| `--platform desktop`, `mobile` or `both` | Where it'll be played (default: both) |
+| `--style <description or link>` | The look and feel to aim for |
+| `--scope small`, `medium` or `large` | How big a game (default: sized from your idea) |
+| `--3d` | Make a 3D game |
+| `--budget <dollars>` | The most to spend on art and sound (default: 20) |
+| `--plan-only` | Stop after the design, before spending anything |
+| `--continue` | Build a saved design, or finish an interrupted game |
+| `--change <what>` | Change something in a finished game, keeping the rest |
+| `--fix #12` or `all` | Fix a finished game's GitHub issues, each as big a job as it needs |
+| `--publish [address]` | Put a finished game online, free, with GitHub Pages |
+| `--bugcheck` | Check a finished game for bugs worth fixing, and report them first |
 
 **Building**
 
@@ -53,6 +69,7 @@ idea ("for phones", "keep it tiny", "in Godot").
 | `--target <web or an engine>` | What to build it in (default: web) |
 | `--gamepad` | Play with a controller, such as a PS5 controller plugged into your computer |
 | `--controls` | Let players change which keys and buttons do what |
+| `--saves [number\|many]` | Several saved games side by side, with a Load screen (default: 3) |
 | `--feedback [on\|hidden\|off]` | A "Report a bug" button that turns players' reports into GitHub issues |
 | `--rounds <1 to 4>` | Rounds of design review (default: 2) |
 | `--no-confirm` | Don't stop to ask for approvals (publishing, a finish or remake plan) |
@@ -136,6 +153,25 @@ own controls don't change unless a player changes them.
 ```
 /gamegen --controls
 ```
+
+## --saves
+
+**Save slots:** several saved games side by side, with a Load screen, so
+people sharing a computer each keep their own game, and anyone can start
+over without losing one. Without it, a game keeps one save.
+
+- `--saves`: three slots.
+- `--saves 5`: five (any number from 2 to 20).
+- `--saves many` (or `infinite`): as many as players like; they make a new
+  one for each new game, and delete the ones they're done with.
+
+```
+/gamegen a branching fairy-tale adventure with three endings --saves
+```
+
+On a game you've already made, `/gamegen --saves` adds them, and anyone's
+saved game moves into the first slot, so nobody loses their progress. How
+and when the game saves stays the same.
 
 ## --feedback
 

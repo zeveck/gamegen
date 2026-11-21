@@ -61,7 +61,7 @@ The [examples](#examples) below show full requests and the games they became. Yo
 
 ### Options
 
-All optional. Unless you say otherwise, gamegen makes a web game that plays in any browser on desktop and phones, with nothing to install. You can also just say these things in your description ("for phones", "keep it tiny", "in Godot"). `/gamegen help` lists the common ones, `/gamegen help advanced` the rest, and `/gamegen help <option>` explains one, such as `/gamegen help style`.
+All optional. Unless you say otherwise, gamegen makes a web game that plays in any browser on desktop and phones, with nothing to install. You can also just say these things in your description ("for phones", "keep it tiny", "in Godot"). `/gamegen help` lists the common ones, `/gamegen help advanced` all of them, and `/gamegen help <option>` explains one, such as `/gamegen help style`.
 
 | Option | What it does | Default |
 |---|---|---|
@@ -76,7 +76,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--fix #12 #15` or `all` | Fix a finished game's GitHub issues, such as players' reports from "Report a bug". gamegen sorts them first: a small bug gets a plain fix that a second helper checks, a design or art change goes the whole way. Issues filed by someone else wait for your OK, and they close when you next publish. | off |
 | `--publish [address]` | Put a finished game online with GitHub Pages, free: at `<you>.github.io/<game>`, or at your own domain (`--publish example.com` gives `<game>.example.com`). See [Share your game](#share-your-game). | off |
 | `--bugcheck` | Check a finished game for bugs worth fixing: fresh reviewers play it and read its code, and you get a short list, most important first. Nothing changes until you pick what to fix; for a published game they can become GitHub issues instead. | off |
-| `--advanced` | With `--help`: lists the more options, below, instead. | off |
+| `--advanced` | With `--help`: lists every option, these and the more options below. | off |
 
 #### More options
 
@@ -85,6 +85,7 @@ All optional. Unless you say otherwise, gamegen makes a web game that plays in a
 | `--target <web or an engine>` | What to build it in: `web`, or an engine such as `godot` or `pygame`. Engines are experimental: gamegen makes the project and all its art and sound, but it can only play-test what it can run, and editors like Unity and Unreal usually can't run here. | `web` |
 | `--gamepad` | Play the whole game with a controller, such as a PS5 controller plugged into your computer (USB or Bluetooth). Xbox and other controllers work too, and the game shows the right buttons for each. Works best in Chrome or Edge. | off |
 | `--controls` | A Controls screen where players change which keys (and controller buttons) do what. Every prompt in the game follows their choice, and it's remembered. Pausing and the menu keys always stay put, so nobody gets locked out. | off |
+| `--saves [number or many]` | Save slots: several saved games side by side, with a Load screen, so people sharing a computer each keep their own, and anyone can start over or try another ending without losing a game. Give a number (2 to 20), or `many` (or `infinite`) for no limit. On a finished game it adds them, and anyone's saved game moves into the first slot. Without it, a game keeps one save. | off (`3` if given alone) |
 | `--feedback [on, hidden or off]` | A "Report a bug" button in the game's pause menu and settings, plus Ctrl+Shift+F to report from anywhere, even when the game is stuck (if the game already uses Ctrl and Shift together, it picks another letter and tells you). Players' reports open as GitHub issues in the game's repo, with the game's details and a screenshot to paste, ready for `--fix #12`. `hidden` shows the button only to people who open the game with `?feedback` on its address (the shortcut works for testers either way). Players need a GitHub account, and the game's repo has to be public (in a private one, the button is left out). | off (`on` if given alone) |
 | `--rounds <1 to 4>` | How many rounds of design review. More rounds, more polish, a bit more time. | `2` |
 | `--no-confirm` | Don't stop to ask for approvals you'd give anyway: publishing's "Go ahead?", and the plan before finishing or remaking a game you started. gamegen still says what it's doing, and still stops if anything looks wrong. | off |

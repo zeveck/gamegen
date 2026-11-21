@@ -159,6 +159,7 @@ afterwards, and remembers that it was dismissed. The game:
 Save progress, best scores and settings to `localStorage` under a key named
 for the game, as a small JSON object with a version number. Wrap reads in
 `try`/`catch` and fall back to a fresh save if it's missing or broken.
+With `--saves`, the game has save slots instead: see saves.md.
 
 ## Looking finished
 

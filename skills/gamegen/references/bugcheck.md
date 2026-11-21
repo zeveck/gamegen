@@ -27,8 +27,9 @@ counts here most of all: only what clears it is reported as worth fixing.
    address, the game folder, `design/GAME_DESIGN.md`, the settings from
    `design/STATUS.md`, the targeted sizes, the play-test guide, the skill
    folder and the bar, plus `references/3d.md` for a 3D game, and
-   `references/gamepad.md` or `references/feedback.md` when the settings
-   say the game has a controller or "Report a bug". They take fresh
+   `references/gamepad.md`, `references/feedback.md` or `references/saves.md`
+   when the settings say the game has a controller, "Report a bug" or save
+   slots. They take fresh
    screenshots into `design/bugcheck/` (not `design/screenshots/`, which
    may be out of date), and ideas for making it more fun go under "Also
    noticed", not as bugs. Each runs a browser: start them as

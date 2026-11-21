@@ -4,6 +4,18 @@ gamegen uses the release date as its version: `vYYYY.M.D` (for example
 `v2026.10.20`). A second release on the same day adds `.2`, a third `.3`, and
 so on (`v2026.10.20.2`).
 
+## v2026.11.21
+
+- **`--saves`: save slots.** Several saved games side by side, with a Load
+  screen, so people sharing a computer each keep their own game, and anyone
+  can start over or try another ending without losing one. Three slots by
+  default, any number from 2 to 20 (`--saves 5`), or `--saves many` for as
+  many as players like. On a finished game, `/gamegen --saves` adds them,
+  and anyone's saved game moves into the first slot, so nobody loses their
+  progress. Without it, a game keeps one save, as before.
+- **`/gamegen help advanced` lists every option,** the everyday ones
+  included, so one command shows them all. `/gamegen help` stays short.
+
 ## v2026.11.20.2
 
 - **`--repo` for a game you're only planning:** `/gamegen --repo private
